@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>2.5D Fashion Editorial • Glossy Luxury Scene</title>
+  <title>2.5D Fashion Editorial • Face + Tilt Interactive</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -12,429 +12,249 @@
       --bg-depth: 0.015;
       --model-depth: 0.04;
       --text-depth: 0.09;
-      --auto-amp: 1;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     html, body {
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       overflow: hidden;
       background: #1a1410;
       font-family: 'Montserrat', sans-serif;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
       touch-action: none;
       cursor: grab;
     }
-
-    body:active {
-      cursor: grabbing;
-    }
+    body:active { cursor: grabbing; }
 
     .scene {
       position: relative;
-      width: 100vw;
-      height: 100vh;
+      width: 100vw; height: 100vh;
       overflow: hidden;
       perspective: 1200px;
       transform-style: preserve-3d;
     }
 
     .layer {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
       will-change: transform;
       transform-style: preserve-3d;
-      transition: transform 0.08s ease-out;
     }
 
-    /* BACKGROUND LAYER - least movement */
-    .layer-bg {
-      z-index: 1;
-    }
-
+    /* BACKGROUND */
+    .layer-bg { z-index: 1; }
     .bg-image {
-      position: absolute;
-      top: -8%;
-      left: -8%;
-      width: 116%;
-      height: 116%;
+      position: absolute; top: -10%; left: -10%;
+      width: 120%; height: 120%;
       background-image: url('https://images.unsplash.com/photo-1744000311635-0280df5cc00e?w=2400&q=85');
       background-size: cover;
       background-position: center 40%;
       filter: saturate(1.05) contrast(1.05) brightness(0.92);
     }
-
     .bg-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        160deg,
-        rgba(40, 25, 15, 0.35) 0%,
-        rgba(20, 12, 8, 0.15) 40%,
-        rgba(60, 35, 20, 0.25) 100%
-      );
+      position: absolute; inset: 0;
+      background: linear-gradient(160deg, rgba(40,25,15,0.35) 0%, rgba(20,12,8,0.15) 40%, rgba(60,35,20,0.25) 100%);
       pointer-events: none;
     }
-
     .bg-vignette {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(
-        ellipse 80% 70% at 50% 45%,
-        transparent 30%,
-        rgba(10, 6, 4, 0.55) 100%
-      );
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 70% at 50% 45%, transparent 30%, rgba(10,6,4,0.55) 100%);
       pointer-events: none;
     }
 
-    /* SUBJECT LAYER - moderate movement */
+    /* MODEL */
     .layer-model {
       z-index: 2;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
+      display: flex; align-items: flex-end; justify-content: center;
       pointer-events: none;
     }
-
     .model-wrapper {
       position: relative;
-      height: 92%;
-      max-height: 920px;
-      width: auto;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
+      height: 92%; max-height: 920px;
+      display: flex; align-items: flex-end; justify-content: center;
       filter: drop-shadow(0 25px 40px rgba(0,0,0,0.45));
     }
-
     .model-image {
-      height: 100%;
-      width: auto;
-      max-width: 48vw;
-      object-fit: contain;
-      object-position: center bottom;
-      /* Clean silhouette treatment */
+      height: 100%; width: auto; max-width: 48vw;
+      object-fit: contain; object-position: center bottom;
       -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
       mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
     }
-
-    /* Soft glow behind model for depth separation */
     .model-glow {
-      position: absolute;
-      bottom: 5%;
-      left: 50%;
+      position: absolute; bottom: 5%; left: 50%;
       transform: translateX(-50%);
-      width: 55%;
-      height: 30%;
-      background: radial-gradient(ellipse, rgba(255, 220, 180, 0.18) 0%, transparent 70%);
-      filter: blur(30px);
-      z-index: -1;
-      pointer-events: none;
+      width: 55%; height: 30%;
+      background: radial-gradient(ellipse, rgba(255,220,180,0.18) 0%, transparent 70%);
+      filter: blur(30px); z-index: -1;
     }
 
-    /* FOREGROUND LAYER - most movement, crisp text */
-    .layer-fg {
-      z-index: 10;
-      pointer-events: none;
-    }
-
+    /* FOREGROUND TEXT */
+    .layer-fg { z-index: 10; pointer-events: none; }
     .editorial-text {
       position: absolute;
       color: #f8f0e6;
-      text-shadow: 
-        0 1px 2px rgba(0,0,0,0.4),
-        0 4px 12px rgba(0,0,0,0.25);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.25);
       letter-spacing: 0.04em;
     }
-
-    /* Main headline - top left */
-    .headline {
-      top: 7%;
-      left: 5%;
-      max-width: 42%;
-    }
-
+    .headline { top: 7%; left: 5%; max-width: 42%; }
     .headline .kicker {
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 500;
+      font-family: 'Montserrat', sans-serif; font-weight: 500;
       font-size: clamp(0.65rem, 1.1vw, 0.85rem);
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: #e8d5b5;
-      margin-bottom: 0.6em;
-      opacity: 0.9;
+      letter-spacing: 0.35em; text-transform: uppercase;
+      color: #e8d5b5; margin-bottom: 0.6em; opacity: 0.9;
     }
-
     .headline h1 {
-      font-family: 'Playfair Display', serif;
-      font-weight: 700;
+      font-family: 'Playfair Display', serif; font-weight: 700;
       font-size: clamp(2.4rem, 5.5vw, 4.8rem);
-      line-height: 0.95;
-      color: #faf6f0;
-      margin-bottom: 0.15em;
+      line-height: 0.95; color: #faf6f0; margin-bottom: 0.15em;
     }
-
-    .headline h1 em {
-      font-style: italic;
-      font-weight: 400;
-      color: #e8c9a0;
-    }
-
+    .headline h1 em { font-style: italic; font-weight: 400; color: #e8c9a0; }
     .headline .sub {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
+      font-family: 'Cormorant Garamond', serif; font-weight: 300;
       font-size: clamp(1.1rem, 2vw, 1.55rem);
-      letter-spacing: 0.08em;
-      color: #d4c4a8;
-      margin-top: 0.4em;
+      letter-spacing: 0.08em; color: #d4c4a8; margin-top: 0.4em;
     }
-
-    /* Vertical magazine text - right side */
     .vertical-type {
-      top: 18%;
-      right: 4.5%;
-      writing-mode: vertical-rl;
-      text-orientation: mixed;
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 400;
+      top: 18%; right: 4.5%;
+      writing-mode: vertical-rl; text-orientation: mixed;
+      font-family: 'Montserrat', sans-serif; font-weight: 400;
       font-size: clamp(0.7rem, 1.15vw, 0.9rem);
-      letter-spacing: 0.45em;
-      text-transform: uppercase;
-      color: #e8d9c0;
-      opacity: 0.85;
+      letter-spacing: 0.45em; text-transform: uppercase;
+      color: #e8d9c0; opacity: 0.85;
     }
-
-    /* Issue / page markers */
     .issue-block {
-      bottom: 11%;
-      left: 5%;
+      bottom: 11%; left: 5%;
       font-family: 'Cormorant Garamond', serif;
       font-size: clamp(0.95rem, 1.6vw, 1.25rem);
-      color: #e0d0b5;
-      line-height: 1.5;
+      color: #e0d0b5; line-height: 1.5;
     }
-
     .issue-block .vol {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 0.7em;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      opacity: 0.75;
-      margin-bottom: 0.3em;
+      font-family: 'Montserrat', sans-serif; font-size: 0.7em;
+      letter-spacing: 0.25em; text-transform: uppercase;
+      opacity: 0.75; margin-bottom: 0.3em;
     }
-
-    /* Decorative quote / body text block */
-    .quote-block {
-      bottom: 18%;
-      right: 6%;
-      max-width: 280px;
-      text-align: right;
-    }
-
+    .quote-block { bottom: 18%; right: 6%; max-width: 280px; text-align: right; }
     .quote-block p {
-      font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      font-weight: 400;
-      font-size: clamp(1rem, 1.7vw, 1.35rem);
-      line-height: 1.45;
-      color: #f0e6d6;
-      opacity: 0.92;
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-weight: 400; font-size: clamp(1rem, 1.7vw, 1.35rem);
+      line-height: 1.45; color: #f0e6d6; opacity: 0.92;
     }
-
     .quote-block .attr {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: #c9b89a;
-      margin-top: 0.8em;
-      opacity: 0.8;
+      font-family: 'Montserrat', sans-serif; font-size: 0.65rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: #c9b89a; margin-top: 0.8em; opacity: 0.8;
     }
-
-    /* Decorative line accents */
     .deco-line {
       position: absolute;
       background: linear-gradient(90deg, transparent, #e8d5b5, transparent);
-      height: 1px;
-      opacity: 0.5;
+      height: 1px; opacity: 0.5;
     }
-
-    .deco-line.top {
-      top: 5.5%;
-      left: 5%;
-      width: 12%;
-    }
-
+    .deco-line.top { top: 5.5%; left: 5%; width: 12%; }
     .deco-line.side {
-      top: 22%;
-      right: 3.2%;
-      width: 1px;
-      height: 18%;
+      top: 22%; right: 3.2%; width: 1px; height: 18%;
       background: linear-gradient(180deg, transparent, #e8d5b5, transparent);
     }
-
-    /* Small brand / logo mark */
     .brand-mark {
-      top: 6.5%;
-      right: 5%;
-      font-family: 'Playfair Display', serif;
-      font-weight: 700;
+      top: 6.5%; right: 5%;
+      font-family: 'Playfair Display', serif; font-weight: 700;
       font-size: clamp(1.1rem, 1.8vw, 1.5rem);
-      letter-spacing: 0.15em;
-      color: #f5e9d5;
-      opacity: 0.9;
+      letter-spacing: 0.15em; color: #f5e9d5; opacity: 0.9;
     }
+    .brand-mark span { font-weight: 400; font-style: italic; font-size: 0.75em; opacity: 0.7; }
 
-    .brand-mark span {
-      font-weight: 400;
-      font-style: italic;
-      font-size: 0.75em;
-      opacity: 0.7;
-    }
-
-    /* Gloss overlay for magazine feel */
     .gloss {
-      position: absolute;
-      inset: 0;
-      z-index: 20;
-      pointer-events: none;
-      background: linear-gradient(
-        125deg,
-        rgba(255,255,255,0.03) 0%,
-        transparent 35%,
-        transparent 65%,
-        rgba(255,255,255,0.02) 100%
-      );
+      position: absolute; inset: 0; z-index: 20; pointer-events: none;
+      background: linear-gradient(125deg, rgba(255,255,255,0.03) 0%, transparent 35%, transparent 65%, rgba(255,255,255,0.02) 100%);
       mix-blend-mode: soft-light;
     }
-
-    /* Subtle film grain */
     .grain {
-      position: absolute;
-      inset: 0;
-      z-index: 15;
-      pointer-events: none;
-      opacity: 0.045;
+      position: absolute; inset: 0; z-index: 15; pointer-events: none; opacity: 0.045;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
-    /* Instructions / hint */
+    /* UI */
     .hint {
-      position: absolute;
-      bottom: 3.5%;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 30;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 0.65rem;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: rgba(232, 213, 181, 0.55);
-      pointer-events: none;
+      position: absolute; bottom: 3.5%; left: 50%; transform: translateX(-50%);
+      z-index: 30; font-family: 'Montserrat', sans-serif;
+      font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: rgba(232,213,181,0.55); pointer-events: none;
       transition: opacity 0.6s ease;
     }
+    .hint.hidden { opacity: 0; }
 
-    .hint.hidden {
-      opacity: 0;
+    .status {
+      position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+      z-index: 40; display: flex; align-items: center; gap: 8px;
+      padding: 6px 14px; border-radius: 20px;
+      background: rgba(20,12,8,0.55); backdrop-filter: blur(8px);
+      border: 1px solid rgba(232,213,181,0.18);
+      font-family: 'Montserrat', sans-serif; font-size: 0.6rem;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(232,213,181,0.7); pointer-events: none;
+      transition: opacity 0.4s;
+    }
+    .status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #888; transition: background 0.3s;
+    }
+    .status.face .status-dot { background: #7dcea0; box-shadow: 0 0 8px #7dcea0; }
+    .status.tilt .status-dot { background: #f0c674; }
+    .status.mouse .status-dot { background: #85c1e9; }
+    .status.auto .status-dot { background: #aaa; }
+
+    /* Hidden camera */
+    #webcam {
+      position: absolute; width: 1px; height: 1px;
+      opacity: 0; pointer-events: none; overflow: hidden;
     }
 
-    /* Responsive adjustments */
     @media (max-width: 768px) {
-      .headline {
-        max-width: 70%;
-        top: 6%;
-        left: 4%;
-      }
-      .headline h1 {
-        font-size: clamp(2rem, 8vw, 3.2rem);
-      }
-      .vertical-type {
-        display: none;
-      }
-      .quote-block {
-        bottom: 14%;
-        right: 4%;
-        max-width: 200px;
-      }
-      .model-image {
-        max-width: 78vw;
-      }
-      .issue-block {
-        bottom: 8%;
-      }
-      .brand-mark {
-        top: 5.5%;
-        right: 4%;
-      }
+      .headline { max-width: 70%; top: 6%; left: 4%; }
+      .headline h1 { font-size: clamp(2rem, 8vw, 3.2rem); }
+      .vertical-type { display: none; }
+      .quote-block { bottom: 14%; right: 4%; max-width: 200px; }
+      .model-image { max-width: 78vw; }
+      .issue-block { bottom: 8%; }
+      .brand-mark { top: 5.5%; right: 4%; }
     }
-
     @media (max-width: 480px) {
-      .headline h1 {
-        font-size: 2.1rem;
-      }
-      .quote-block {
-        display: none;
-      }
+      .headline h1 { font-size: 2.1rem; }
+      .quote-block { display: none; }
     }
   </style>
 </head>
 <body>
   <div class="scene" id="scene">
-    <!-- BACKGROUND LAYER -->
     <div class="layer layer-bg" id="layerBg">
       <div class="bg-image"></div>
       <div class="bg-overlay"></div>
       <div class="bg-vignette"></div>
     </div>
 
-    <!-- SUBJECT LAYER -->
     <div class="layer layer-model" id="layerModel">
       <div class="model-wrapper">
         <div class="model-glow"></div>
-        <img 
-          class="model-image" 
-          src="https://images.pexels.com/photos/28838760/pexels-photo-28838760.jpeg?auto=compress&cs=tinysrgb&w=1400" 
-          alt="Fashion model"
-          draggable="false"
-        />
+        <img class="model-image"
+          src="https://images.pexels.com/photos/28838760/pexels-photo-28838760.jpeg?auto=compress&cs=tinysrgb&w=1400"
+          alt="Fashion model" draggable="false" />
       </div>
     </div>
 
-    <!-- FOREGROUND LAYER (typography) -->
     <div class="layer layer-fg" id="layerFg">
       <div class="deco-line top"></div>
       <div class="deco-line side"></div>
-
-      <div class="editorial-text brand-mark">
-        ATELIER <span>№ 24</span>
-      </div>
-
+      <div class="editorial-text brand-mark">ATELIER <span>№ 24</span></div>
       <div class="editorial-text headline">
         <div class="kicker">Autumn / Winter Editorial</div>
         <h1>Silent<br><em>Opulence</em></h1>
         <div class="sub">The art of quiet luxury</div>
       </div>
-
-      <div class="editorial-text vertical-type">
-        Fashion • Architecture • Desire
-      </div>
-
+      <div class="editorial-text vertical-type">Fashion • Architecture • Desire</div>
       <div class="editorial-text issue-block">
         <div class="vol">Volume XII — Page 48</div>
-        Photographed in the golden suite<br>
-        of Hôtel Maison
+        Photographed in the golden suite<br>of Hôtel Maison
       </div>
-
       <div class="editorial-text quote-block">
         <p>“Elegance is the only beauty that never fades.”</p>
         <div class="attr">— Audrey Hepburn</div>
@@ -443,154 +263,205 @@
 
     <div class="gloss"></div>
     <div class="grain"></div>
-    <div class="hint" id="hint">Move • Tilt • Touch</div>
+    <div class="hint" id="hint">Камера · Наклон · Касание</div>
+    <div class="status auto" id="status">
+      <div class="status-dot"></div>
+      <span id="statusText">Авто</span>
+    </div>
   </div>
 
-  <script>
-    (function () {
-      const scene = document.getElementById('scene');
-      const layerBg = document.getElementById('layerBg');
-      const layerModel = document.getElementById('layerModel');
-      const layerFg = document.getElementById('layerFg');
-      const hint = document.getElementById('hint');
+  <video id="webcam" playsinline muted></video>
 
-      // Depth multipliers (text most, model medium, bg least)
-      const DEPTH = {
-        bg: 12,
-        model: 32,
-        fg: 68
-      };
+  <script type="module">
+    const scene = document.getElementById('scene');
+    const layerBg = document.getElementById('layerBg');
+    const layerModel = document.getElementById('layerModel');
+    const layerFg = document.getElementById('layerFg');
+    const hint = document.getElementById('hint');
+    const statusEl = document.getElementById('status');
+    const statusText = document.getElementById('statusText');
+    const video = document.getElementById('webcam');
 
-      let targetX = 0;
-      let targetY = 0;
-      let currentX = 0;
-      let currentY = 0;
-      let autoPhase = 0;
-      let isInteracting = false;
-      let interactionTimeout = null;
-      let hasInteracted = false;
+    // Depth: text most, model medium, bg least
+    const DEPTH = { bg: 14, model: 36, fg: 78 };
 
-      // Smooth lerp
-      function lerp(a, b, t) {
-        return a + (b - a) * t;
+    let targetX = 0, targetY = 0;
+    let currentX = 0, currentY = 0;
+    let autoPhase = 0;
+    let mode = 'auto'; // 'face' | 'tilt' | 'mouse' | 'auto'
+    let faceActive = false;
+    let lastFaceTime = 0;
+    let hasInteracted = false;
+    let faceLandmarker = null;
+    let lastVideoTime = -1;
+    let cameraReady = false;
+
+    function lerp(a, b, t) { return a + (b - a) * t; }
+
+    function setMode(m) {
+      if (mode === m) return;
+      mode = m;
+      statusEl.className = 'status ' + m;
+      const labels = { face: 'Лицо', tilt: 'Наклон', mouse: 'Мышь', auto: 'Авто' };
+      statusText.textContent = labels[m] || m;
+    }
+
+    function applyLayers(x, y) {
+      layerBg.style.transform = `translate3d(${x * DEPTH.bg}px, ${y * DEPTH.bg}px, 0) scale(1.05)`;
+      layerModel.style.transform = `translate3d(${x * DEPTH.model}px, ${y * DEPTH.model}px, 0)`;
+      layerFg.style.transform = `translate3d(${x * DEPTH.fg}px, ${y * DEPTH.fg}px, 0)`;
+    }
+
+    // ---------- FACE TRACKING (MediaPipe) ----------
+    async function initFaceTracking() {
+      try {
+        const { FaceLandmarker, FilesetResolver } = await import(
+          'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14'
+        );
+
+        const vision = await FilesetResolver.forVisionTasks(
+          'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm'
+        );
+
+        faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath:
+              'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
+            delegate: 'GPU'
+          },
+          runningMode: 'VIDEO',
+          numFaces: 1
+        });
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: 'user',
+            width: { ideal: 640 },
+            height: { ideal: 480 }
+          },
+          audio: false
+        });
+
+        video.srcObject = stream;
+        await video.play();
+        cameraReady = true;
+        console.log('Face tracking ready');
+      } catch (err) {
+        console.warn('Camera / FaceLandmarker unavailable:', err.message);
+        cameraReady = false;
       }
+    }
 
-      // Apply transforms
-      function applyLayers(x, y) {
-        // x,y are normalized -1 to 1
-        const tx = x * DEPTH.bg;
-        const ty = y * DEPTH.bg;
-        layerBg.style.transform = `translate3d(${tx}px, ${ty}px, 0) scale(1.04)`;
+    function processFace() {
+      if (!faceLandmarker || !cameraReady || video.readyState < 2) return false;
 
-        const mx = x * DEPTH.model;
-        const my = y * DEPTH.model;
-        layerModel.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
+      const now = performance.now();
+      if (video.currentTime === lastVideoTime) return faceActive;
+      lastVideoTime = video.currentTime;
 
-        const fx = x * DEPTH.fg;
-        const fy = y * DEPTH.fg;
-        layerFg.style.transform = `translate3d(${fx}px, ${fy}px, 0)`;
-      }
+      const result = faceLandmarker.detectForVideo(video, now);
+      if (result.faceLandmarks && result.faceLandmarks.length > 0) {
+        const landmarks = result.faceLandmarks[0];
+        // Nose tip ≈ landmark 1
+        const nose = landmarks[1];
+        // Mirror X because selfie camera is mirrored
+        const nx = (0.5 - nose.x) * 2.4;
+        const ny = (nose.y - 0.45) * 2.2;
 
-      // Animation loop
-      function tick() {
-        // Autoplay gentle figure-8 / orbit when not interacting
-        if (!isInteracting) {
-          autoPhase += 0.0065;
-          const autoX = Math.sin(autoPhase) * 0.55;
-          const autoY = Math.sin(autoPhase * 0.7 + 1.2) * 0.35;
-          targetX = autoX;
-          targetY = autoY;
-        }
-
-        currentX = lerp(currentX, targetX, 0.075);
-        currentY = lerp(currentY, targetY, 0.075);
-
-        applyLayers(currentX, currentY);
-        requestAnimationFrame(tick);
-      }
-
-      // Mouse move
-      function onPointerMove(clientX, clientY) {
-        const rect = scene.getBoundingClientRect();
-        const nx = ((clientX - rect.left) / rect.width) * 2 - 1;
-        const ny = ((clientY - rect.top) / rect.height) * 2 - 1;
         targetX = Math.max(-1, Math.min(1, nx));
         targetY = Math.max(-1, Math.min(1, ny));
-        isInteracting = true;
+        faceActive = true;
+        lastFaceTime = now;
+        setMode('face');
         hasInteracted = true;
         hint.classList.add('hidden');
-
-        clearTimeout(interactionTimeout);
-        interactionTimeout = setTimeout(() => {
-          isInteracting = false;
-        }, 2200);
+        return true;
       }
 
-      // Mouse
-      scene.addEventListener('mousemove', (e) => {
-        onPointerMove(e.clientX, e.clientY);
-      });
+      if (now - lastFaceTime > 400) {
+        faceActive = false;
+      }
+      return faceActive;
+    }
 
-      // Touch
-      scene.addEventListener('touchmove', (e) => {
-        if (e.touches.length > 0) {
-          e.preventDefault();
-          onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
-        }
-      }, { passive: false });
+    // ---------- DEVICE ORIENTATION (TILT) ----------
+    function handleOrientation(e) {
+      if (e.gamma == null || e.beta == null) return;
+      if (faceActive) return;
 
-      scene.addEventListener('touchstart', (e) => {
-        if (e.touches.length > 0) {
-          onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
-        }
-      }, { passive: true });
+      const nx = Math.max(-1, Math.min(1, e.gamma / 22));
+      const ny = Math.max(-1, Math.min(1, (e.beta - 40) / 30));
+      targetX = nx * 0.95;
+      targetY = ny * 0.85;
+      setMode('tilt');
+      hasInteracted = true;
+      hint.classList.add('hidden');
+    }
 
-      // Device orientation (mobile tilt)
-      let orientSupported = false;
-      function handleOrientation(e) {
-        if (e.gamma == null || e.beta == null) return;
-        orientSupported = true;
-        // gamma: left-right (-90 to 90), beta: front-back (-180 to 180)
-        const nx = Math.max(-1, Math.min(1, e.gamma / 28));
-        const ny = Math.max(-1, Math.min(1, (e.beta - 45) / 35));
-        if (!isInteracting) {
-          targetX = nx * 0.9;
-          targetY = ny * 0.7;
-        }
-        hasInteracted = true;
-        hint.classList.add('hidden');
+    if (window.DeviceOrientationEvent) {
+      if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+        const ask = () => {
+          DeviceOrientationEvent.requestPermission()
+            .then(s => { if (s === 'granted') window.addEventListener('deviceorientation', handleOrientation); })
+            .catch(() => {});
+          scene.removeEventListener('touchstart', ask);
+          scene.removeEventListener('click', ask);
+        };
+        scene.addEventListener('touchstart', ask, { once: true });
+        scene.addEventListener('click', ask, { once: true });
+      } else {
+        window.addEventListener('deviceorientation', handleOrientation);
+      }
+    }
+
+    // ---------- MOUSE / TOUCH ----------
+    function onPointer(clientX, clientY) {
+      if (faceActive) return;
+      const rect = scene.getBoundingClientRect();
+      const nx = ((clientX - rect.left) / rect.width) * 2 - 1;
+      const ny = ((clientY - rect.top) / rect.height) * 2 - 1;
+      targetX = Math.max(-1, Math.min(1, nx));
+      targetY = Math.max(-1, Math.min(1, ny));
+      setMode('mouse');
+      hasInteracted = true;
+      hint.classList.add('hidden');
+    }
+
+    scene.addEventListener('mousemove', e => onPointer(e.clientX, e.clientY));
+    scene.addEventListener('touchmove', e => {
+      if (e.touches.length) {
+        e.preventDefault();
+        onPointer(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: false });
+    scene.addEventListener('touchstart', e => {
+      if (e.touches.length) onPointer(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+
+    // ---------- MAIN LOOP ----------
+    function tick() {
+      const hasFace = processFace();
+
+      if (!hasFace && mode !== 'tilt' && mode !== 'mouse') {
+        autoPhase += 0.0055;
+        targetX = Math.sin(autoPhase) * 0.45;
+        targetY = Math.sin(autoPhase * 0.65 + 1.1) * 0.28;
+        setMode('auto');
       }
 
-      if (window.DeviceOrientationEvent) {
-        // iOS 13+ requires permission
-        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-          // We request on first interaction
-          const requestOrient = () => {
-            DeviceOrientationEvent.requestPermission()
-              .then(state => {
-                if (state === 'granted') {
-                  window.addEventListener('deviceorientation', handleOrientation);
-                }
-              })
-              .catch(() => {});
-            scene.removeEventListener('touchstart', requestOrient);
-            scene.removeEventListener('click', requestOrient);
-          };
-          scene.addEventListener('touchstart', requestOrient, { once: true });
-          scene.addEventListener('click', requestOrient, { once: true });
-        } else {
-          window.addEventListener('deviceorientation', handleOrientation);
-        }
-      }
+      currentX = lerp(currentX, targetX, 0.09);
+      currentY = lerp(currentY, targetY, 0.09);
+      applyLayers(currentX, currentY);
 
-      // Start
-      tick();
+      requestAnimationFrame(tick);
+    }
 
-      // Hide hint after a while even without interaction
-      setTimeout(() => {
-        if (!hasInteracted) hint.classList.add('hidden');
-      }, 8000);
-    })();
+    initFaceTracking();
+    tick();
+
+    setTimeout(() => {
+      if (!hasInteracted) hint.classList.add('hidden');
+    }, 9000);
   </script>
 </body>
 </html>
