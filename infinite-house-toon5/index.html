@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Infinite House — 5 мультяшных 2.5D диванов</title>
+<style>
+  :root{font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#2f2d30;background:#f7f3ee}
+  *{box-sizing:border-box}
+  body{margin:0;background:#f7f3ee}
+  main{max-width:1280px;margin:0 auto;padding:24px 16px 40px}
+  h1{margin:0 0 8px;font-size:clamp(28px,4vw,42px);line-height:1.05;letter-spacing:-.04em}
+  .sub{max-width:860px;color:#7c7872;line-height:1.5;margin:0 0 18px;font-size:14px}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .chip{padding:8px 12px;border-radius:999px;background:#ece7df;color:#5e5a56;font-weight:700;font-size:12px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .card{background:#fff;border:1px solid #ede7df;border-radius:22px;padding:14px;box-shadow:0 14px 36px rgba(69,44,16,.06)}
+  .canvasWrap{aspect-ratio:1/1;display:grid;place-items:center;border-radius:18px;background:radial-gradient(circle at 50% 38%,#fffdfb 0%,#f7efe4 62%,#ebe1d2 100%);overflow:hidden}
+  canvas{width:100%;height:auto;display:block}
+  .meta{padding:12px 4px 4px}
+  .meta h3{margin:0 0 4px;font-size:18px;letter-spacing:-.02em}
+  .meta p{margin:0;color:#7b766f;font-size:13px;line-height:1.45;min-height:54px}
+  .tag{display:inline-block;margin-top:10px;padding:6px 10px;border-radius:999px;background:#f3f6f8;color:#57707f;font-size:11px;font-weight:800;letter-spacing:.04em}
+  @media (max-width:640px){main{padding:18px 12px 28px}.sub{font-size:13px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <h1>5 мультяшных 2.5D-диванов</h1>
+  <p class="sub">Сделано <b>именно кодом</b>, без PNG и нейросетевых картинок. Свет специально упрощён: не объёмный «глянец», а более плоский <b>toon / cel-shading</b> в духе мультфильмов, комиксов и стилизованных игр.</p>
+  <div class="chips">
+    <span class="chip">100% code</span>
+    <span class="chip">2.5D</span>
+    <span class="chip">toon shading</span>
+    <span class="chip">без PNG</span>
+  </div>
+  <section class="grid" id="grid"></section>
+</main>
+<script>
+const STYLES = [
+  {
+    id:'cloud',
+    title:'Cloud Plush',
+    desc:'Очень мягкий и милый стиль: облачные формы, большие подушки, спокойная пастель.',
+    tag:'SOFT KAWAII',
+    bg:['#fffdfb','#f8efe7','#eadfd2'],
+    frame:'#f4b6c4', seat:'#fff3e1', back:'#f7e6d5', wood:'#cfa268', accent:'#f39bb4', accent2:'#ffd86d', line:'#765b57', outline:'#7a625b'
+  },
+  {
+    id:'mint',
+    title:'Mint Comic',
+    desc:'Более «комиксный» вид: чистые плоскости, яркий акцент, плед как графический элемент.',
+    tag:'COMIC CASUAL',
+    bg:['#fcfffe','#edf8f5','#ddeee8'],
+    frame:'#47c4b4', seat:'#fff0ce', back:'#69d9ca', wood:'#b88652', accent:'#ff8d74', accent2:'#ffe16f', line:'#365856', outline:'#426563'
+  },
+  {
+    id:'forest',
+    title:'Forest Tale',
+    desc:'Сказочный мультяшный стиль: шалфей, дерево, уют и мягкая сказочная атмосфера.',
+    tag:'FAIRY COZY',
+    bg:['#fffdfa','#f4f1e6','#e5dfc9'],
+    frame:'#afba76', seat:'#dce6f0', back:'#c0c98c', wood:'#ae7d50', accent:'#c77c56', accent2:'#f8eedb', line:'#5d5844', outline:'#6b644d'
+  },
+  {
+    id:'candy',
+    title:'Candy Pop',
+    desc:'Игрушечный и яркий стиль с почти «Диснеевской» простотой: конфетные цвета и сердечки.',
+    tag:'CANDY TOON',
+    bg:['#fffdfd','#f8f2ff','#ede4ff'],
+    frame:'#b694ea', seat:'#fff1c9', back:'#ffb0ca', wood:'#c8955d', accent:'#76e0d5', accent2:'#ff8ab2', line:'#614f78', outline:'#6c597f'
+  },
+  {
+    id:'premium',
+    title:'Soft Storybook',
+    desc:'Более спокойный, собранный мультяшный стиль с плоским светом и аккуратными формами.',
+    tag:'STORYBOOK',
+    bg:['#fefefe','#f1f4f8','#e6eaf0'],
+    frame:'#97a9c4', seat:'#ebe3ec', back:'#b8c6da', wood:'#a98769', accent:'#a874b7', accent2:'#e5c488', line:'#5d6068', outline:'#686c75'
+  }
+];
+
+function q(sel,root=document){return root.querySelector(sel)}
+function create(tag, cls){const el=document.createElement(tag); if(cls)el.className=cls; return el}
+
+function roundedRect(ctx,x,y,w,h,r,fill,stroke,line=3){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+  ctx.fillStyle=fill; ctx.fill();
+  if(stroke){ctx.lineWidth=line; ctx.strokeStyle=stroke; ctx.stroke();}
+}
+function ellipse(ctx,x,y,rx,ry,fill,stroke,line=3){
+  ctx.beginPath(); ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2); ctx.closePath();
+  ctx.fillStyle=fill; ctx.fill(); if(stroke){ctx.lineWidth=line; ctx.strokeStyle=stroke; ctx.stroke();}
+}
+function heart(ctx,x,y,s,color,stroke){
+  ctx.save(); ctx.translate(x,y); ctx.beginPath();
+  ctx.moveTo(0,s*.35);
+  ctx.bezierCurveTo(-s*.62,-s*.1,-s*.74,-s*.68,-s*.12,-s*.72);
+  ctx.bezierCurveTo(0,-s*.86,s*.12,-s*.72,s*.12,-s*.72);
+  ctx.bezierCurveTo(s*.74,-s*.68,s*.62,-s*.1,0,s*.35);
+  ctx.closePath(); ctx.fillStyle=color; ctx.fill();
+  ctx.lineWidth=3; ctx.strokeStyle=stroke; ctx.stroke(); ctx.restore();
+}
+function flower(ctx,x,y,r,petal,center,stroke){
+  for(let i=0;i<5;i++){
+    const a=-Math.PI/2 + i*Math.PI*2/5;
+    ellipse(ctx,x+Math.cos(a)*r*.65,y+Math.sin(a)*r*.65,r*.42,r*.42,petal,stroke,2.5)
+  }
+  ellipse(ctx,x,y,r*.28,r*.28,center,stroke,2.5)
+}
+function drawFacePillow(ctx,x,y,w,h,fill,stroke){
+  roundedRect(ctx,x,y,w,h,22,fill,stroke,3)
+  ctx.beginPath(); ctx.moveTo(x+26,y+20); ctx.lineTo(x+45,y-2); ctx.lineTo(x+62,y+22); ctx.closePath(); ctx.fillStyle=fill; ctx.fill(); ctx.strokeStyle=stroke; ctx.lineWidth=3; ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x+w-62,y+22); ctx.lineTo(x+w-45,y-2); ctx.lineTo(x+w-26,y+20); ctx.closePath(); ctx.fillStyle=fill; ctx.fill(); ctx.stroke();
+  ctx.strokeStyle=stroke; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(x+55,y+58,9,0,Math.PI); ctx.stroke(); ctx.beginPath(); ctx.arc(x+w-55,y+58,9,0,Math.PI); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x+w*.5-12,y+74); ctx.quadraticCurveTo(x+w*.5,y+82,x+w*.5+12,y+74); ctx.stroke();
+  ellipse(ctx,x+35,y+70,10,7,'#ffbac8',null,0); ellipse(ctx,x+w-35,y+70,10,7,'#ffbac8',null,0)
+}
+function ground(ctx){ ellipse(ctx,210,302,132,24,'rgba(80,58,44,.12)',null,0) }
+function darken(hex,amt=.15){const c=hex.replace('#','').match(/.{2}/g).map(x=>parseInt(x,16)); return '#'+c.map(v=>Math.max(0,Math.round(v*(1-amt))).toString(16).padStart(2,'0')).join('') }
+function lighten(hex,amt=.15){const c=hex.replace('#','').match(/.{2}/g).map(x=>parseInt(x,16)); return '#'+c.map(v=>Math.min(255,Math.round(v+(255-v)*amt)).toString(16).padStart(2,'0')).join('') }
+
+function topFace(ctx, pts, fill, stroke){
+  ctx.beginPath(); ctx.moveTo(pts[0][0],pts[0][1]); for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i][0],pts[i][1]); ctx.closePath(); ctx.fillStyle=fill; ctx.fill(); ctx.strokeStyle=stroke; ctx.lineWidth=3; ctx.stroke();
+}
+
+function drawSofa(ctx, s){
+  ctx.clearRect(0,0,420,420)
+  // background disc
+  const g=ctx.createRadialGradient(210,150,5,210,150,230)
+  g.addColorStop(0,s.bg[0]); g.addColorStop(.68,s.bg[1]); g.addColorStop(1,s.bg[2]);
+  ctx.fillStyle=g; ctx.fillRect(0,0,420,420)
+  ground(ctx)
+  const outline=s.outline
+  const frameFront=s.frame, frameTop=lighten(s.frame,.16), frameSide=darken(s.frame,.12)
+  const seatFront=s.seat, seatTop=lighten(s.seat,.12), seatSide=darken(s.seat,.10)
+  const backFront=s.back, backTop=lighten(s.back,.12), backSide=darken(s.back,.10)
+  const wood=s.wood
+
+  // base 2.5D geometry
+  // front base
+  roundedRect(ctx,110,214,200,66,22,frameFront,outline,3)
+  // top seat platform
+  topFace(ctx,[[124,195],[292,195],[310,214],[110,214]],frameTop,outline)
+  // right side
+  topFace(ctx,[[292,195],[310,214],[310,280],[292,262]],frameSide,outline)
+
+  // backrest as 3 toon bumps
+  const bumps = [
+    {x:148,y:130,w:68,h:92},
+    {x:194,y:118,w:78,h:102},
+    {x:248,y:132,w:66,h:90}
+  ]
+  if(s.id==='premium'){ bumps[0]={x:146,y:128,w:70,h:94}; bumps[1]={x:194,y:116,w:82,h:106}; bumps[2]={x:250,y:131,w:68,h:92}; }
+  if(s.id==='candy'){ bumps[0]={x:144,y:131,w:70,h:88}; bumps[1]={x:193,y:114,w:84,h:98}; bumps[2]={x:252,y:133,w:68,h:86}; }
+  for(const b of bumps){
+    ellipse(ctx,b.x+b.w/2,b.y+b.h/2,b.w/2,b.h/2,backFront,outline,3)
+    ellipse(ctx,b.x+b.w*.37,b.y+b.h*.30,b.w*.14,b.h*.08,lighten(backFront,.2),null,0)
+  }
+
+  // arms
+  ellipse(ctx,100,215,34,52,frameFront,outline,3)
+  ellipse(ctx,320,215,36,52,frameFront,outline,3)
+  if(s.id==='forest' || s.id==='premium'){
+    ctx.lineWidth=6; ctx.strokeStyle=darken(wood,.05)
+    ctx.beginPath(); ctx.arc(100,220,24,Math.PI*.6,Math.PI*1.45); ctx.stroke();
+    ctx.beginPath(); ctx.arc(320,220,24,-Math.PI*.45,Math.PI*.42); ctx.stroke();
+  }
+
+  // cushions top + front little extrusion
+  roundedRect(ctx,132,193,78,44,16,seatTop,outline,3)
+  roundedRect(ctx,214,193,78,44,16,seatTop,outline,3)
+  roundedRect(ctx,132,236,78,22,10,seatFront,outline,3)
+  roundedRect(ctx,214,236,78,22,10,seatFront,outline,3)
+
+  // feet
+  ellipse(ctx,144,288,18,13,wood,outline,3)
+  ellipse(ctx,280,288,18,13,wood,outline,3)
+  ellipse(ctx,322,275,18,12,wood,outline,3)
+
+  // style accents
+  if(s.id==='cloud'){
+    flower(ctx,145,211,20,s.accent,s.accent2,outline)
+    drawFacePillow(ctx,204,177,72,62,'#fff5ea',outline)
+    roundedRect(ctx,268,172,52,58,16,'#f8cbb2',outline,3)
+    for(let i=0;i<3;i++){ctx.strokeStyle='#e5b292';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(285+i*12,172);ctx.lineTo(285+i*12,230);ctx.stroke()}
+    roundedRect(ctx,285,128,70,88,20,'#f3b1a7',outline,3)
+  }
+  if(s.id==='mint'){
+    roundedRect(ctx,130,171,56,56,16,s.accent,outline,3)
+    flower(ctx,250,208,18,s.accent2,'#fff6d9',outline)
+    roundedRect(ctx,278,164,58,74,18,'#ff987d',outline,3)
+    for(let i=0;i<4;i++){ctx.strokeStyle='#ffd39f';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(286+i*12,168);ctx.lineTo(315+i*12,232);ctx.stroke()}
+  }
+  if(s.id==='forest'){
+    roundedRect(ctx,124,170,62,58,16,'#f4edd8',outline,3)
+    ellipse(ctx,220,203,28,28,s.accent,outline,3)
+    flower(ctx,270,206,14,'#f8f1df','#fff8ed',outline)
+    roundedRect(ctx,274,164,66,82,18,'#f2e7cf',outline,3)
+    for(let i=0;i<4;i++){ctx.strokeStyle='#ddc6a1';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(282+i*13,170);ctx.lineTo(306+i*13,236);ctx.stroke()}
+  }
+  if(s.id==='candy'){
+    heart(ctx,146,212,18,s.accent2,outline)
+    heart(ctx,171,198,11,s.accent,outline)
+    roundedRect(ctx,250,172,54,54,16,'#fff9e7',outline,3)
+    for(let i=0;i<3;i++){heart(ctx,264+i*14,199,8,i%2?s.accent:s.accent2,outline)}
+    roundedRect(ctx,290,165,58,70,18,s.accent,outline,3)
+  }
+  if(s.id==='premium'){
+    roundedRect(ctx,128,170,58,56,16,'#efeaec',outline,3)
+    flower(ctx,212,208,17,s.accent,s.accent2,outline)
+    roundedRect(ctx,252,170,54,56,16,'#e6dcec',outline,3)
+    roundedRect(ctx,290,162,58,76,18,'#d4c0df',outline,3)
+  }
+
+  // comic strokes / face planes to flatten light impression
+  ctx.strokeStyle='rgba(255,255,255,.55)'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(136,199); ctx.lineTo(199,199); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(218,199); ctx.lineTo(281,199); ctx.stroke();
+}
+
+function makeCard(style){
+  const card=create('article','card')
+  const wrap=create('div','canvasWrap')
+  const canvas=document.createElement('canvas'); canvas.width=420; canvas.height=420; wrap.appendChild(canvas)
+  const meta=create('div','meta')
+  meta.innerHTML=`<h3>${style.title}</h3><p>${style.desc}</p><span class="tag">${style.tag}</span>`
+  card.append(wrap,meta)
+  const ctx=canvas.getContext('2d')
+  drawSofa(ctx,style)
+  return card
+}
+const grid=q('#grid')
+STYLES.forEach(s=>grid.appendChild(makeCard(s)))
+</script>
+</body>
+</html>
