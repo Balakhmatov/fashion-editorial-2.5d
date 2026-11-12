@@ -39,6 +39,9 @@ button:disabled{opacity:.33;cursor:default}
 .action{border:2px solid #ab9aad;background:#fff;border-radius:11px;height:42px;min-width:0;color:#59445d;font-size:22px;font-weight:850;box-shadow:0 3px 0 #36264018}
 .action:active:not(:disabled){transform:translateY(2px)}
 .action.red{color:#c24453}
+.object-toggle{width:100%;display:flex;gap:8px;justify-content:center;align-items:center;border:1.5px solid #e2cbab;border-radius:11px;background:#fff0d6;color:#62445a;font-size:12px;font-weight:850;margin-top:11px;padding:10px 13px;min-height:41px}
+.object-toggle:hover{background:#ffe6be}
+.object-toggle[hidden]{display:none}
 .rotValue{font-size:13px;text-align:center;font-weight:850;background:#f1e8ef;color:#524257;border-radius:10px;padding:12px 4px;white-space:nowrap}
 .panel-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
 .panel-heading h3{font-size:16px;font-weight:900;margin:0}
@@ -122,6 +125,7 @@ button:disabled{opacity:.33;cursor:default}
     <button class="action" id="clone" title="Дублировать" aria-label="Дублировать">⊕</button>
     <button class="action red" id="remove" title="Удалить" aria-label="Удалить">⊗</button>
    </div>
+   <button id="objectToggle" class="object-toggle" hidden type="button">💡 Выключить</button>
   </section>
   <section class="panel">
    <div class="panel-heading"><h3>🛋️ Мебель и декор</h3><small>Нажми, чтобы добавить</small></div>
@@ -348,6 +352,21 @@ try{
   localStorage.setItem('ih_art_apartment_snap_v2','1');
  }
 }catch{}
+// Users with saved apartments get one sample TV without losing their room.
+try{
+ if(!localStorage.getItem('ih_art_apartment_tv_intro_v1')){
+  const hadSavedRoom=!!localStorage.getItem('ih_art_apartment_v1');
+  if(hadSavedRoom&&!objects.some(o=>o.type==='tv')){
+   for(const x of [9.4,4.5,13.8,6,2.2]){
+    const sample={id:Math.max(0,...objects.map(o=>o.id))+1,type:'tv',x,z:0,wallSide:'back',rot:0,on:true};
+    if(!hasConflict(sample,x,0)){
+     objects.push(sample);localStorage.setItem('ih_art_apartment_v1',JSON.stringify(objects));break;
+    }
+   }
+  }
+  localStorage.setItem('ih_art_apartment_tv_intro_v1','1');
+ }
+}catch{}
 function box(o){
  const spec=ITEMS[o.type];
  if(spec.wall){
@@ -470,11 +489,18 @@ function update(){
    im.src=artPreview(o);
    im.style.transform=o.type==='sofa'&&sofaView(o).flip?'scaleX(-1)':'none';
    name.textContent=ITEMS[o.type].name;
-   info.textContent=o.type==='sofa'?sofaView(o).heading+' · поворот 45°':ITEMS[o.type].wall?'На стене · перетаскивай вдоль неё':'Перемещай по клеткам';
+   info.textContent=o.type==='sofa'?sofaView(o).heading+' · поворот 45°':(o.type==='lamp'||o.type==='tv')?(deviceOn(o)?'Включён · нажми, чтобы выключить':'Выключен · нажми, чтобы включить'):ITEMS[o.type].wall?'На стене · перетаскивай вдоль неё':'Перемещай по клеткам';
    turn.textContent=o.type==='sofa'?(dir8(o.rot)+1)+' / 8':ITEMS[o.type].wall?(wallSide(o)==='back'?'Задняя':'Левая'):'—';
  }else{
    im.removeAttribute('src');im.style.transform='none';name.textContent='Выбери предмет';
    info.textContent='Нажми на мебель в квартире';turn.textContent='—';
+ }
+ const interactive=!!o&&(o.type==='lamp'||o.type==='tv');
+ const toggle=document.getElementById('objectToggle');
+ toggle.hidden=!interactive;
+ if(interactive){
+  toggle.textContent=(o.type==='lamp'?'💡 ':'📺 ')+(deviceOn(o)?'Выключить':'Включить');
+  toggle.title=(deviceOn(o)?'Выключить ':'Включить ')+ITEMS[o.type].name.toLowerCase();
  }
  const disable=!o||o.type!=='sofa';
  document.getElementById('turnL').disabled=disable;
@@ -496,7 +522,7 @@ c.addEventListener('pointerdown',e=>{
  }
  const p=pt(e),o=pick(p.x,p.y);
  if(o){
-  selected=o.id;drag={kind:'object',id:o.id,originX:o.x,originZ:o.z,start:p};
+  selected=o.id;drag={kind:'object',id:o.id,originX:o.x,originZ:o.z,start:p,startRaw:raw,moved:false};
  }else{
   selected=null;drag={kind:'pan',start:raw,startX:camera.x,startY:camera.y};
  }
@@ -514,6 +540,10 @@ c.addEventListener('pointermove',e=>{
   syncZoom();render();return;
  }
  if(!drag)return;
+ if(drag.kind==='object'){
+  if(Math.hypot(raw.x-drag.startRaw.x,raw.y-drag.startRaw.y)>9)drag.moved=true;
+  if(!drag.moved)return;
+ }
  if(drag.kind==='pan'){
   camera.x=drag.startX+raw.x-drag.start.x;
   camera.y=drag.startY+raw.y-drag.start.y;
@@ -534,12 +564,20 @@ c.addEventListener('pointermove',e=>{
  const [nx,nz]=snapPos(o.type,rawX,rawZ);
  if(!hasConflict(o,nx,nz)){o.x=nx;o.z=nz;render();}
 });
+function toggleDevice(o){
+ if(!o||(o.type!=='lamp'&&o.type!=='tv'))return false;
+ o.on=!deviceOn(o);
+ save();return true;
+}
 function stop(e){
  pointers.delete(e.pointerId);
  if(pinch){if(pointers.size<2){pinch=null;drag=null;}return;}
  if(!drag)return;
- const wasObject=drag.kind==='object';drag=null;
- if(wasObject)save();
+ const finished=drag;drag=null;
+ const o=finished.kind==='object'?objects.find(x=>x.id===finished.id):null;
+ if(o&&!finished.moved&&e.type==='pointerup'&&toggleDevice(o)){
+  flash((o.type==='lamp'?'💡 Торшер':'📺 Телевизор')+(deviceOn(o)?' включён':' выключен'));
+ }else if(o&&finished.moved)save();
  update();
 }
 c.addEventListener('pointerup',stop);
@@ -551,6 +589,10 @@ c.addEventListener('wheel',e=>{
  zoomAt(e.deltaY<0?1.11:1/1.11,p.x,p.y);
 },{passive:false});
 
+document.getElementById('objectToggle').onclick=()=>{
+ const o=objects.find(x=>x.id===selected);
+ if(toggleDevice(o))update();
+};
 document.getElementById('turnL').onclick=()=>{const o=objects.find(x=>x.id===selected);if(!o||o.type!=='sofa')return;o.rot=dir8(o.rot-1);save();update()};document.getElementById('turnR').onclick=()=>{const o=objects.find(x=>x.id===selected);if(!o||o.type!=='sofa')return;o.rot=dir8(o.rot+1);save();update()};
 
 document.getElementById('clone').onclick=()=>{
