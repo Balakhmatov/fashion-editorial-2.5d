@@ -94,7 +94,7 @@ function sceneBackground(){ctx.fillStyle='#b1dcd6';ctx.fillRect(0,0,c.width,c.he
  ellipse(165,91,61,17,'#f5f7eb');ellipse(196,80,32,22,'#f5f7eb');ellipse(790,93,62,20,'#f5f7eb');ellipse(754,82,34,20,'#f5f7eb');}
 let showGrid=true,showWalls=true,MODE='move';let selected=1,drag=null,lastPt=null;
 const initial=[
- {id:1,type:'sofa',x:2.2,z:4.8,rot:1},
+ {id:1,type:'sofa',x:2.2,z:4.8,rot:0},
  {id:2,type:'chair',x:.8,z:4.7,rot:0},
  {id:3,type:'rug',x:2.55,z:5.5,rot:0},
  {id:4,type:'table',x:2.65,z:5.6,rot:0},
@@ -127,25 +127,33 @@ for(const o of objects){
 /* Original sofa illustrations in eight ordered compass headings.
  * Two missing directions use reflections of source art, not crude 3D geometry. */
 const SOFA_VIEWS=[
- {key:'sofa_0',flip:false,heading:'Юг'},
- {key:'sofa_1',flip:false,heading:'Юго-запад'},
- {key:'sofa_2',flip:false,heading:'Запад'},
- {key:'sofa_4',flip:true,heading:'Северо-запад'},
- {key:'sofa_3',flip:false,heading:'Север'},
- {key:'sofa_4',flip:false,heading:'Северо-восток'},
- {key:'sofa_2',flip:true,heading:'Восток'},
- {key:'sofa_5',flip:false,heading:'Юго-восток'}
+ {key:'sofa_1',flip:false,heading:'Юго-запад',angle:225},
+ {key:'sofa_2',flip:false,heading:'Запад',angle:270},
+ {key:'sofa_4',flip:false,heading:'Северо-запад',angle:315},
+ {key:'sofa_3',flip:false,heading:'Север',angle:0},
+ {key:'sofa_4',flip:true,heading:'Северо-восток',angle:45},
+ {key:'sofa_2',flip:true,heading:'Восток',angle:90},
+ {key:'sofa_5',flip:false,heading:'Юго-восток',angle:135},
+ {key:'sofa_0',flip:false,heading:'Юг',angle:180}
 ];
 const dir8=n=>((Math.trunc(Number(n)||0)%8)+8)%8;
 const sofaView=o=>SOFA_VIEWS[dir8(o.rot)];
 const sprite=o=>imgs[o.type==='sofa'?sofaView(o).key:o.type];
-// One-time migration: preserve stored sofa directions, positions and other furniture.
+// Preserve saved room objects and migrate old sofa headings only once.
 try{
- if(localStorage.getItem('ih_art_apartment_v1')&&!localStorage.getItem('ih_art_apartment_8way_migrated')){
+ const key='ih_art_apartment_v1',hasSaved=!!localStorage.getItem(key);
+ if(hasSaved&&!localStorage.getItem('ih_art_apartment_8way_migrated')){
   const oldToNew=[0,1,2,4,5,7];
   for(const o of objects)if(o.type==='sofa')o.rot=oldToNew[((o.rot||0)%6+6)%6];
-  localStorage.setItem('ih_art_apartment_v1',JSON.stringify(objects));
+  localStorage.setItem(key,JSON.stringify(objects));
   localStorage.setItem('ih_art_apartment_8way_migrated','1');
+ }
+ if(!localStorage.getItem('ih_art_apartment_sw_first')){
+  if(hasSaved){
+   for(const o of objects)if(o.type==='sofa')o.rot=dir8((o.rot||0)-1);
+   localStorage.setItem(key,JSON.stringify(objects));
+  }
+  localStorage.setItem('ih_art_apartment_sw_first','1');
  }
 }catch{}
 function box(o){
@@ -254,7 +262,7 @@ function update(){
    im.src='data:image/webp;base64,'+ART[o.type==='sofa'?sofaView(o).key:o.type];
    im.style.transform=o.type==='sofa'&&sofaView(o).flip?'scaleX(-1)':'none';
    name.textContent=ITEMS[o.type].name;
-   info.textContent=o.type==='sofa'?'Исходный рисованный диван · 8 направлений по 45°':ITEMS[o.type].wall?'Закреплено на стене · перемещай вдоль стены':'Рисованный предмет';
+   info.textContent=o.type==='sofa'?'Исходный рисованный диван · 8 направлений, шаг 45°':ITEMS[o.type].wall?'Закреплено на стене · перемещай вдоль стены':'Рисованный предмет';
    turn.textContent=o.type==='sofa'?sofaView(o).heading+' · '+(dir8(o.rot)+1)+' / 8':ITEMS[o.type].wall?(wallSide(o)==='back'?'Задняя':'Левая'):'арт · 1';
  }else{
    im.removeAttribute('src');im.style.transform='none';name.textContent='Выбери предмет';
@@ -312,7 +320,7 @@ for(const [type,s] of Object.entries(ITEMS)){
  let el=document.createElement('button');el.className='item';el.dataset.type=type;
  el.innerHTML='<img alt="" src="'+('data:image/webp;base64,'+ART[type==='sofa'?'sofa_1':type])+'"><b>'+s.name+'</b>';
  el.onclick=()=>{
-   const np=nextPos(type),o={id:Math.max(0,...objects.map(x=>x.id))+1,type,x:np[0],z:np[1],rot:type==='sofa'?1:0};
+   const np=nextPos(type),o={id:Math.max(0,...objects.map(x=>x.id))+1,type,x:np[0],z:np[1],rot:0};
    if(ITEMS[type].wall)o.wallSide=np[2];
    if(hasConflict(o,np[0],np[1])&&type!=='rug'){flash('Нет свободного места');return;}
    objects.push(o);selected=o.id;save();update();
