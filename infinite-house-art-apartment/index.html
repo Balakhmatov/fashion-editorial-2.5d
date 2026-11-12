@@ -123,13 +123,16 @@ for(const o of objects){
 }
 
 
-/* Art positions must represent successive 60-degree viewpoints.
-   The missing back-right view is mirrored from the back-left illustration,
-   until a dedicated illustration is available. */
+/* Ordered from front through the first side, rear and opposite side.
+   Never mirror a rear-facing sprite into a front/side slot. The six
+   illustrations are independent paintings, not exact 3D camera renders. */
 const SOFA_FRAMES=[
- {key:'sofa_0',flip:false},{key:'sofa_1',flip:false},
- {key:'sofa_4',flip:true},{key:'sofa_3',flip:false},
- {key:'sofa_4',flip:false},{key:'sofa_5',flip:false}
+ {key:'sofa_0',flip:false},
+ {key:'sofa_1',flip:false},
+ {key:'sofa_2',flip:false},
+ {key:'sofa_3',flip:false},
+ {key:'sofa_4',flip:false},
+ {key:'sofa_5',flip:false}
 ];
 const sofaFrame=o=>SOFA_FRAMES[((o.rot||0)%6+6)%6];
 const sprite=o=>imgs[o.type==='sofa'?sofaFrame(o).key:o.type];
