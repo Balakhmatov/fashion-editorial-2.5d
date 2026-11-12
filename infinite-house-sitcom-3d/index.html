@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f8f4eb"><meta name="apple-mobile-web-app-capable" content="yes">
+<title>Infinite House — рисованный 3D / проверка стиля</title>
+<style>
+:root{font-family:ui-rounded,system-ui,-apple-system,'Segoe UI',sans-serif;color:#352c35;background:#f6f0e7;-webkit-tap-highlight-color:transparent}
+*{box-sizing:border-box}html,body{margin:0;min-width:310px}button{font:inherit;cursor:pointer}main{max-width:1120px;margin:auto;padding:23px 16px 45px}
+.topline{display:flex;justify-content:space-between;align-items:start;gap:12px;margin-bottom:16px}
+small.kicker{display:block;text-transform:uppercase;letter-spacing:.19em;color:#9c796f;font-weight:900;font-size:11px;margin-bottom:8px}
+h1{font-size:clamp(27px,4vw,39px);font-weight:900;line-height:1.07;letter-spacing:-.045em;margin:0 0 9px}.sub{color:#7f7271;font-size:13px;line-height:1.5;margin:0;max-width:680px}
+.pill{background:#e6f2e7;color:#407150;border-radius:40px;padding:10px 14px;white-space:nowrap;font-size:11px;font-weight:900}
+.room{position:relative;overflow:hidden;border-radius:28px;background:radial-gradient(circle at 50% 43%,#fffdf9 0%,#fff0e1 60%,#dce8e5 100%);border:2px solid #d9c7bd;box-shadow:0 16px 0 #d6c9be55,0 25px 45px #42301b13;touch-action:none}
+#scene{width:100%;height:min(67vh,690px);min-height:400px;display:block;touch-action:none}
+.watermark{pointer-events:none;position:absolute;left:16px;top:16px;display:flex;align-items:center;gap:8px;padding:10px 14px;border:2px solid #d8c5ae;border-radius:30px;background:#fff8e9ec;font-size:12px;font-weight:950;letter-spacing:.03em;color:#7b5e4c}
+.watermark .dot{height:9px;width:9px;border-radius:50%;background:#5fc78d;border:2px solid #3f8f63}
+.roomLabel{position:absolute;top:17px;right:16px;border-radius:25px;padding:10px 12px;background:#fff6ecdc;color:#82655b;font-weight:900;font-size:11px;border:2px solid #ead6c5;pointer-events:none}
+.hint{pointer-events:none;position:absolute;bottom:16px;left:16px;background:#fff8eae8;border:2px solid #e5d5c1;padding:10px 14px;border-radius:16px;font-size:12px;font-weight:750;color:#806856;max-width:85%}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px;padding:15px;background:#fffdf9;border:2px solid #e9d9c6;border-radius:20px}
+.section{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.section b{font-size:12px;color:#776b66;margin-right:4px;white-space:nowrap}
+.segment{display:flex;background:#f2eae2;border-radius:14px;padding:4px;border:1px solid #e5d7c9}.segment button{border:0;background:transparent;padding:11px 14px;font-size:12px;font-weight:850;color:#7d726d;border-radius:10px}.segment button.active{background:#fff;box-shadow:0 2px 5px #735b4d22;color:#4c4050}
+.swatch{height:34px;width:34px;border-radius:50%;border:3px solid white;box-shadow:0 0 0 2px #d9c8bc;background:var(--c)}.swatch.active{box-shadow:0 0 0 3px #75587b}
+.go{margin-left:auto;padding:12px 17px;border:2px solid #7d526d;border-radius:14px;background:#7e5372;color:white;font-size:12px;font-weight:900}
+.note{font-size:12px;color:#8a7c78;line-height:1.5;margin:13px 4px 0}
+#status{display:none;position:absolute;inset:15% 9%;background:#fff6efed;border:2px solid #c99893;border-radius:20px;align-items:center;justify-content:center;text-align:center;padding:25px;font-size:14px;font-weight:650;color:#734f50}
+@media(max-width:650px){main{padding:14px 10px 30px}.pill{display:none}#scene{height:min(68svh,590px);min-height:320px}.room{border-radius:20px}.controls{gap:13px;padding:12px}.section{width:100%}.segment{flex:1}.segment button{flex:1}.go{margin-left:0;flex:1}.hint{left:9px;bottom:10px;padding:7px 10px;font-size:10px}.watermark{left:9px;top:9px;padding:7px 9px;font-size:10px}.roomLabel{right:9px;top:9px;padding:7px 9px;font-size:9px}}
+</style>
+</head>
+<body>
+<main>
+  <div class="topline"><div><small class="kicker">Infinite House / Art Test 01</small><h1>Рисованный, но настоящий 3D</h1><p class="sub">Один диван, одна комната. Стены не крутятся — пальцем вращается только диван. Сравни плоский мультяшный свет с обычным объёмным.</p></div><span class="pill">100% CODE · WEBGL2</span></div>
+  <div class="room" id="room"><canvas id="scene" aria-label="Комната с вращаемым мультяшным диваном"></canvas>
+    <div class="watermark"><i class="dot"></i> CLOUD · CARTOON</div>
+    <div class="roomLabel">3D / 360°</div>
+    <div class="hint">☝️ Проведи пальцем — диван повернётся · ↔ 360°</div>
+    <div id="status"></div>
+  </div>
+  <div class="controls"><div class="section"><b>Отрисовка</b><div class="segment"><button id="toon" class="active">✏️ Мультфильм</button><button id="real">◐ Объёмный свет</button></div></div><div class="section" id="palette"><b>Обивка</b><button class="swatch active" style="--c:#f2dfca" data-color="0" aria-label="Кремовый"></button><button class="swatch" style="--c:#cbb7e5" data-color="1" aria-label="Лаванда"></button><button class="swatch" style="--c:#a8d3c3" data-color="2" aria-label="Мятный"></button></div><button class="go" id="spin">↻ Автовращение</button></div>
+  <p class="note">Это живая 3D-геометрия, не изображение и не набор видов PNG. Камера и комната закреплены, диван поворачивается плавно на любой угол. Никаких внешних библиотек или ассетов.</p>
+</main>
+<script>
+'use strict';
+const canvas=document.getElementById('scene');
+const gl=canvas.getContext('webgl2',{antialias:true,alpha:true,premultipliedAlpha:false});
+const body=document.getElementById('room');
+let state={spin:0.12,auto:false,mode:0,color:0},drag=false,lastX=0,moved=false;
+const swatches=['#f2dfca','#cbb7e5','#a8d3c3'];
+const P=(h)=>{h=h.replace('#','');return [0,2,4].map(i=>parseInt(h.slice(i,i+2),16)/255)};
+const L=(c,t)=>P(c).map(v=>v+(1-v)*t),D=(c,t)=>P(c).map(v=>v*(1-t));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const sub=(a,b)=>a.map((v,i)=>v-b[i]);
+const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const norm=a=>{let k=Math.hypot(...a)||1;return a.map(v=>v/k)};
+let roomVerts=[],sofaVerts=[],using=roomVerts;
+function triangle(a,b,c,na,nb,nc,col,ink=0){let C=typeof col==='string'?P(col):col;using.push(...a,...na,...C,ink,...b,...nb,...C,ink,...c,...nc,...C,ink)}
+function quad(a,b,c,d,n,col,ink=0){triangle(a,b,c,n,n,n,col,ink);triangle(a,c,d,n,n,n,col,ink)}
+function faceRect(x,y,z,w,h,axis,col,ink=0){
+ if(axis==='z')quad([x-w/2,y-h/2,z],[x+w/2,y-h/2,z],[x+w/2,y+h/2,z],[x-w/2,y+h/2,z],[0,0,1],col,ink);
+ else quad([x,y-h/2,z-w/2],[x,y-h/2,z+w/2],[x,y+h/2,z+w/2],[x,y+h/2,z-w/2],[1,0,0],col,ink);
+}
+function box(x,y,z,w,h,d,col,ink=0){let hx=w/2,hy=h/2,hz=d/2;for(const a of [-1,1]){
+ quad([x-hx,y-hy,z+a*hz],[x+hx,y-hy,z+a*hz],[x+hx,y+hy,z+a*hz],[x-hx,y+hy,z+a*hz],[0,0,a],col,ink);
+ quad([x+a*hx,y-hy,z-hz],[x+a*hx,y-hy,z+hz],[x+a*hx,y+hy,z+hz],[x+a*hx,y+hy,z-hz],[a,0,0],col,ink);
+ quad([x-hx,y+a*hy,z-hz],[x+hx,y+a*hy,z-hz],[x+hx,y+a*hy,z+hz],[x-hx,y+a*hy,z+hz],[0,a,0],col,ink);
+ }}
+function roundedBox(x,y,z,w,h,d,round,col,ink=1){
+ let hx=w/2,hy=h/2,hz=d/2,r=clamp(round,.015,Math.min(hx,hy,hz)*.97),inn=[hx-r,hy-r,hz-r],N=10;
+ for(let axis=0;axis<3;axis++)for(let sign of [-1,1]){
+ let i=(axis+1)%3,j=(axis+2)%3,pts=[],ns=[];
+ for(let v=0;v<=N;v++)for(let u=0;u<=N;u++){
+ let p=[0,0,0];p[axis]=sign*[hx,hy,hz][axis];p[i]=(u/N*2-1)*[hx,hy,hz][i];p[j]=(v/N*2-1)*[hx,hy,hz][j];
+ let q=p.map((k,a)=>clamp(k,-inn[a],inn[a]));let n=norm(sub(p,q));pts.push([x+q[0]+n[0]*r,y+q[1]+n[1]*r,z+q[2]+n[2]*r]);ns.push(n);
+ }
+ let color=typeof col==='string'?P(col):col;
+ for(let v=0;v<N;v++)for(let u=0;u<N;u++){let k=v*(N+1)+u;triangle(pts[k],pts[k+1],pts[k+N+2],ns[k],ns[k+1],ns[k+N+2],color,ink);triangle(pts[k],pts[k+N+2],pts[k+N+1],ns[k],ns[k+N+2],ns[k+N+1],color,ink)}
+ }
+}
+function ellipse(x,y,z,rx,ry,rz,color,ink=1,R=18,C=28){
+ let col=typeof color==='string'?P(color):color;
+ function f(a,b){let s=Math.sin(a);return [x+rx*s*Math.cos(b),y+ry*Math.cos(a),z+rz*s*Math.sin(b)]}
+ function n(a,b){let s=Math.sin(a);return norm([s*Math.cos(b)/rx,Math.cos(a)/ry,s*Math.sin(b)/rz])}
+ for(let i=0;i<R;i++)for(let j=0;j<C;j++){let a=i*Math.PI/R,a2=(i+1)*Math.PI/R,b=j*2*Math.PI/C,b2=(j+1)*2*Math.PI/C;
+ triangle(f(a,b),f(a,b2),f(a2,b2),n(a,b),n(a,b2),n(a2,b2),col,ink);triangle(f(a,b),f(a2,b2),f(a2,b),n(a,b),n(a2,b2),n(a2,b),col,ink);}
+}
+function sphere(x,y,z,rx,ry,rz,col,ink=1){ellipse(x,y,z,rx,ry,rz,col,ink)}
+function flower(x,y,z,size,petal,center){for(let i=0;i<6;i++){let a=i*Math.PI/3;sphere(x+Math.sin(a)*size*.56,y+Math.cos(a)*size*.56,z,size*.32,size*.32,.07,petal)}sphere(x,y,z+.055,size*.28,size*.28,.09,center)}
+function makeRoom(){using=roomVerts;roomVerts.length=0;
+ // Graphic novel / sitcom room: solid rectangular floor, two straight walls, no realistic reflections
+ box(0,-.14,0,7.3,.28,6.2,'#d79467');box(0,.025,0,7.13,.08,6.02,'#eeb98b');
+ // comic plank grid, readable yet subtle
+ for(let x=-3.15;x<=3.16;x+=.72)box(x,.075,0,.018,.011,6.0,'#f9d8b1');
+ for(let z=-2.66;z<=2.66;z+=.72)box(0,.079,z,7.13,.011,.018,'#f9d8b1');
+ box(0,1.42,-3.07,7.35,2.82,.18,'#f7debc');
+ box(-3.65,1.42,0,.18,2.82,6.30,'#f3d1a9');
+ // thick illustrated outer edges and room trim
+ box(0,2.86,-3.07,7.44,.095,.21,'#5b4550');box(-3.65,2.86,0,.21,.095,6.39,'#5b4550');
+ box(0,.12,-2.94,7.19,.17,.12,'#a98269');box(-3.53,.12,0,.12,.17,6.08,'#ae8569');
+ // rear window, rectangular frames, simple flat blue sky, skyline
+ box(1.54,1.62,-2.928,1.75,1.55,.065,'#6b5054');
+ box(1.54,1.63,-2.878,1.53,1.32,.045,'#a9dcec');
+ // flat city blocks across glass
+ for(let i=0;i<5;i++){let xx=.95+i*.27;box(xx,1.25+((i*3)%4)*.05,-2.824,.24,.55+((i*3)%4)*.12,.018,i%2?'#8cb4c5':'#a6bdc7')}
+ box(1.54,1.63,-2.77,.095,1.50,.072,'#654c55');box(1.54,1.63,-2.75,1.66,.095,.073,'#654c55');
+ box(1.54,.83,-2.72,1.82,.17,.13,'#bd885f');
+ // curtains, drawn with simple colored volumes
+ roundedBox(.52,1.72,-2.68,.28,1.50,.19,.09,'#bba0cc',0);
+ roundedBox(2.56,1.72,-2.68,.29,1.50,.19,.09,'#bba0cc',0);
+ box(1.54,2.48,-2.66,2.25,.07,.07,'#6d4f5e');
+ // wall framed artwork, positioned left of window
+ box(-1.15,1.82,-2.89,.82,.95,.09,'#6c4b4e');box(-1.15,1.82,-2.826,.70,.82,.09,'#fff0c8');
+ flower(-1.15,1.84,-2.72,.20,'#ffba75','#e4a24f');
+ // left wall decorative trim and mini painting
+ box(-3.50,1.63,-.48,.09,.85,1.13,'#654e52');box(-3.44,1.63,-.48,.09,.72,.97,'#a0c3c5');
+ box(-3.38,1.57,-.48,.08,.28,.44,'#f0cf82');
+ // lavender rug, simple soft blob geometry, under the rotating sofa
+ ellipse(0,.10,.50,2.62,.065,1.62,'#9e82b2',0,10,48);
+ ellipse(0,.15,.50,2.38,.045,1.39,'#cbb3dd',0,10,48);
+ ellipse(0,.18,.50,1.96,.025,1.04,'#d6c5e6',0,8,48);
+}
+function makeSofa(){using=sofaVerts;sofaVerts.length=0;const fabric=swatches[state.color],seat=state.color===1?'#f8ecdf':state.color===2?'#f8eede':'#fff0d9';
+ const outline='#856e65';
+ for(let x of [-1.27,1.27])for(let z of [-.43,.48])sphere(x,.25,z,.14,.20,.14,'#ad7656',1);
+ roundedBox(0,.61,0,3.30,.45,1.52,.21,fabric,1);
+ // three scalloped soft clouds (the recognizable silhouette)
+ sphere(-1.04,1.51,-.53,.70,.66,.34,seat,1);
+ sphere(0,1.65,-.57,.82,.77,.38,seat,1);
+ sphere(1.04,1.51,-.53,.70,.66,.34,seat,1);
+ // seat cushion / seams
+ roundedBox(-.74,.91,.20,1.37,.39,1.16,.14,'#fff4e6',1);
+ roundedBox(.74,.91,.20,1.37,.39,1.16,.14,'#fff4e6',1);
+ roundedBox(-.74,.73,.77,1.25,.115,.08,.035,'#e9b9aa',0);
+ roundedBox(.74,.73,.77,1.25,.115,.08,.035,'#e9b9aa',0);
+ // pillowy armrests
+ sphere(-1.52,1.17,.06,.39,.53,.76,fabric,1);
+ sphere(1.52,1.17,.06,.39,.53,.76,fabric,1);
+ sphere(-1.49,1.22,.60,.38,.40,.36,fabric,1);
+ sphere(1.49,1.22,.60,.38,.40,.36,fabric,1);
+ // accent pillows face towards +z, physically 3D; lavender pillow with little cloud icon
+ roundedBox(-.58,1.35,-.11,.69,.68,.25,.12,'#b99dd9',1);
+ sphere(-.72,1.40,.065,.18,.13,.07,'#fff7ed',0);
+ sphere(-.52,1.47,.070,.18,.17,.07,'#fff7ed',0);
+ sphere(-.35,1.40,.065,.18,.13,.07,'#fff7ed',0);
+ roundedBox(.48,1.34,-.11,.64,.68,.27,.13,'#f19b88',1);
+ // bright tiny accent pillow on left
+ roundedBox(-1.15,1.23,.12,.44,.51,.23,.11,'#ffd066',1);
+ // decorative flower stitch on coral pillow
+ flower(.49,1.35,.068,.15,'#ffebc9','#e7b762');
+ // hand-drawn piping on the back front edge
+ roundedBox(0,.59,.77,2.73,.08,.08,.025,'#e7ad9e',0);
+}
+makeRoom();makeSofa();
+const VS=`#version 300 es
+precision highp float;in vec3 aPos,aNormal,aColor;in float aInk;
+uniform vec3 uRight,uUp,uEye,uCenter;uniform float uScale,uAspect,uRotation;
+out vec3 vNormal,vColor;out float vInk;
+void main(){float c=cos(uRotation),s=sin(uRotation);vec3 pos=vec3(aPos.x*c-aPos.z*s,aPos.y,aPos.x*s+aPos.z*c);vec3 no=vec3(aNormal.x*c-aNormal.z*s,aNormal.y,aNormal.x*s+aNormal.z*c);vec3 rel=pos-uCenter;
+ gl_Position=vec4(dot(rel,uRight)/(uScale*uAspect),dot(rel,uUp)/uScale,dot(rel,-uEye)/18.,1.0);vNormal=no;vColor=aColor;vInk=aInk;}`;
+const FS=`#version 300 es
+precision highp float;in vec3 vNormal,vColor;in float vInk;uniform int uMode;uniform vec3 uEye;out vec4 color;
+void main(){vec3 n=normalize(vNormal);float l=max(dot(n,normalize(vec3(-.43,.91,1.12))),0.);
+ float shade=(uMode==0)?(l>.65?1.04:l>.28?.92:.82):(.63+.45*l);
+ vec3 col=clamp(vColor*shade,0.,1.);
+ float edge=1.0-smoothstep(.10,.30,abs(dot(n,normalize(uEye))));
+ float ink=(uMode==0?edge*.90:edge*.32)*vInk;
+ col=mix(col,vec3(.28,.20,.25),ink);
+ if(uMode!=0){float hi=pow(max(dot(reflect(-normalize(vec3(-.43,.91,1.12)),n),normalize(uEye)),0.),18.)*.10*vInk;col+=hi;}
+ color=vec4(pow(col,vec3(.96)),1.);}`;
+let program=null,roomBuffer=null,sofaBuffer=null,roomCount=roomVerts.length/10,sofaCount=sofaVerts.length/10,softCtx=null;
+function compile(src,type){const sh=gl.createShader(type);gl.shaderSource(sh,src);gl.compileShader(sh);if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(sh));return sh}
+if(gl){try{
+ program=gl.createProgram();gl.attachShader(program,compile(VS,gl.VERTEX_SHADER));gl.attachShader(program,compile(FS,gl.FRAGMENT_SHADER));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));
+ roomBuffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,roomBuffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(roomVerts),gl.STATIC_DRAW);
+ sofaBuffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,sofaBuffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(sofaVerts),gl.DYNAMIC_DRAW);
+ }catch(e){document.getElementById('status').textContent='Ошибка WebGL: '+e.message;document.getElementById('status').style.display='flex';console.error(e)}
+}else{softCtx=canvas.getContext('2d');document.querySelector('.pill').textContent='CANVAS · SOFTWARE 3D';}
+function makeCamera(){let e=norm([.62,.60,.72]);let right=norm(cross([0,1,0],e));let up=norm(cross(e,right));return {e,right,up,center:[0,1.17,0],scale:3.40}}
+function resize(){const r=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);const w=Math.round(r.width*dpr),h=Math.round(r.height*dpr);if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}return [w,h]}
+function bindBuffer(b,rotation){gl.useProgram(program);const cam=makeCamera(),aspect=canvas.width/canvas.height;
+ gl.uniform3fv(gl.getUniformLocation(program,'uRight'),cam.right);gl.uniform3fv(gl.getUniformLocation(program,'uUp'),cam.up);gl.uniform3fv(gl.getUniformLocation(program,'uEye'),cam.e);
+ gl.uniform3fv(gl.getUniformLocation(program,'uCenter'),cam.center);gl.uniform1f(gl.getUniformLocation(program,'uScale'),cam.scale);gl.uniform1f(gl.getUniformLocation(program,'uAspect'),aspect);
+ gl.uniform1f(gl.getUniformLocation(program,'uRotation'),rotation);gl.uniform1i(gl.getUniformLocation(program,'uMode'),state.mode);
+ gl.bindBuffer(gl.ARRAY_BUFFER,b);const stride=40;for(const [name,n,offset] of [['aPos',3,0],['aNormal',3,12],['aColor',3,24],['aInk',1,36]]){let a=gl.getAttribLocation(program,name);gl.enableVertexAttribArray(a);gl.vertexAttribPointer(a,n,gl.FLOAT,false,stride,offset)}
+}
+function renderSoftware(){
+ const ctx=softCtx;if(!ctx)return;
+ // Rasterize the exact same triangles with a depth buffer: unlike painter sorting,
+ // this cannot tear the sofa cushions into overlapping triangular shards.
+ const [w,h]=resize();const cam=makeCamera(),aspect=w/h;
+ const image=ctx.createImageData(w,h),pix=image.data,zbuf=new Float32Array(w*h);
+ zbuf.fill(-1e12);
+ const light=norm([-.43,.91,1.12]),eye=cam.e;
+ function raster(vertices,rotation){
+  const co=Math.cos(rotation),si=Math.sin(rotation),N=vertices.length;
+  for(let i=0;i<N;i+=30){
+   let p=[],n=[],colors=[];
+   for(let j=0;j<3;j++){
+    const k=i+j*10,xx=vertices[k],yy=vertices[k+1],zz=vertices[k+2];
+    const wx=xx*co-zz*si,wz=xx*si+zz*co;
+    const rx=wx-cam.center[0],ry=yy-cam.center[1],rz=wz-cam.center[2];
+    let sx=w*.5+(rx*cam.right[0]+ry*cam.right[1]+rz*cam.right[2])/(cam.scale*aspect)*w*.5;
+    let sy=h*.5-(rx*cam.up[0]+ry*cam.up[1]+rz*cam.up[2])/cam.scale*h*.5;
+    const depth=rx*eye[0]+ry*eye[1]+rz*eye[2];
+    p.push([sx,sy,depth]);n.push([vertices[k+3]*co-vertices[k+5]*si,vertices[k+4],vertices[k+3]*si+vertices[k+5]*co]);
+    colors.push([vertices[k+6],vertices[k+7],vertices[k+8],vertices[k+9]]);
+   }
+   const x0=p[0][0],y0=p[0][1],x1=p[1][0],y1=p[1][1],x2=p[2][0],y2=p[2][1];
+   const det=(y1-y2)*(x0-x2)+(x2-x1)*(y0-y2);
+   if(Math.abs(det)<1e-5)continue;
+   let minx=Math.max(0,Math.floor(Math.min(x0,x1,x2))),maxx=Math.min(w-1,Math.ceil(Math.max(x0,x1,x2)));
+   let miny=Math.max(0,Math.floor(Math.min(y0,y1,y2))),maxy=Math.min(h-1,Math.ceil(Math.max(y0,y1,y2)));
+   if(minx>maxx||miny>maxy)continue;
+   const inv=1/det;
+   const a=(y1-y2)*inv,b=(x2-x1)*inv,c=(y2-y0)*inv,d=(x0-x2)*inv;
+   for(let yy=miny;yy<=maxy;yy++){
+    let W0=a*(minx+.5-x2)+b*(yy+.5-y2),W1=c*(minx+.5-x2)+d*(yy+.5-y2);
+    for(let xx=minx;xx<=maxx;xx++,W0+=a,W1+=c){
+     const W2=1-W0-W1;if(W0<-.0001||W1<-.0001||W2<-.0001)continue;
+     const idx=yy*w+xx;
+     const dep=p[0][2]*W0+p[1][2]*W1+p[2][2]*W2;
+     if(dep<=zbuf[idx])continue;zbuf[idx]=dep;
+     let nx=n[0][0]*W0+n[1][0]*W1+n[2][0]*W2;
+     let ny=n[0][1]*W0+n[1][1]*W1+n[2][1]*W2;
+     let nz=n[0][2]*W0+n[1][2]*W1+n[2][2]*W2;
+     const invLen=1/(Math.hypot(nx,ny,nz)||1);nx*=invLen;ny*=invLen;nz*=invLen;
+     let li=Math.max(0,nx*light[0]+ny*light[1]+nz*light[2]);
+     let shade=state.mode===0?(li>.65?1.04:li>.28?.92:.82):(.63+.45*li);
+     let edge=1-smooth(0.10,0.30,Math.abs(nx*eye[0]+ny*eye[1]+nz*eye[2]));
+     let ink=state.mode===0?edge*.9:edge*.32;
+     ink*=colors[0][3]*W0+colors[1][3]*W1+colors[2][3]*W2;
+     const off=idx*4;
+     for(let ch=0;ch<3;ch++){
+      const base=(colors[0][ch]*W0+colors[1][ch]*W1+colors[2][ch]*W2)*shade;
+      pix[off+ch]=Math.round(Math.min(1,base*(1-ink)+[.28,.20,.25][ch]*ink)*255);
+     }
+     pix[off+3]=255;
+    }
+   }
+  }
+ }
+ raster(roomVerts,0);raster(sofaVerts,state.spin);
+ ctx.clearRect(0,0,w,h);ctx.putImageData(image,0,0);
+ }
+function smooth(a,b,x){x=clamp((x-a)/(b-a),0,1);return x*x*(3-2*x)}
+function draw(){if(!program){renderSoftware();return}resize();gl.viewport(0,0,canvas.width,canvas.height);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.disable(gl.CULL_FACE);
+ bindBuffer(roomBuffer,0);gl.drawArrays(gl.TRIANGLES,0,roomCount);bindBuffer(sofaBuffer,state.spin);gl.drawArrays(gl.TRIANGLES,0,sofaCount);
+}
+function rebuildSofa(){makeSofa();sofaCount=sofaVerts.length/10;if(gl&&sofaBuffer){gl.bindBuffer(gl.ARRAY_BUFFER,sofaBuffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(sofaVerts),gl.DYNAMIC_DRAW)}draw()}
+canvas.addEventListener('pointerdown',e=>{drag=true;moved=false;lastX=e.clientX;canvas.setPointerCapture(e.pointerId)});
+canvas.addEventListener('pointermove',e=>{if(!drag)return;let dx=e.clientX-lastX;lastX=e.clientX;state.spin+=dx*.012;moved=true;draw()});
+canvas.addEventListener('pointerup',()=>drag=false);canvas.addEventListener('pointercancel',()=>drag=false);
+document.getElementById('toon').onclick=()=>{state.mode=0;document.getElementById('toon').classList.add('active');document.getElementById('real').classList.remove('active');draw()};
+document.getElementById('real').onclick=()=>{state.mode=1;document.getElementById('real').classList.add('active');document.getElementById('toon').classList.remove('active');draw()};
+document.querySelector('#palette').addEventListener('click',e=>{const b=e.target.closest('[data-color]');if(!b)return;state.color=+b.dataset.color;document.querySelectorAll('.swatch').forEach(q=>q.classList.toggle('active',+q.dataset.color===state.color));rebuildSofa()});
+document.getElementById('spin').onclick=()=>{state.auto=!state.auto;document.getElementById('spin').textContent=state.auto?'⏸ Остановить':'↻ Автовращение'};
+window.addEventListener('resize',draw);new ResizeObserver(draw).observe(body);document.addEventListener('visibilitychange',()=>{if(!document.hidden)draw()});
+let last=0;function tick(t){if(state.auto&&!drag&&t-last>24){state.spin+=.008;draw();last=t;}requestAnimationFrame(tick)}requestAnimationFrame(tick);draw();
+</script></body></html>
