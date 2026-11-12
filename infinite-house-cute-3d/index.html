@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#faf6f2">
+<title>Infinite House — Cute Cloud & Pop: 6 живых 3D-диванов</title>
+<style>
+:root{font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#333036;background:#faf6f2;-webkit-tap-highlight-color:transparent}*{box-sizing:border-box}body{margin:0;min-width:320px}button{font:inherit;cursor:pointer;border:0}button:focus-visible,input:focus-visible{outline:3px solid #7fbfca;outline-offset:3px}
+main{max-width:1130px;margin:auto;padding:26px 20px 45px}.eyebrow{color:#8c8a83;letter-spacing:.22em;text-transform:uppercase;font-weight:800;font-size:11px;margin-bottom:10px}h1{font-weight:850;font-size:clamp(27px,4.3vw,42px);letter-spacing:-.05em;line-height:1.05;margin:0 0 10px}.intro{font-size:14px;color:#797772;line-height:1.5;max-width:680px;margin:0 0 24px}.head{display:flex;align-items:end;justify-content:space-between;gap:16px}.chip{border-radius:30px;background:#ebf5f0;color:#468170;font-size:11px;font-weight:800;padding:10px 15px;white-space:nowrap;margin-bottom:24px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 305px;gap:17px;align-items:start}.stage{position:relative;background:radial-gradient(ellipse at 50% 42%,#fffdfa,#fff0e9 64%,#e9e1d6);aspect-ratio:1.12;min-height:370px;overflow:hidden;border-radius:25px;border:1px solid #efebe3;box-shadow:0 20px 45px #5b47220d;touch-action:none}#view{width:100%;height:100%;display:block;touch-action:none}.stamp{position:absolute;top:18px;left:18px;display:flex;align-items:center;gap:7px;background:#fff9;border:1px solid #fff7;backdrop-filter:blur(8px);border-radius:30px;padding:9px 12px;font-size:11px;font-weight:800;color:#4b7a66}.dot{height:7px;width:7px;background:#41b58c;border-radius:100%}.scene-name{position:absolute;right:18px;top:19px;background:#fff9;padding:8px 11px;border-radius:30px;font-size:10px;font-weight:800;letter-spacing:.07em;color:#858078}.hint{position:absolute;left:18px;bottom:16px;color:#89827b;background:#ffffffa8;border-radius:11px;padding:8px 11px;font-size:11px;pointer-events:none}.error{display:none;position:absolute;inset:0;align-items:center;justify-content:center;text-align:center;padding:22px;background:#f8eee9;color:#574640;line-height:1.5}.error.show{display:flex}
+.panel{background:white;border:1px solid #f0ede8;border-radius:25px;padding:21px;box-shadow:0 15px 40px #4a3b1f0a}.panel h2{font-size:23px;letter-spacing:-.035em;margin:0 0 6px}.panel p{font-size:13px;color:#88837d;line-height:1.5;margin:0 0 18px;min-height:38px}.sec{border-top:1px solid #f1efec;margin-top:16px;padding-top:17px}.line{display:flex;justify-content:space-between;align-items:center;gap:9px;font-weight:750;font-size:12px;margin-bottom:12px}.line .value{color:#99918c;font-weight:550}.colors{display:flex;flex-wrap:wrap;gap:9px}.swatch{width:34px;height:34px;border-radius:100%;background:var(--color);border:3px solid white;box-shadow:0 0 0 1px #dcd9d4;transition:transform .2s}.swatch.active{box-shadow:0 0 0 2px #6e8d8a;transform:scale(1.06)}.range{width:100%;accent-color:#83adad;cursor:pointer}.buttons{display:flex;gap:8px;margin-top:20px}.action{border:1px solid #e7e5e0;border-radius:13px;background:#faf8f6;color:#4c4b49;padding:12px 9px;font-size:12px;font-weight:750;flex:1}.action.primary{background:#39534d;color:white;border-color:#39534d}
+.style-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}.style{background:white;border:1px solid #eae5df;display:flex;align-items:center;text-align:left;gap:10px;padding:15px 12px;border-radius:17px;color:#3e3a38;min-width:0;transition:background .15s,border-color .15s}.style.active{background:#e9f3f1;border:2px solid #7aa69e;padding:14px 11px}.style .emoji{font-size:25px;line-height:1.1}.style b{font-size:12px;line-height:1.15;display:block}.style small{display:block;font-size:10px;color:#968f87;margin-top:5px}.footer{font-size:12px;color:#908a83;line-height:1.5;margin:17px 0 0}
+@media(max-width:780px){main{padding:18px 12px 30px}h1{font-size:29px}.intro{margin-bottom:14px;font-size:12px}.chip{display:none}.layout{grid-template-columns:1fr;gap:12px}.stage{aspect-ratio:1.0;min-height:310px;border-radius:19px}.panel{padding:17px;border-radius:19px}.panel p{min-height:0}.style-grid{display:flex;overflow-x:auto;gap:8px;padding:2px 1px 9px;scroll-snap-type:x mandatory}.style{min-width:148px;scroll-snap-align:start}.style b{font-size:12px}.hint{font-size:10px}.scene-name{font-size:9px;right:12px}.stamp{left:12px}}
+</style></head><body>
+<main>
+<header class="head"><div><div class="eyebrow">INFINITE HOUSE · CUTE TOON / 05</div><h1>Мультяшные 3D-диваны с характером</h1><p class="intro">Шесть характерных вариаций двух любимых стилей — Cloud Plush и Pop Art. Каждый диван собран из настоящей 3D-геометрии кодом. Поверни пальцем — он объёмный со всех сторон.</p></div><span class="chip">100% CODE · 3D</span></header>
+<div class="layout"><section class="stage" id="stage"><canvas id="view" aria-label="Интерактивная 3D-модель дивана"></canvas><div class="stamp"><span class="dot"></span> LIVE · TOON 3D</div><div class="scene-name" id="sceneName">CLOUD · BOW</div><div class="hint">↔ Поверни диван пальцем · двумя пальцами приблизь</div><div class="error" id="error"></div></section>
+<aside class="panel"><h2 id="objectTitle">Cloud Bow</h2><p id="objectDesc">Облачная спинка, большой бантик и подушка с мордочкой.</p>
+<div class="sec"><div class="line"><span>Изменить оттенок</span><span class="value" id="colorName">Розовый</span></div><div class="colors" id="colors"></div></div>
+<div class="sec"><div class="line"><span>Мягкость формы</span><span class="value" id="roundLabel">85%</span></div><input class="range" type="range" id="roundness" min="15" max="100" step="5" value="85"></div>
+<div class="sec"><div class="line"><span>Размер</span><span class="value" id="sizeLabel">100%</span></div><input class="range" type="range" id="size" min="75" max="125" step="5" value="100"></div>
+<div class="buttons"><button class="action" id="reset">↶ Сбросить</button><button class="action primary" id="autorotate">↻ Автовращение</button></div>
+</aside></div>
+<nav class="style-grid" id="styles" aria-label="Шесть мультяшных 3D-диванов">
+<button type="button" class="style active" data-style="cloud_bow"><span class="emoji">🎀</span><span><b>Cloud Bow</b><small>Бантик и мордочка</small></span></button>
+<button type="button" class="style" data-style="cloud_sleep"><span class="emoji">🌙</span><span><b>Cloud Sleep</b><small>Луна и звёзды</small></span></button>
+<button type="button" class="style" data-style="cloud_heart"><span class="emoji">💗</span><span><b>Cloud Heart</b><small>Сердечки</small></span></button>
+<button type="button" class="style" data-style="pop_sticker"><span class="emoji">🍭</span><span><b>Pop Sticker</b><small>Стикеры и цветы</small></span></button>
+<button type="button" class="style" data-style="pop_candy"><span class="emoji">🍬</span><span><b>Pop Candy</b><small>Конфетная тема</small></span></button>
+<button type="button" class="style" data-style="pop_star"><span class="emoji">⭐</span><span><b>Pop Star</b><small>Звёздочки</small></span></button>
+</nav>
+<p class="footer">Шесть вариантов — настоящая вращаемая 3D-геометрия на WebGL2 без скачивания моделей и изображений. Декор тоже объёмный, а освещение нарочито мультяшное.</p>
+</main>
+<script>
+'use strict';
+const canvas=document.getElementById('view');
+const err=document.getElementById('error');
+const gl=canvas.getContext('webgl2',{antialias:true,alpha:true,premultipliedAlpha:false,preserveDrawingBuffer:true});
+if(!gl){
+  const warning=document.getElementById('error');
+  warning.textContent='Браузер отключил WebGL2. Открой страницу в Safari или Chrome с разрешённым аппаратным ускорением.';
+  warning.classList.add('show');
+}else{
+const VS=`#version 300 es
+precision highp float;
+in vec3 aPosition; in vec3 aNormal; in vec3 aColor; in float aShine;
+uniform vec3 uRight, uUp, uEye, uCenter; uniform float uScale, uAspect;
+out vec3 vNormal, vColor, vWorld, vEye; out float vShine;
+void main(){ vec3 rel=aPosition-uCenter;
+ gl_Position=vec4(dot(rel,uRight)/(uScale*uAspect), dot(rel,uUp)/uScale, 0., 1.);
+ // depth from camera, mapped into [-1,1].
+ gl_Position.z=dot(rel,-uEye)/18.;
+ vNormal=aNormal; vColor=aColor; vWorld=aPosition; vEye=uEye; vShine=aShine;
+}`;
+const FS=`#version 300 es
+precision highp float;
+in vec3 vNormal,vColor,vWorld,vEye; in float vShine;
+uniform int uMode; out vec4 frag;
+void main(){
+ vec3 n=normalize(vNormal);
+ vec3 l=normalize(vec3(-.64,.92,1.24));
+ float d=max(dot(n,l),0.);
+ // Hand-picked cartoon light, just 3 discreet tones. No specular highlights.
+ float shade=d>.68?1.075:d>.24?.92:.77;
+ // Softer on the forest storybook version, punchier on pop and cat.
+ if(uMode==1) shade=d>.7?1.05:d>.28?.94:.84;
+ if(uMode==2) shade=d>.7?1.09:d>.28?.88:.73;
+ vec3 base=clamp(vColor*shade,0.,1.);
+ // Ink silhouette based on angular position of real 3D surface relative to camera.
+ float f=abs(dot(n,normalize(vEye)));
+ float contour=1.0-smoothstep(.105,.235,f);
+ vec3 ink=mix(vec3(.16,.14,.18),vColor*.44,.24);
+ // Thin tinted ink prevents harsh black polygons and keeps a drawn look.
+ vec3 col=mix(base,ink,contour*.82);
+ frag=vec4(col,1.);
+}`;
+const SHADOWVS=`#version 300 es
+precision highp float;in vec3 aPosition;uniform vec3 uRight,uUp,uEye,uCenter;uniform float uScale,uAspect;out vec2 vUV;
+void main(){vUV=aPosition.xz; vec3 rel=aPosition-uCenter;gl_Position=vec4(dot(rel,uRight)/(uScale*uAspect),dot(rel,uUp)/uScale,dot(rel,-uEye)/18.,1.);}`;
+const SHADOWFS=`#version 300 es
+precision highp float;in vec2 vUV;out vec4 frag;
+void main(){float r=length(vUV);float a=exp(-r*r*2.2)*.23;frag=vec4(.36,.29,.23,a);}`;
+function compile(s,t){const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(o));return o;}
+function program(vs,fs){const p=gl.createProgram();gl.attachShader(p,compile(vs,gl.VERTEX_SHADER));gl.attachShader(p,compile(fs,gl.FRAGMENT_SHADER));gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(p));return p;}
+const pg=program(VS,FS),spg=program(SHADOWVS,SHADOWFS);
+const hexColor=h=>{h=h.replace('#','');return [0,2,4].map(i=>parseInt(h.slice(i,i+2),16)/255);};
+const presets={
+ cloud_bow:{name:'Cloud Bow',subtitle:'Пухлая облачная спинка, бантик, цветок и подушка с сонной мордочкой.',color:1,tag:'CLOUD · BOW',bg:'#ffedf3'},
+ cloud_sleep:{name:'Cloud Sleep',subtitle:'Сиреневое облачко, луна, звёзды и мягкий сонный плед.',color:5,tag:'CLOUD · SLEEP',bg:'#f2ebff'},
+ cloud_heart:{name:'Cloud Heart',subtitle:'Персиковые подушки и объёмные сердечки — диван-обнимашка.',color:6,tag:'CLOUD · HEART',bg:'#fff0e8'},
+ pop_sticker:{name:'Pop Sticker',subtitle:'Бирюзовая игрушечная мебель со стикерами и весёлой подушкой-цветком.',color:4,tag:'POP · STICKER',bg:'#e8fbf4'},
+ pop_candy:{name:'Pop Candy',subtitle:'Лавандовая конфетная мебель с драже и полосатым пледом.',color:5,tag:'POP · CANDY',bg:'#f4ebff'},
+ pop_star:{name:'Pop Star',subtitle:'Медово-жёлтый диван с объёмными звёздами и коралловыми акцентами.',color:3,tag:'POP · STAR',bg:'#fff2d6'}
+};
+const palettes=[['Шалфей','#8cae86'],['Розовый','#e9a0b6'],['Голубой','#739fc6'],['Жёлтый','#e6b66b'],['Бирюза','#38bfb2'],['Лаванда','#ab94d2'],['Коралл','#f38e79']];
+const st={style:'cloud_bow',color:1,round:.85,size:1,yaw:.71,elevation:.47,zoom:2.52,auto:false};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const plus=(a,b)=>a.map((v,i)=>v+b[i]);const mul=(a,s)=>a.map(x=>x*s);const sub=(a,b)=>a.map((v,i)=>v-b[i]);
+const dot=(a,b)=>a.reduce((q,v,i)=>q+v*b[i],0);const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const norm=a=>mul(a,1/(Math.hypot(...a)||1));
+const geometries=[];
+function addTri(a,b,c,na,nb,nc,color,shine=1){geometries.push(...a,...na,...color,shine,...b,...nb,...color,shine,...c,...nc,...color,shine);}
+function addQuad(a,b,c,d,na,nb,nc,nd,color,shine=1){addTri(a,b,c,na,nb,nc,color,shine);addTri(a,c,d,na,nc,nd,color,shine);}
+function roundedBox(x,y,z,w,h,d,round,color,shine=1,rot=0){
+ const c=Array.isArray(color)?color:hexColor(color), hx=w/2,hy=h/2,hz=d/2;
+ const r=clamp(round,0.015,Math.min(hx,hy,hz)*.97);
+ const N=9;const halves=[hx,hy,hz]; const inner=[hx-r,hy-r,hz-r];
+ for(let axis=0;axis<3;axis++)for(const sign of [-1,1]){
+  const i=(axis+1)%3,j=(axis+2)%3;
+  const verts=[],nrms=[];
+  for(let v=0;v<=N;v++)for(let u=0;u<=N;u++){
+   let p=[0,0,0];p[axis]=sign*halves[axis];p[i]=(u/N*2-1)*halves[i];p[j]=(v/N*2-1)*halves[j];
+   let q=p.map((k,a)=>clamp(k,-inner[a],inner[a]));let n=norm(sub(p,q));
+   const yy=p[1]; const zz=p[2]; // optional rounded pillow lofting by geometry only
+   let pos=plus(q,mul(n,r));
+   if(rot){const xx=pos[0],zz2=pos[2];pos[0]=xx*Math.cos(rot)-zz2*Math.sin(rot);pos[2]=xx*Math.sin(rot)+zz2*Math.cos(rot);
+     const nx=n[0],nz=n[2];n[0]=nx*Math.cos(rot)-nz*Math.sin(rot);n[2]=nx*Math.sin(rot)+nz*Math.cos(rot);}
+   verts.push(plus(pos,[x,y,z]));nrms.push(n);
+  }
+  for(let v=0;v<N;v++)for(let u=0;u<N;u++){
+    const k=v*(N+1)+u;let a=k,b=k+1,cc=k+N+2,d0=k+N+1;
+    addQuad(verts[a],verts[b],verts[cc],verts[d0],nrms[a],nrms[b],nrms[cc],nrms[d0],c,shine);
+  }
+ }
+}
+function ellipsoid(x,y,z,rx,ry,rz,color,shine=1,ring=18,cols=24){
+ const col=Array.isArray(color)?color:hexColor(color);
+ function p(a,b){let yy=Math.cos(a),r=Math.sin(a);return [x+rx*r*Math.cos(b),y+ry*yy,z+rz*r*Math.sin(b)];}
+ function n(a,b){return norm([Math.sin(a)*Math.cos(b)/rx,Math.cos(a)/ry,Math.sin(a)*Math.sin(b)/rz]);}
+ for(let i=0;i<ring;i++)for(let j=0;j<cols;j++){
+  const a=i/ring*Math.PI,b=j/cols*2*Math.PI, a2=(i+1)/ring*Math.PI,b2=(j+1)/cols*2*Math.PI;
+  addQuad(p(a,b),p(a,b2),p(a2,b2),p(a2,b),n(a,b),n(a,b2),n(a2,b2),n(a2,b),col,shine);
+ }
+}
+function cylinder(x,y,z,r,h,color,vertical=true,sz=28){
+ const col=hexColor(color),topY=y+h/2,bottomY=y-h/2;
+ for(let i=0;i<sz;i++){
+ const a=i/sz*Math.PI*2,b=(i+1)/sz*Math.PI*2,cs=Math.cos(a),sn=Math.sin(a),cs2=Math.cos(b),sn2=Math.sin(b);
+ const va=[x+r*cs,bottomY,z+r*sn],vb=[x+r*cs2,bottomY,z+r*sn2],vc=[x+r*cs2,topY,z+r*sn2],vd=[x+r*cs,topY,z+r*sn],na=[cs,0,sn],nb=[cs2,0,sn2];
+ addQuad(va,vb,vc,vd,na,nb,nb,na,col,.6);
+ addTri([x,topY,z],vd,vc,[0,1,0],[0,1,0],[0,1,0],col,.6);
+ }
+}
+function blend(c1,c2,t){return hexColor(c1).map((v,i)=>v*(1-t)+hexColor(c2)[i]*t);}
+function tinted(h,delta){const rgb=hexColor(h);return rgb.map(x=>clamp(delta>=0?x+(1-x)*delta:x*(1+delta),0,1));}
+function wood(){return '#bb8c62';}
+function puff(x,y,z,w,h,d,color=palettes[st.color][1],factor=1){
+ roundedBox(x,y,z,w,h,d,Math.min(w,h,d)*clamp(st.round*.83*factor,.09,.48),color,.9);
+}
+function pad(x,y,z,rx,ry,rz,color=palettes[st.color][1],shine=.8){ellipsoid(x,y,z,rx,ry,rz,color,shine,14,22);}
+function foot(x,z,y=.235,r=.105){cylinder(x,y,z,r,y*1.58,wood());pad(x,.08,z,r*1.03,.085,r*1.05,wood(),.4);}
+function flower(x,y,z,r,color,center){
+ for(let a=0;a<6;a++){const t=a*Math.PI/3;pad(x+Math.sin(t)*r*.55,y+Math.cos(t)*r*.55,z,r*.40,r*.41,.085,color);}
+ pad(x,y,z+.065,r*.25,r*.25,.11,center);
+}
+function roundPillow(x,y,z,w,h,color){puff(x,y,z,w,h,.25,color,1.3);}
+function seatCushion(x,y,z,w,h,d,color){puff(x,y,z,w,h,d,color,1.08);}
+// Every cute detail is geometry, not a textured image.
+function bow3D(x,y,z,col){
+ pad(x-.16,y,z,.23,.135,.12,col);pad(x+.16,y,z,.23,.135,.12,col);
+ pad(x,y,z+.04,.10,.12,.14,'#f8e6cd');
+}
+function heart3D(x,y,z,s,col){
+ pad(x-s*.20,y+s*.21,z,s*.25,s*.25,s*.18,col);
+ pad(x+s*.20,y+s*.21,z,s*.25,s*.25,s*.18,col);
+ pad(x,y-s*.08,z,s*.39,s*.39,s*.19,col);
+ pad(x,y-s*.28,z,s*.22,s*.17,s*.15,col);
+}
+function star3D(x,y,z,s,col){
+ pad(x,y,z,s*.32,s*.32,s*.16,col);
+ for(let i=0;i<5;i++){
+  const a=Math.PI*2*i/5-Math.PI/2;
+  pad(x+Math.cos(a)*s*.47,y+Math.sin(a)*s*.47,z,s*.23,s*.23,s*.13,col);
+ }
+}
+function face3D(x,y,z){
+ const ink='#73565c';
+ pad(x-.15,y+.07,z,.046,.07,.042,ink);
+ pad(x+.15,y+.07,z,.046,.07,.042,ink);
+ pad(x,y-.035,z+.01,.055,.04,.055,'#d38f87');
+ pad(x-.24,y-.025,z-.015,.08,.055,.03,'#f6b4b8');
+ pad(x+.24,y-.025,z-.015,.08,.055,.03,'#f6b4b8');
+}
+function candy3D(x,y,z){
+ pad(x,y,z,.17,.14,.17,'#ffd970');
+ pad(x-.23,y,z,.09,.16,.12,'#fff1ba');
+ pad(x+.23,y,z,.09,.16,.12,'#fff1ba');
+}
+function cloudSofa(){
+ const variant=st.style;
+ const c=palettes[st.color][1],cream='#fff3df';
+ const cloud=variant==='cloud_sleep'?'#efe5ff':variant==='cloud_heart'?'#ffe5d8':'#fff1e1';
+ const seat=variant==='cloud_sleep'?'#fff0e0':variant==='cloud_heart'?'#fff3dc':'#fff7e7';
+ for(const x of [-1.25,1.25])for(const z of [-.47,.53])foot(x,z,.22,.13);
+ puff(0,.63,0,3.28,.47,1.54,c,1.25);
+ // large organic cloud silhouette
+ pad(-1.01,1.53,-.60,.66,.78,.35,cloud);pad(0,1.73,-.66,.88,.90,.42,cloud);pad(1.01,1.52,-.60,.68,.78,.35,cloud);
+ for(const x of [-.71,.71])seatCushion(x,.94,.13,1.42,.43,1.20,seat);
+ for(const s of [-1,1]){pad(s*1.49,1.14,.12,.42,.57,.80,c);pad(s*1.47,1.10,.65,.39,.47,.43,c);}
+ if(variant==='cloud_bow'){
+   bow3D(-.10,2.19,-.32,'#f3a1b8');
+   flower(-.94,1.28,.08,.29,'#f4a6bb','#ffe38c');
+   puff(.74,1.33,-.14,.65,.60,.23,'#fff0e2');
+   face3D(.74,1.31,.014);
+   pad(-.22,.51,.78,.35,.07,.08,'#ffe29e',.3);
+ }
+ if(variant==='cloud_sleep'){
+   // night sky with raised stars on the central cloud
+   star3D(-.45,2.13,-.245,.22,'#fce29d');
+   star3D(.36,2.19,-.245,.17,'#a6d1ff');
+   puff(.65,1.32,-.16,.66,.57,.25,'#fff7dc');
+   // moon-shaped impression using offset spheres
+   pad(.60,1.35,.03,.19,.23,.07,'#ffdb8d');
+   pad(.68,1.41,.082,.18,.21,.045,'#fff7dc');
+   for(let i=0;i<5;i++)pad(-1.0+i*.21,.55,.81,.07,.06,.05,'#a5bdf0');
+ }
+ if(variant==='cloud_heart'){
+   heart3D(-.85,1.29,.025,.48,'#fca3b8');
+   puff(.74,1.29,-.16,.62,.55,.25,'#fff6ed');
+   heart3D(.74,1.32,.025,.30,'#ffba80');
+   bow3D(.07,.53,.83,'#ffe3a4');
+ }
+}
+function popSofa(){
+ const variant=st.style;
+ const c=palettes[st.color][1],seat=variant==='pop_candy'?'#fff4d3':variant==='pop_star'?'#fff2e4':'#fff1d5';
+ for(const x of [-1.28,1.28])for(const z of [-.51,.56])foot(x,z,.20,.14);
+ puff(0,.59,0,3.34,.48,1.58,c);
+ // chunky three-lobe back, intentionally toy-like
+ pad(-1.02,1.47,-.64,.58,.74,.37,c);pad(0,1.66,-.69,.75,.88,.43,c);pad(1.02,1.48,-.64,.58,.75,.39,c);
+ for(const x of [-.73,.73])seatCushion(x,.96,.16,1.42,.42,1.20,seat);
+ for(const s of [-1,1]){pad(s*1.51,1.09,.02,.40,.54,.84,c);pad(s*1.52,1.18,.63,.34,.34,.40,c);}
+ if(variant==='pop_sticker'){
+   puff(-.89,1.31,-.15,.65,.56,.23,'#ff907c');
+   star3D(-.89,1.34,.015,.24,'#fff2bb');
+   flower(.82,1.32,-.10,.36,'#ffe071','#fff9d5');
+   // confetti in front edge
+   for(let i=0;i<5;i++)pad(-.53+i*.25,.47,.83,.065,.055,.042,['#fff1a7','#ffb4bf','#adeada'][i%3]);
+ }
+ if(variant==='pop_candy'){
+   puff(-.88,1.28,-.14,.60,.53,.23,'#ffd3e1');
+   candy3D(-.88,1.31,.018);
+   puff(.80,1.28,-.11,.60,.53,.24,'#aee9df');
+   flower(.80,1.31,.045,.22,'#ffb4c2','#fff0b5');
+   for(let i=0;i<5;i++)puff(-.62+i*.30,.48,.86,.22,.08,.09,i%2?'#ffadd0':'#ffe58e',.4);
+ }
+ if(variant==='pop_star'){
+   puff(-.85,1.27,-.17,.61,.55,.26,'#ffab9e');
+   star3D(-.85,1.30,.014,.33,'#ffdc83');
+   puff(.85,1.27,-.17,.60,.55,.26,'#f8f2ff');
+   heart3D(.85,1.31,.011,.29,'#7bcfff');
+   star3D(0,2.13,-.29,.22,'#fff3c7');
+ }
+}
+function retroSofa(){
+ const c=palettes[st.color][1],wood='#b78053',seat='#89abc1',pale='#ede6ce';
+ for(const x of [-1.28,1.28])for(const z of [-.52,.48])foot(x,z,.21,.12);
+ puff(0,.58,0,3.33,.41,1.6,wood,.7);
+ puff(0,.72,0,3.13,.36,1.52,c);
+ // thick wooden crest / upholster panel
+ puff(0,1.47,-.73,3.25,1.25,.27,wood,.55);
+ puff(0,1.45,-.52,2.95,1.05,.37,c);
+ // vertical flutes on back
+ for(const x of [-1.04,-.36,.36,1.04])pad(x,1.45,-.29,.32,.49,.18,c,.6);
+ for(const x of [-.72,.72])seatCushion(x,.95,.17,1.42,.38,1.13,seat);
+ for(const s of [-1,1]){
+   pad(s*1.51,1.08,.02,.36,.48,.76,c);
+   pad(s*1.56,1.10,.58,.36,.37,.36,wood,.55);
+   pad(s*1.56,1.10,.72,.27,.27,.13,c);
+ }
+ roundPillow(-.85,1.31,-.10,.48,.54,pale);
+ pad(.50,1.29,-.14,.30,.30,.14,'#d59b78');
+ // wood medallion along front
+ pad(0,.50,.82,.20,.15,.09,wood,.5);
+}
+function modSofa(){
+ const c=palettes[st.color][1],seat='#f8e4ff',deeper='#8477b3';
+ // modular low chunky platform
+ puff(0,.48,0,3.37,.48,1.62,deeper);
+ puff(-.68,.66,-.33,1.70,.47,1.14,c);
+ puff(.99,.66,.06,1.32,.47,1.87,c);
+ puff(-.80,1.21,-.72,1.64,.90,.46,c);
+ puff(.57,1.20,-.81,1.20,.88,.46,c);
+ // chaise cushion extends forward
+ seatCushion(-.70,.96,.21,1.45,.31,1.05,seat);
+ seatCushion(.97,.96,.33,1.25,.31,1.68,seat);
+ puff(-1.54,1.00,-.03,.30,.67,1.49,c);
+ puff(1.58,1.00,.08,.30,.67,1.66,c);
+ roundPillow(-.97,1.37,-.33,.42,.44,'#f4acbb');
+ roundPillow(.67,1.40,-.30,.47,.44,'#f9d58e');
+}
+function kittySofa(){
+ const c=palettes[st.color][1],cream='#fff1cb',blush='#faadac',eyes='#58443a';
+ for(const x of [-1.27,1.27])for(const z of [-.53,.50])foot(x,z,.23,.12);
+ puff(0,.60,0,3.20,.42,1.57,c);
+ pad(0,1.52,-.62,1.40,.90,.37,cream,.9);
+ // two towering cat ears
+ pad(-.90,2.15,-.67,.35,.52,.28,cream);
+ pad(.90,2.15,-.67,.35,.52,.28,cream);
+ pad(-.90,2.16,-.40,.19,.34,.09,blush);
+ pad(.90,2.16,-.40,.19,.34,.09,blush);
+ for(const x of [-.70,.70])seatCushion(x,.95,.15,1.37,.42,1.19,cream);
+ for(const s of [-1,1])pad(s*1.45,1.04,.07,.42,.55,.78,c);
+ // eyes and cheeks on front of vertical backrest (front is +z)
+ for(const x of [-.42,.42])pad(x,1.62,-.215,.08,.13,.06,eyes,.3);
+ pad(0,1.41,-.204,.12,.086,.066,'#d18e8c');
+ pad(-.68,1.40,-.22,.20,.10,.055,blush);
+ pad(.68,1.40,-.22,.20,.10,.055,blush);
+ pad(0,.57,.81,.19,.11,.08,blush);
+ // little tail to the right
+ pad(1.64,.76,-.57,.22,.18,.40,c);
+}
+function makeSofa(){
+ (st.style.startsWith('cloud')?cloudSofa:popSofa)();
+}
+function rebuild(){
+ geometries.length=0;
+ makeSofa();
+ if(st.size!==1)for(let i=0;i<geometries.length;i+=10){geometries[i]*=st.size;geometries[i+1]*=st.size;geometries[i+2]*=st.size;}
+ const data=new Float32Array(geometries);
+ gl.bindBuffer(gl.ARRAY_BUFFER,meshBuffer);gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW);vertexCount=data.length/10;
+ document.getElementById('objectTitle').textContent=presets[st.style].name;
+ document.getElementById('objectDesc').textContent=presets[st.style].subtitle;
+ document.getElementById('sceneName').textContent=presets[st.style].tag;
+ document.getElementById('stage').style.background='radial-gradient(ellipse at 50% 42%, #fffdfa 0%,'+presets[st.style].bg+' 64%,#e9e1d6 100%)';
+ draw();
+}
+const meshBuffer=gl.createBuffer();let vertexCount=0;
+const shadowData=new Float32Array([-2,0.015,-2, 2,0.015,-2, 2,0.015,2, -2,0.015,-2, 2,0.015,2, -2,0.015,2]);
+const shadowBuffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,shadowBuffer);gl.bufferData(gl.ARRAY_BUFFER,shadowData,gl.STATIC_DRAW);
+function bindCamera(p,right,up,eye,aspect){gl.uniform3fv(gl.getUniformLocation(p,'uRight'),right);gl.uniform3fv(gl.getUniformLocation(p,'uUp'),up);gl.uniform3fv(gl.getUniformLocation(p,'uEye'),eye);gl.uniform3fv(gl.getUniformLocation(p,'uCenter'),[0,.95,0]);gl.uniform1f(gl.getUniformLocation(p,'uScale'),st.zoom);gl.uniform1f(gl.getUniformLocation(p,'uAspect'),aspect);}
+function resize(){const r=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,1.65);const w=Math.round(r.width*dpr),h=Math.round(r.height*dpr);if(w!==canvas.width||h!==canvas.height){canvas.width=w;canvas.height=h;}gl.viewport(0,0,w,h);}
+function draw(){resize();gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);
+ const e=norm([Math.cos(st.yaw)*Math.cos(st.elevation),Math.sin(st.elevation),Math.sin(st.yaw)*Math.cos(st.elevation)]);
+ const right=norm(cross([0,1,0],e)),up=norm(cross(e,right)),aspect=canvas.width/canvas.height;
+ // translucent contact shadow at y=0
+ gl.useProgram(spg);bindCamera(spg,right,up,e,aspect);gl.bindBuffer(gl.ARRAY_BUFFER,shadowBuffer);const sLoc=gl.getAttribLocation(spg,'aPosition');gl.enableVertexAttribArray(sLoc);gl.vertexAttribPointer(sLoc,3,gl.FLOAT,false,12,0);
+ gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);gl.drawArrays(gl.TRIANGLES,0,6);gl.depthMask(true);gl.disable(gl.BLEND);
+ gl.useProgram(pg);bindCamera(pg,right,up,e,aspect);gl.uniform1i(gl.getUniformLocation(pg,'uMode'),(st.style.startsWith('cloud')?0:2));gl.bindBuffer(gl.ARRAY_BUFFER,meshBuffer);
+ const stride=10*4;for(const [a,n,o,k] of [['aPosition',3,0],['aNormal',3,3*4],['aColor',3,6*4],['aShine',1,9*4]]){let loc=gl.getAttribLocation(pg,a);gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,n,gl.FLOAT,false,stride,o);}
+ gl.drawArrays(gl.TRIANGLES,0,vertexCount);
+}
+// UI — all five models are built from geometry every time a parameter changes.
+function paintPalette(){
+ const root=document.getElementById('colors');
+ root.innerHTML=palettes.map((x,i)=>`<button type="button" class="swatch ${i===st.color?'active':''}" style="--color:${x[1]}" data-color="${i}" aria-label="${x[0]}" title="${x[0]}"></button>`).join('');
+ document.getElementById('colorName').textContent=palettes[st.color][0];
+}
+function renderControls(){
+ document.querySelectorAll('[data-style]').forEach(x=>{x.classList.toggle('active',x.dataset.style===st.style);x.setAttribute('aria-pressed',String(x.dataset.style===st.style));});
+ document.getElementById('roundness').value=Math.round(st.round*100);
+ document.getElementById('roundLabel').textContent=Math.round(st.round*100)+'%';
+ document.getElementById('size').value=Math.round(st.size*100);
+ document.getElementById('sizeLabel').textContent=Math.round(st.size*100)+'%';
+ document.getElementById('autorotate').textContent=st.auto?'⏸ Остановить':'↻ Автовращение';
+ paintPalette();
+}
+document.getElementById('styles').addEventListener('click',e=>{
+ const b=e.target.closest('[data-style]');if(!b)return;
+ st.style=b.dataset.style;st.color=presets[st.style].color;st.round=.85;st.size=1;
+ renderControls();rebuild();
+});
+document.getElementById('colors').addEventListener('click',e=>{
+ const b=e.target.closest('[data-color]');if(!b)return;st.color=+b.dataset.color;paintPalette();rebuild();
+});
+document.getElementById('roundness').addEventListener('input',e=>{st.round=+e.target.value/100;document.getElementById('roundLabel').textContent=e.target.value+'%';rebuild();});
+document.getElementById('size').addEventListener('input',e=>{st.size=+e.target.value/100;document.getElementById('sizeLabel').textContent=e.target.value+'%';rebuild();});
+document.getElementById('autorotate').addEventListener('click',()=>{st.auto=!st.auto;renderControls();});
+document.getElementById('reset').addEventListener('click',()=>{Object.assign(st,{color:presets[st.style].color,round:.85,size:1,yaw:.71,elevation:.47,zoom:2.52,auto:false});renderControls();rebuild();});
+let dragging=false,lastX=0,lastY=0,pinch=0;
+const touchDist=ev=>ev.touches.length<2?0:Math.hypot(ev.touches[0].clientX-ev.touches[1].clientX,ev.touches[0].clientY-ev.touches[1].clientY);
+canvas.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId);});
+canvas.addEventListener('pointermove',e=>{if(!dragging)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;st.yaw+=dx*.009;st.elevation=clamp(st.elevation+dy*.005,.22,1.03);draw();});
+canvas.addEventListener('pointerup',()=>dragging=false);canvas.addEventListener('pointercancel',()=>dragging=false);
+canvas.addEventListener('wheel',e=>{e.preventDefault();st.zoom=clamp(st.zoom+e.deltaY*.002,1.9,5);draw();},{passive:false});
+canvas.addEventListener('touchstart',e=>{if(e.touches.length>=2)pinch=touchDist(e);},{passive:true});
+canvas.addEventListener('touchmove',e=>{if(e.touches.length>=2){const dist=touchDist(e);if(pinch){st.zoom=clamp(st.zoom+(pinch-dist)*.008,1.9,5);draw();}pinch=dist;}},{passive:true});
+window.addEventListener('resize',draw);new ResizeObserver(draw).observe(document.getElementById('stage'));
+renderControls();rebuild();
+// Only render repeatedly when auto-rotation is selected.
+let previous=0;
+function frame(t){if(st.auto&&!dragging&&document.visibilityState==='visible'&&t-previous>24){st.yaw+=.008;draw();previous=t;}requestAnimationFrame(frame);}
+requestAnimationFrame(frame);
+
+}
+</script>
+</body></html>
