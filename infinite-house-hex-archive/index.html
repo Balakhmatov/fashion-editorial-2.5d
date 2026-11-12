@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#f9f5f1"><meta name="apple-mobile-web-app-capable" content="yes">
+<title>Infinite House — Cloud Apartment Builder</title>
+<style>
+:root{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#403a41;background:#f8f5f1;-webkit-tap-highlight-color:transparent}*{box-sizing:border-box}body{margin:0}button,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.42;cursor:not-allowed}button:focus-visible{outline:3px solid #9c76bd;outline-offset:3px}
+.app{max-width:1370px;margin:auto;padding:18px 17px 35px}.top{display:flex;justify-content:space-between;align-items:center;gap:13px;padding:4px 2px 16px}.brand{display:flex;gap:10px;align-items:center}.logo{width:46px;height:46px;display:grid;place-items:center;border-radius:16px;background:#fce0e7;font-size:27px;box-shadow:inset 0 -4px #00000009}.brand b{font-size:16px;font-weight:900;letter-spacing:.12em;display:block}.brand small{color:#938791;font-weight:800;letter-spacing:.12em;font-size:10px}.pill{border:1px solid #eae3df;background:white;border-radius:999px;color:#777072;font-size:12px;padding:9px 12px;white-space:nowrap}.layout{display:grid;grid-template-columns:minmax(0,1fr) 328px;gap:16px;align-items:start}.scene-shell{min-width:0}.viewport{height:min(75vh,700px);min-height:495px;border-radius:26px;border:1px solid #f0e8e5;box-shadow:0 15px 45px #67515113;overflow:hidden;position:relative;background:radial-gradient(circle at 52% 33%,#fffaf8,#f7e9e2 62%,#e8d9d4);touch-action:none}canvas{display:block;width:100%;height:100%;touch-action:none}.overlay-top{position:absolute;pointer-events:none;top:16px;left:17px;right:17px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.tag{display:inline-flex;gap:6px;align-items:center;border-radius:999px;background:#fffdfac9;border:1px solid #ffffffbd;padding:10px 12px;color:#665563;font-size:11px;font-weight:850;backdrop-filter:blur(8px)}.tag span{color:#a66d98}.tiny{font-size:10px;color:#8e7e85}.floating-bottom{position:absolute;left:13px;right:13px;bottom:13px;display:flex;justify-content:space-between;gap:8px;align-items:end;pointer-events:none}.help{max-width:67%;background:#fffefad8;color:#766b72;border:1px solid #ffffffa8;padding:10px 12px;border-radius:15px;font-size:12px;line-height:1.4;pointer-events:none;backdrop-filter:blur(5px)}.zoom{display:flex;gap:4px;pointer-events:auto;background:#fffdf8dd;border:1px solid #fff;padding:4px;border-radius:14px}.zoom button{border:0;background:transparent;min-width:35px;height:36px;font-size:20px;color:#665865;border-radius:10px}.zoom button:active{background:#f4e6ec}
+.modes{margin-top:12px;background:white;padding:6px;border-radius:19px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;border:1px solid #eee7e0;box-shadow:0 8px 18px #3e24300a}.mode{background:transparent;border:0;border-radius:14px;padding:12px 4px;color:#8c7a84;display:flex;align-items:center;justify-content:center;gap:7px;font-size:12px;font-weight:850;min-width:0}.mode.active{color:#553d57;background:#f5e7ee}.mode .emoji{font-size:18px}.footnote{margin:12px 2px;color:#9a8d8c;font-size:12px;line-height:1.45}
+.panel{background:white;border:1px solid #f0e8e4;border-radius:25px;padding:21px;box-shadow:0 15px 40px #4a28200a}.eyebrow{color:#be8ca1;letter-spacing:.15em;font-size:10px;font-weight:900;text-transform:uppercase}h1{margin:6px 0 9px;font-size:29px;letter-spacing:-.055em;line-height:1.12}h1 em{font-style:normal;color:#c58bad}p{color:#847983;font-size:13px;line-height:1.5;margin:0 0 16px}.divider{height:1px;background:#f0eae8;margin:18px 0}.section-title{font-size:11px;font-weight:900;letter-spacing:.08em;color:#8c7a85;text-transform:uppercase;margin-bottom:12px}.status{padding:11px 12px;border-radius:13px;background:#faf4f7;font-size:12px;color:#835e77;line-height:1.5}.row{display:flex;gap:8px;margin:9px 0}.btn{border:1px solid #ebdfe8;border-radius:13px;background:#fffafd;padding:11px 12px;font-size:12px;font-weight:800;flex:1;color:#644d60;min-width:0;min-height:44px}.btn.primary{background:#77516f;color:white;border-color:#77516f}.btn.negative{color:#b26870}.btn.active{background:#efe2ef;border-color:#a57b9d}.btn.small{padding:9px 8px;min-height:39px}.colorbar{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 15px}.swatch{width:31px;height:31px;display:block;border:3px solid white;border-radius:50%;box-shadow:0 0 0 1px #ded6db;background:var(--c)}.swatch.active{box-shadow:0 0 0 2px #9c6c92}.items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.item{border:1px solid #f0e5e8;border-radius:16px;background:#fffaf9;text-align:left;padding:11px 9px;display:flex;align-items:center;gap:8px;min-height:59px;color:#584b54}.item:active{background:#f4e4e9}.item .pic{font-size:24px}.item b{font-size:12px;display:block}.item small{font-size:10px;color:#9b8b95}.panel .hidden{display:none}.info{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{border:1px solid #f3e8e9;background:#fffbfa;padding:10px;border-radius:12px}.stat b{display:block;font-size:18px;color:#704e67}.stat small{color:#9c8e91;font-size:10px}.desc{background:#f9f3f5;border-radius:14px;padding:12px;color:#806c78;font-size:12px;line-height:1.5}.toast{position:fixed;z-index:10;bottom:24px;left:50%;transform:translate(-50%,25px);opacity:0;transition:.18s;max-width:min(90vw,540px);width:max-content;padding:12px 16px;background:#473841;color:#fff;border-radius:16px;font-weight:700;font-size:13px;text-align:center;pointer-events:none;box-shadow:0 12px 32px #0003}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:850px){.app{padding:12px 10px 23px}.layout{grid-template-columns:1fr;gap:12px}.viewport{height:min(63vh,610px);min-height:370px;border-radius:20px}.panel{border-radius:20px;padding:17px}h1{font-size:25px}.modes{margin-top:9px}.mode{flex-direction:column;gap:2px;padding:8px 1px;font-size:11px}.mode .emoji{font-size:20px}.help{font-size:11px}.top{padding-bottom:12px}.pill{font-size:10px;padding:8px}}
+@media(max-width:390px){.mode{font-size:10px}.help{max-width:70%}.tag{padding:7px 9px;font-size:10px}.viewport{min-height:345px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top"><div class="brand"><div class="logo">☁️</div><div><b>INFINITE HOUSE</b><small>CLOUD APARTMENT · BUILDER 02</small></div></div><div class="pill" id="saveFlag">● Сохранено</div></header>
+<div class="layout">
+<div class="scene-shell">
+  <section class="viewport" id="stage"><canvas id="view" aria-label="Интерактивная 3D-квартира с гексагональной сеткой"></canvas><div class="overlay-top"><div class="tag"><span>✦</span> МОЯ КВАРТИРА</div><div class="tag" id="coordsLabel">37 гексов</div></div><div class="floating-bottom"><div class="help" id="hint">Касайся мебели или свободного гекса. В режиме стен выбирай ребро между ячейками.</div><div class="zoom"><button id="zoomOut" aria-label="Отдалить">−</button><button id="cameraReset" aria-label="Камера по умолчанию">⌖</button><button id="zoomIn" aria-label="Приблизить">+</button></div></div></section>
+  <nav class="modes" aria-label="Режим строительства">
+    <button class="mode active" data-mode="furniture"><span class="emoji">🛋️</span><span>Мебель</span></button>
+    <button class="mode" data-mode="walls"><span class="emoji">🧱</span><span>Стены</span></button>
+    <button class="mode" data-mode="decor"><span class="emoji">🖼️</span><span>На стену</span></button>
+    <button class="mode" data-mode="expand"><span class="emoji">➕</span><span>Площадь</span></button>
+    <button class="mode" data-mode="camera"><span class="emoji">👀</span><span>Осмотр</span></button>
+  </nav>
+  <div class="footnote">Программная 3D-геометрия · ячейки + коллизии · стены по рёбрам · 6 направлений · сохранение на устройстве. Никаких ограничений по типу комнаты.</div>
+</div>
+<aside class="panel">
+  <div class="eyebrow">CLOUD PLUSH COLLECTION</div><h1>Своя квартира.<br><em>Свои правила.</em></h1><p>Строй перегородки, размещай мебель где угодно и расширяй пространство, когда захочешь.</p>
+  <div class="info"><div class="stat"><b id="statCells">37</b><small>Ячеек площади</small></div><div class="stat"><b id="statObjects">6</b><small>Предметов</small></div></div>
+  <div class="divider"></div>
+  <section id="furnitureTools">
+    <div class="section-title">Выбранный предмет</div><div class="status" id="selectionStatus">Коснись мебели, чтобы выбрать. Новую — добавь из каталога.</div>
+    <div class="section-title" style="margin-top:15px">Цвет обивки</div><div class="colorbar" id="colors"></div>
+    <div class="row"><button class="btn" id="rotateLeft">↶ −60°</button><button class="btn" id="rotateRight">+60° ↷</button></div>
+    <div class="row"><button class="btn negative" id="deleteFurniture">Удалить</button><button class="btn" id="cloneFurniture">Дублировать</button></div>
+    <div class="divider"></div><div class="section-title">Добавить в квартиру</div><div class="items" id="furnitureCatalog"></div>
+  </section>
+  <section id="wallsTools" class="hidden"><div class="section-title">Перегородки и проёмы</div><div class="desc">Коснись ребра между двумя соседними гексами: появится стена. Повторное касание убирает её и создаёт проход. Внешний периметр строится автоматически.</div><div class="row"><button id="wallsClear" class="btn negative">Убрать перегородки</button></div><div class="status" id="wallStatus">Свободно строй любые помещения — типы комнат не назначаются.</div></section>
+  <section id="decorTools" class="hidden"><div class="section-title">Настенный декор</div><div class="desc">Выбери предмет, затем коснись стены. На одном сегменте размещается один настенный предмет. Повторное размещение заменяет его.</div><div class="items" id="wallCatalog"></div><div class="row"><button class="btn negative" id="removeWallDecor">Убрать декор со стены</button></div><div class="status" id="wallItemStatus">Выбери окно, картину, полку или светильник.</div></section>
+  <section id="expandTools" class="hidden"><div class="section-title">Расширение площади</div><div class="desc">Светлые гексы по периметру — территория для расширения. Коснись любого соседнего гекса: он станет твоим, а внешние стены и декоративные «соседи» сместятся наружу.</div><div class="status" id="expandStatus">Расширение бесплатное в прототипе. Можно присоединять ячейки в любом направлении.</div></section>
+  <section id="cameraTools" class="hidden"><div class="section-title">Осмотр квартиры</div><div class="desc">Веди пальцем — поворачивай камеру. Двумя пальцами приближай и отдаляй. Возвращайся к расстановке в любой момент.</div><div class="row"><button class="btn" id="resetCamera2">Вернуть ракурс</button><button class="btn" id="toggleGrid">Сетка: включена</button></div></section>
+  <div class="divider"></div><div class="row"><button class="btn small" id="resetAll">↺ Начать заново</button><button class="btn primary small" id="saveNow">✓ Сохранить</button></div>
+</aside>
+</div><div id="toast" class="toast" role="status"></div>
+</div>
+<script>
+'use strict';
+const $=x=>document.querySelector(x), $$=x=>Array.from(document.querySelectorAll(x));
+const canvas=$('#view'), ctx=canvas.getContext('2d',{alpha:false}),stage=$('#stage');
+const D=[[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]],SQ=Math.sqrt(3),SIZE=.72;
+const palettes=['#f3b8c7','#94bed5','#b7a6de','#a8bfaa','#f2c77a','#e8a2a3','#eedcc9'];
+const catalog={sofa:{name:'Облачный диван',icon:'🛋️',cells:[[0,0],[1,0]],price:'2 гекса'},chair:{name:'Кресло-пух',icon:'🪑',cells:[[0,0]],price:'1 гекс'},bed:{name:'Кровать-облако',icon:'🛏️',cells:[[0,0],[1,0],[0,1]],price:'3 гекса'},table:{name:'Столик',icon:'🫖',cells:[[0,0]],price:'1 гекс'},dresser:{name:'Комод',icon:'🗄️',cells:[[0,0],[1,0]],price:'2 гекса'},fridge:{name:'Холодильник',icon:'🧊',cells:[[0,0]],price:'1 гекс'}};
+const wallCatalog={window:{icon:'🪟',name:'Окно'},picture:{icon:'🖼️',name:'Картина'},shelf:{icon:'📚',name:'Полка'},lamp:{icon:'💡',name:'Светильник'}};
+function key(q,r){return q+','+r}function parse(k){return k.split(',').map(Number)}
+function add(a,b){return [a[0]+b[0],a[1]+b[1]]}
+function rotateHex([q,r],n){for(let i=0;i<((n%6)+6)%6;i++)[q,r]=[-r,q+r];return [q,r]}
+function hexToWorld(q,r){return [SIZE*SQ*(q+r/2),SIZE*1.5*r]}
+function worldToHex(x,z){let q=(SQ/3*x-z/3)/SIZE,r=(2/3*z)/SIZE;let cx=q,cz=r,cy=-cx-cz;let rx=Math.round(cx),ry=Math.round(cy),rz=Math.round(cz);let xd=Math.abs(rx-cx),yd=Math.abs(ry-cy),zd=Math.abs(rz-cz);if(xd>yd&&xd>zd)rx=-ry-rz;else if(yd>zd)ry=-rx-rz;else rz=-rx-ry;return [rx,rz]}
+function vertices(q,r){const [x,z]=hexToWorld(q,r);return Array.from({length:6},(_,i)=>[x+SIZE*Math.cos(Math.PI/6+i*Math.PI/3),z+SIZE*Math.sin(Math.PI/6+i*Math.PI/3)])}
+function edgeVerts(q,r,d){const v=vertices(q,r),e=(5-d+6)%6;return [v[e],v[(e+1)%6]]}
+function neighbor(q,r,d){return [q+D[d][0],r+D[d][1]]}
+function wallKey(q,r,d){const n=neighbor(q,r,d),a=key(q,r),b=key(...n);return a<b?a+'|'+b:b+'|'+a}
+function boundary(keyset){const edges=[];for(const k of keyset){const [q,r]=parse(k);for(let d=0;d<6;d++){const n=neighbor(q,r,d);if(!keyset.has(key(...n)))edges.push({q,r,d,id:wallKey(q,r,d),exterior:true})}}return edges}
+function frontier(keyset){const f=new Set();for(const k of keyset){const [q,r]=parse(k);for(let d=0;d<6;d++){const n=key(...neighbor(q,r,d));if(!keyset.has(n))f.add(n)}}return f}
+function seed(){const cells=new Set();for(let q=-3;q<=3;q++)for(let r=-3;r<=3;r++)if(Math.max(Math.abs(q),Math.abs(r),Math.abs(-q-r))<=3)cells.add(key(q,r));return {cells:[...cells],walls:[wallKey(-1,-1,0),wallKey(0,-1,0),wallKey(-1,1,5),wallKey(0,1,5)],decor:[{id:wallKey(-1,-2,2),type:'window'}],items:[{id:1,type:'sofa',q:-2,r:0,rot:0,color:0},{id:2,type:'chair',q:1,r:-1,rot:3,color:2},{id:3,type:'bed',q:0,r:-3,rot:1,color:0},{id:4,type:'table',q:-1,r:2,rot:0,color:4},{id:5,type:'dresser',q:1,r:1,rot:3,color:3},{id:6,type:'fridge',q:2,r:0,rot:0,color:1}],next:7}};
+const STORAGE='infinite-house-apartment-v2';let data;try{data=JSON.parse(localStorage.getItem(STORAGE))}catch{};
+if(!data||!Array.isArray(data.cells)||!Array.isArray(data.items))data=seed();
+let cells=new Set(data.cells),walls=new Set(data.walls||[]),decor=data.decor||[],items=data.items||[],next=data.next||7;
+let mode='furniture',selected=null,selectedWall=null,activeWallType='picture',hover=null,showGrid=true;
+let camera={yaw:.75,elevation:.72,zoom:1,panX:0,panZ:0},W=1000,H=640,scale=58;
+let shapes=[],furnitureRecords=[],pickPoints=[],wallRecords=[],drawCount=0,raf=0;let drag=null,lastPointer=null;
+let saveTimer=null,toastTimer=null;
+function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2100)}
+function save(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{try{localStorage.setItem(STORAGE,JSON.stringify({cells:[...cells],walls:[...walls],decor,items,next}));$('#saveFlag').textContent='● Сохранено';}catch{toast('Браузер не позволил сохранить данные')}},180);$('#saveFlag').textContent='◌ Сохраняю…'}
+function updateStats(){$('#statCells').textContent=cells.size;$('#statObjects').textContent=items.length;$('#coordsLabel').textContent=cells.size+' гексов · '+items.length+' предметов';}
+const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
+function hexFootprint(item,q=item.q,r=item.r,rot=item.rot){return catalog[item.type].cells.map(c=>{const d=rotateHex(c,rot);return key(q+d[0],r+d[1])})}
+function valid(item,q=item.q,r=item.r,rot=item.rot){const occ=new Set(items.filter(x=>x.id!==item.id).flatMap(x=>hexFootprint(x))),foot=hexFootprint(item,q,r,rot),taken=new Set(foot);return foot.every(k=>cells.has(k)&&!occ.has(k))&&foot.every(k=>{const [cq,cr]=parse(k);return D.every((_,d)=>{const nk=key(...neighbor(cq,cr,d));return !taken.has(nk)||!walls.has(wallKey(cq,cr,d))})})}
+function findSpot(type,rotation=0){const cand=[...cells].map(k=>parse(k)).sort((a,b)=>Math.abs(a[0])+Math.abs(a[1])-Math.abs(b[0])-Math.abs(b[1]));const it={id:-100,type,rot:rotation};return cand.find(([q,r])=>valid(it,q,r,rotation))}
+function center(){let xs=0,zs=0;for(const k of cells){const [x,z]=hexToWorld(...parse(k));xs+=x;zs+=z}return [xs/cells.size,zs/cells.size]}
+function cameraBasis(){const y=camera.yaw,e=camera.elevation;return {right:[Math.cos(y),0,-Math.sin(y)],up:[-Math.sin(y)*Math.sin(e),Math.cos(e),-Math.cos(y)*Math.sin(e)],eye:[Math.sin(y)*Math.cos(e),Math.sin(e),Math.cos(y)*Math.cos(e)]}}
+function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]}
+function projected(p){const [cx,cz]=center(),basis=cameraBasis(),v=[p[0]-cx-camera.panX,p[1]-.15,p[2]-cz-camera.panZ];return [W*.50+dot(v,basis.right)*scale,H*.57-dot(v,basis.up)*scale,dot(v,basis.eye)]}
+function unproject(sx,sy,y=0){const [cx,cz]=center(),ya=camera.yaw,e=camera.elevation;const sxn=(sx-W*.5)/scale;const syn=(sy-H*.57)/scale;const ztilt=(syn+(y-.15)*Math.cos(e))/Math.sin(e);return [cx+camera.panX+sxn*Math.cos(ya)+ztilt*Math.sin(ya),cz+camera.panZ-sxn*Math.sin(ya)+ztilt*Math.cos(ya)]}
+function color(h,sh=.0){let s=h.startsWith('#')?h.slice(1):h;if(s.length===3)s=s.split('').map(x=>x+x).join('');let vals=[0,2,4].map(i=>parseInt(s.slice(i,i+2),16));return vals.map(v=>clamp(Math.round(sh>=0?v+(255-v)*sh:v*(1+sh)),0,255))}
+function css(c,a=1){return `rgba(${c[0]},${c[1]},${c[2]},${a})`}
+function mix(a,b,f){return a.map((v,i)=>Math.round(v*(1-f)+b[i]*f))}
+function shade(c,n){const L=[-.45,1,.85],l=dot(n,L)/(Math.hypot(...n)*Math.hypot(...L)||1);const t=l>.65?.11:l>.15?-.05:-.17;return color(cssHex(c),t)}
+function cssHex(c){return '#'+c.map(x=>x.toString(16).padStart(2,'0')).join('')}
+function tri(a,b,c,material,normal,outline=false){shapes.push({v:[a,b,c],normal,mat:material,outline})}
+function quad(a,b,c,d,material,normal){tri(a,b,c,material,normal);tri(a,c,d,material,normal)}
+function plane(points,mat,n){for(let i=1;i<points.length-1;i++)tri(points[0],points[i],points[i+1],mat,n)}
+function cbox(pos,sz,rad,mat,rot=0){ // smoothly rounded cuboid with vertex normals
+ const [hx,hy,hz]=sz.map(x=>x/2),r=clamp(rad,.006,Math.min(hx,hy,hz)*.95),N=5;
+ const halves=[hx,hy,hz],inn=halves.map(v=>v-r),co=Math.cos(rot),si=Math.sin(rot);
+ const transformed=(p)=>[pos[0]+p[0]*co-p[2]*si,pos[1]+p[1],pos[2]+p[0]*si+p[2]*co];
+ for(let axis=0;axis<3;axis++)for(const sign of [-1,1]){
+  const i=(axis+1)%3,j=(axis+2)%3,vertices=[],normals=[];
+  for(let v=0;v<=N;v++)for(let u=0;u<=N;u++){
+   const p=[0,0,0];p[axis]=sign*halves[axis];p[i]=(u/N*2-1)*halves[i];p[j]=(v/N*2-1)*halves[j];
+   const q=p.map((x,k)=>clamp(x,-inn[k],inn[k])),n=p.map((x,k)=>x-q[k]);const ln=Math.hypot(...n)||1;
+   const local=p.map((_,k)=>q[k]+r*n[k]/ln);vertices.push(transformed(local));normals.push([n[0]*co-n[2]*si,n[1],n[0]*si+n[2]*co]);
+  }
+  for(let v=0;v<N;v++)for(let u=0;u<N;u++){const a=v*(N+1)+u,b=a+1,c=a+N+2,d=a+N+1;
+    const nn=[normals[a][0]+normals[b][0]+normals[c][0]+normals[d][0],normals[a][1]+normals[b][1]+normals[c][1]+normals[d][1],normals[a][2]+normals[b][2]+normals[c][2]+normals[d][2]];
+    quad(vertices[a],vertices[b],vertices[c],vertices[d],mat,nn);
+  }
+ }
+}
+function orb(pos,radii,mat,rot=0){const N=8,M=12,co=Math.cos(rot),si=Math.sin(rot),[rx,ry,rz]=radii;
+ const p=(u,v)=>{const a=u*Math.PI/N,b=v*Math.PI*2/M;const x=rx*Math.sin(a)*Math.cos(b),z=rz*Math.sin(a)*Math.sin(b);return [pos[0]+x*co-z*si,pos[1]+ry*Math.cos(a),pos[2]+x*si+z*co]};
+ for(let u=0;u<N;u++)for(let v=0;v<M;v++){const a=p(u,v),b=p(u,v+1),c=p(u+1,v+1),d=p(u+1,v),xx=((a[0]+b[0]+c[0]+d[0])/4-pos[0])/rx,yy=((a[1]+b[1]+c[1]+d[1])/4-pos[1])/ry,zz=((a[2]+b[2]+c[2]+d[2])/4-pos[2])/rz;quad(a,b,c,d,mat,[xx,yy,zz])}
+}
+function frame(center,side,w,h,depth,color){ // rectangular frame on a vertical plane
+ const [a,b]=side,dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz),ux=dx/len,uz=dz/len,nx=-uz,nz=ux;
+ const span=(x,y)=>[center[0]+ux*x+nx*depth,center[1]+y,center[2]+uz*x+nz*depth];
+ const thick=.065;
+ const rect=(x0,y0,x1,y1,m)=>plane([span(x0,y0),span(x1,y0),span(x1,y1),span(x0,y1)],m,[nx,0,nz]);
+ rect(-w/2,-h/2,-w/2+thick,h/2,color);rect(w/2-thick,-h/2,w/2,h/2,color);rect(-w/2,-h/2,w/2,-h/2+thick,color);rect(-w/2,h/2-thick,w/2,h/2,color);
+ return {rect,span,n:[nx,0,nz]};
+}
+function balloon(pos,scaleSize,mat){orb(pos,[scaleSize*.5,scaleSize*.5,scaleSize*.5],mat)}
+function renderFurniture(it){const footprint=hexFootprint(it),centers=footprint.map(k=>hexToWorld(...parse(k))),x=centers.reduce((a,c)=>a+c[0],0)/centers.length,z=centers.reduce((a,c)=>a+c[1],0)/centers.length,rot=it.rot*Math.PI/3,co=Math.cos(rot),si=Math.sin(rot);
+ const local=(a,y,b)=>[x+a*co-b*si,y,z+a*si+b*co];const c=color(palettes[it.color]||palettes[0]),base=color('#f6ecdf'),dark=color('#b69272');
+ const box=(a,y,b,w,h,d,round,mat)=>cbox(local(a,y,b),[w,h,d],round,mat,rot);
+ const ell=(a,y,b,rx,ry,rz,mat)=>orb(local(a,y,b),[rx,ry,rz],mat,rot);
+ if(it.type==='sofa'){
+  box(0,.37,0,2.14,.38,.9,.17,c);ell(-.77,.85,-.28,.46,.55,.30,base);ell(0,.95,-.31,.61,.62,.31,base);ell(.77,.85,-.28,.46,.55,.30,base);
+  box(-.52,.65,.16,.94,.23,.63,.11,base);box(.52,.65,.16,.94,.23,.63,.11,base);ell(-1.05,.73,.08,.26,.39,.47,c);ell(1.05,.73,.08,.26,.39,.47,c);
+  box(-.55,.23,-.32,.11,.28,.10,.04,dark);box(.60,.23,-.32,.11,.28,.10,.04,dark);
+  ell(-.58,1.00,-.12,.19,.19,.13,color('#f0a9b5'));ell(.54,.94,-.11,.23,.25,.12,color('#ffcf8a'));
+ }else if(it.type==='chair'){
+  box(0,.39,0,.95,.37,.91,.16,c);ell(0,.99,-.26,.49,.57,.34,base);box(0,.65,.16,.75,.25,.62,.13,base);ell(-.46,.73,.08,.21,.34,.38,c);ell(.46,.73,.08,.21,.34,.38,c);ell(0,.87,-.02,.20,.22,.12,color('#f5b3bd'));
+ }else if(it.type==='bed'){
+  box(0,.32,0,2.20,.40,1.35,.17,c);box(0,.59,.01,2.02,.28,1.19,.13,base);ell(-.65,.79,-.38,.36,.16,.24,color('#fffafa'));ell(.32,.77,-.38,.36,.16,.24,color('#fffafa'));box(0,.74,.25,1.72,.15,.58,.11,color('#e8c6d9'));ell(0,.96,.65,.72,.26,.15,c);
+ }else if(it.type==='table'){
+  box(0,.69,0,.93,.15,.75,.075,color('#f5ddbc'));box(-.33,.35,-.25,.10,.60,.10,.03,dark);box(.33,.35,-.25,.10,.60,.10,.03,dark);box(-.33,.35,.25,.10,.60,.10,.03,dark);box(.33,.35,.25,.10,.60,.10,.03,dark);ell(0,.90,0,.19,.20,.19,color('#ffc9d0'));
+ }else if(it.type==='dresser'){
+  box(0,.77,0,1.82,1.34,.68,.13,c);for(let y of [.49,.82,1.15]){box(0,y,.36,1.55,.21,.045,.035,base);ell(-.15,y,.41,.065,.05,.025,dark);ell(.15,y,.41,.065,.05,.025,dark)}box(0,1.47,0,1.85,.10,.71,.04,color('#fff5e1'));
+ }else if(it.type==='fridge'){
+  box(0,1.0,0,.92,1.85,.77,.14,color('#f8f4fd'));box(0,.71,.40,.81,.91,.03,.045,color('#d8e8ed'));box(0,1.48,.40,.81,.76,.03,.045,color('#eaf5f5'));box(-.30,1.49,.45,.055,.33,.05,.02,dark);box(-.30,.77,.45,.055,.24,.05,.02,dark);ell(.20,1.59,.45,.12,.12,.06,c);
+ }
+ furnitureRecords.push({it,x,z});
+}
+function renderWall(edge){const [a,b]=edgeVerts(edge.q,edge.r,edge.d),h=1.80,wallcolor=color('#f1e0da'),top=color('#fff5e9'),trim=color('#d8b8b9');
+ const mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],{eye}=cameraBasis(),[cx,cz]=center();const front=(mid[0]-cx)*eye[0]+(mid[1]-cz)*eye[2]>.5;
+ const exterior=edge.exterior;const draw=!exterior||!front;wallRecords.push({...edge,a,b,mid,visible:draw});if(!draw)return;
+ const v0=[a[0],0,a[1]],v1=[b[0],0,b[1]],v2=[b[0],h,b[1]],v3=[a[0],h,a[1]];
+ const n=[-(b[1]-a[1]),0,b[0]-a[0]];
+ plane([v0,v1,v2,v3],exterior?wallcolor:color('#eacdd6'),n);
+ const trimH=.10;plane([[a[0],h,a[1]],[b[0],h,b[1]],[b[0],h+trimH,b[1]],[a[0],h+trimH,a[1]]],top,n);
+ plane([[a[0],0.07,a[1]],[b[0],0.07,b[1]],[b[0],0.19,b[1]],[a[0],0.19,a[1]]],trim,n);
+ const deco=decor.find(d=>d.id===edge.id);if(!deco)return;
+ const dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz),ux=dx/len,uz=dz/len;
+ const nx=-uz,nz=ux,px=mid[0]+nx*.028,pz=mid[1]+nz*.028;
+ const point=(u,v,o=.07)=>[px+ux*u+nx*o,v,pz+uz*u+nz*o];
+ const flat=(u,v,w,h,material,o=.08)=>{plane([point(u-w/2,v-h/2,o),point(u+w/2,v-h/2,o),point(u+w/2,v+h/2,o),point(u-w/2,v+h/2,o)],material,[nx,0,nz]);};
+ if(deco.type==='window'){flat(0,1.12,.67,.83,color('#fffaf5'));flat(0,1.12,.53,.69,color('#a8dce9'),.10);flat(0,1.12,.06,.69,color('#fcf5f1'),.14);flat(0,1.12,.53,.07,color('#fffaf5'),.14)}
+ if(deco.type==='picture'){flat(0,1.15,.62,.65,color('#ae86a5'));flat(0,1.15,.49,.52,color('#fce4e7'),.12);flat(0,1.13,.23,.28,color('#eeb2c5'),.15)}
+ if(deco.type==='shelf'){flat(0,1.00,.68,.10,color('#bd9377'));flat(-.20,1.27,.12,.42,color('#8bb5bf'),.15);flat(.08,1.30,.16,.38,color('#e7bf81'),.15);flat(.28,1.25,.13,.40,color('#c9a9d4'),.15)}
+ if(deco.type==='lamp'){flat(0,1.20,.20,.25,color('#d9a678'));flat(0,1.32,.39,.23,color('#ffe5a2'),.12)}
+}
+function renderAll(){raf=0;const b=stage.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2),ww=Math.max(320,Math.round(b.width*dpr)),hh=Math.max(250,Math.round(b.height*dpr));if(canvas.width!==ww||canvas.height!==hh){canvas.width=ww;canvas.height=hh}W=ww;H=hh;scale=Math.min(W/8.9,H/9.2)*camera.zoom;ctx.fillStyle='#f7eeea';ctx.fillRect(0,0,W,H);
+ const bg=ctx.createRadialGradient(W*.5,H*.25,15,W*.5,H*.32,W*.73);bg.addColorStop(0,'#fffdfa');bg.addColorStop(.74,'#f6e8e3');bg.addColorStop(1,'#e9d7d2');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+ const primitive=[];function poly(v,fill,stroke=null,line=.8,alpha=1){primitive.push({v,fill,stroke,line,alpha})}
+ // floor + neighboring abstract tiles, always reflow around border
+ const f=frontier(cells),f2=frontier(new Set([...cells,...f]));for(const k of f2){if(cells.has(k)||f.has(k))continue;const [q,r]=parse(k),v=vertices(q,r),verts=v.map(([x,z])=>[x,-.16,z]);poly(verts,'#e9dfe2','#e5d6d8',.4,.55)}
+ for(const k of f){const [q,r]=parse(k),v=vertices(q,r).map(([x,z])=>[x,-.10,z]);if(mode==='expand')poly(v,'#d4eddb','#88b49b',1.7,.82);else poly(v,'#eee1e3','#e1cfd1',.6,.62)}
+ for(const k of cells){const [q,r]=parse(k),v=vertices(q,r),verts=v.map(([x,z])=>[x,0,z]);poly(verts,(q+r)%2===0?'#fff6ec':'#fff2e8',showGrid?'#d8bfc0':'#ffefe7',showGrid?1.35:.25,1)}
+ // selected hover footprint preview, independent from occupancy of objects
+ if(mode==='furniture'&&hover&&hover.hex){const it=items.find(i=>i.id===selected);if(it){const ok=valid(it,...hover.hex);for(const k of hexFootprint(it,...hover.hex)){if(!cells.has(k))continue;poly(vertices(...parse(k)).map(([x,z])=>[x,.022,z]),ok?'#c6e8d6':'#ffb8c1',ok?'#62ac83':'#c25d72',1.4,.68)}}}
+ if(mode==='expand'&&hover&&hover.hex){const k=key(...hover.hex);if(f.has(k))poly(vertices(...hover.hex).map(([x,z])=>[x,.03,z]),'#91d6aa','#3b9a64',2.4,.92)}
+ // shadow before furniture
+ for(const it of items){const coords=hexFootprint(it).map(k=>hexToWorld(...parse(k))),px=coords.reduce((a,v)=>a+v[0],0)/coords.length,pz=coords.reduce((a,v)=>a+v[1],0)/coords.length;const v=[];for(let i=0;i<20;i++){let t=2*Math.PI*i/20;v.push([px+Math.cos(t)*.7,-.011,pz+Math.sin(t)*.47])}poly(v,'rgba(104,75,73,.15)')}
+ shapes=[];furnitureRecords=[];wallRecords=[];
+ for(const it of items)renderFurniture(it);
+ const allEdges=boundary(cells);
+ // canonical walls are internal only; robustly choose one side
+ const internal=[];const already=new Set();for(const k of cells){const [q,r]=parse(k);for(let d=0;d<6;d++){const n=neighbor(q,r,d),nk=key(...n),id=wallKey(q,r,d);if(cells.has(nk)&&walls.has(id)&&!already.has(id)){already.add(id);internal.push({q,r,d,id,exterior:false})}}}
+ for(const e of [...allEdges,...internal])renderWall(e);
+ // arrange primitive and geometry by perspective depth from farthest to nearest
+ const projectedPolys=[];
+ for(const p of primitive){const pp=p.v.map(projected),depth=pp.reduce((s,v)=>s+v[2],0)/pp.length;projectedPolys.push({points:pp,depth,fill:p.fill,stroke:p.stroke,line:p.line,alpha:p.alpha})}
+ for(const s of shapes){const pp=s.v.map(projected),depth=pp.reduce((n,v)=>n+v[2],0)/pp.length,base=shade(s.mat,s.normal);projectedPolys.push({points:pp,depth,fill:css(base),stroke:null,line:0,alpha:1,mesh:true})}
+ projectedPolys.sort((a,b)=>a.depth-b.depth);
+ for(const p of projectedPolys){ctx.globalAlpha=p.alpha;ctx.beginPath();ctx.moveTo(p.points[0][0],p.points[0][1]);for(let j=1;j<p.points.length;j++)ctx.lineTo(p.points[j][0],p.points[j][1]);ctx.closePath();ctx.fillStyle=p.fill;ctx.fill();ctx.strokeStyle=p.stroke||p.fill;ctx.lineWidth=p.mesh?.9:p.stroke?p.line:0; if(ctx.lineWidth)ctx.stroke()}
+ ctx.globalAlpha=1;
+ // crisp wall outlines + selection overlay
+ for(const w of wallRecords){if(!w.visible)continue;const a=projected([w.a[0],1.88,w.a[1]]),b=projected([w.b[0],1.88,w.b[1]]);ctx.strokeStyle=w.exterior?'#c99fa8':'#aa899c';ctx.lineWidth=2.4*dpr;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke()}
+ if(selected!=null&&mode==='furniture'){const item=items.find(i=>i.id===selected);if(item){for(const k of hexFootprint(item)){const h=vertices(...parse(k)).map(([x,z])=>projected([x,.03,z]));ctx.beginPath();h.forEach((p,j)=>j?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fillStyle='rgba(255,198,225,.12)';ctx.fill();ctx.strokeStyle='#b75f9e';ctx.lineWidth=2.6*dpr;ctx.stroke()}}}
+ if((mode==='walls'||mode==='decor')&&hover?.wall){const e=hover.wall,[a,b]=edgeVerts(e.q,e.r,e.d);const pa=projected([a[0],.04,a[1]]),pb=projected([b[0],.04,b[1]]);ctx.lineWidth=5*dpr;ctx.strokeStyle='#b66ea0';ctx.beginPath();ctx.moveTo(pa[0],pa[1]);ctx.lineTo(pb[0],pb[1]);ctx.stroke();const centerP=projected([(a[0]+b[0])/2,1.07,(a[1]+b[1])/2]);ctx.beginPath();ctx.arc(centerP[0],centerP[1],5*dpr,0,Math.PI*2);ctx.fillStyle='#b66ea0';ctx.fill()}
+ // border of apartment (only floor tile edges)
+ ctx.globalAlpha=1;drawCount++;
+}
+function requestDraw(){if(!raf)raf=requestAnimationFrame(renderAll)}
+function screenPoint(event){const r=canvas.getBoundingClientRect();return [(event.clientX-r.left)*(W/r.width),(event.clientY-r.top)*(H/r.height)]}
+function distToSegment(p,a,b){const dx=b[0]-a[0],dy=b[1]-a[1],t=clamp(((p[0]-a[0])*dx+(p[1]-a[1])*dy)/(dx*dx+dy*dy||1),0,1);return Math.hypot(p[0]-(a[0]+t*dx),p[1]-(a[1]+t*dy))}
+function hit(sx,sy){const world=unproject(sx,sy),h=worldToHex(...world),onFloor=cells.has(key(...h)),f=frontier(cells);let pickedItem=null,dist=1e12;
+ for(const it of items){const p=hexFootprint(it).map(k=>hexToWorld(...parse(k))),x=p.reduce((s,v)=>s+v[0],0)/p.length,z=p.reduce((s,v)=>s+v[1],0)/p.length;const sp=projected([x,.42,z]);const d=Math.hypot(sp[0]-sx,sp[1]-sy);if(d<dist&&d<Math.max(36,scale*.8)){dist=d;pickedItem=it}}
+ let edge=null,edgeDist=Number.POSITIVE_INFINITY;for(const k of cells){const [q,r]=parse(k);for(let d=0;d<6;d++){const n=key(...neighbor(q,r,d));if(cells.has(n)&&key(q,r)>n)continue;const [a,b]=edgeVerts(q,r,d),pp1=projected([a[0],0,a[1]]),pp2=projected([b[0],0,b[1]]);
+ let dd=distToSegment([sx,sy],pp1,pp2);
+ // In decoration mode, tapping the vertical wall itself also selects it.
+ if(mode==='decor'&&(!cells.has(n)||walls.has(wallKey(q,r,d)))){
+   for(const y of [.45,.90,1.35,1.75]){
+     const pa=projected([a[0],y,a[1]]),pb=projected([b[0],y,b[1]]);
+     dd=Math.min(dd,distToSegment([sx,sy],pa,pb));
+   }
+ }
+ if(dd<edgeDist){edgeDist=dd;edge={q,r,d,id:wallKey(q,r,d),exterior:!cells.has(n)}}}}
+ return {hex:h,item:pickedItem,wall:edgeDist<Math.max(mode==='decor'?22:13,scale*(mode==='decor'?.29:.21))?edge:null,onFloor,expandable:f.has(key(...h))}}
+function updateEditor(){updateStats();if(mode==='furniture'){const it=items.find(x=>x.id===selected);$('#selectionStatus').textContent=it?`${catalog[it.type].icon} ${catalog[it.type].name} · ${catalog[it.type].price} · поворот ${it.rot*60}°`:'Выбери предмет в квартире или добавь новый.';$$('.swatch').forEach((b,i)=>b.classList.toggle('active',it?.color===i));$('#rotateLeft').disabled=$('#rotateRight').disabled=$('#deleteFurniture').disabled=$('#cloneFurniture').disabled=!it}
+ $$('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));for(const m of ['furniture','walls','decor','expand','camera'])$('#'+m+'Tools').classList.toggle('hidden',m!==mode);
+ const help={furniture:'Тяни предмет к свободному гексу · занятые места подсвечены красным.',walls:'Коснись ребра между гексами: построить / убрать перегородку.',decor:'Выбери предмет справа и коснись стены.',expand:'Коснись светлого гекса за стеной, чтобы расширить квартиру.',camera:'Проведи пальцем, чтобы вращать камеру; двумя пальцами — масштаб.'};$('#hint').textContent=help[mode];requestDraw()}
+function chooseMode(m){mode=m;hover=null;updateEditor()}
+function chooseItem(id){selected=id;updateEditor()}
+function relocate(id,q,r){const it=items.find(i=>i.id===id);if(!it)return false;if(!valid(it,q,r,it.rot)){toast('Гексы заняты или находятся за границей квартиры');return false}it.q=q;it.r=r;save();updateEditor();return true}
+function rotateItem(delta){const it=items.find(i=>i.id===selected);if(!it)return;const rot=((it.rot+delta)%6+6)%6;if(!valid(it,it.q,it.r,rot)){toast('Для поворота не хватает свободных гексов');return}it.rot=rot;save();updateEditor()}
+function addItem(t){const p=findSpot(t);if(!p){toast('Нет свободного места — расширь квартиру');return}const it={id:next++,type:t,q:p[0],r:p[1],rot:0,color:Math.floor(Math.random()*palettes.length)};items.push(it);selected=it.id;chooseMode('furniture');save();toast('Предмет добавлен: '+catalog[t].name)}
+function wallTap(e){if(!e)return;const [nq,nr]=neighbor(e.q,e.r,e.d);const other=cells.has(key(nq,nr));if(!other){toast('Внешнюю стену можно сдвинуть расширением площади');return}if(walls.has(e.id)){walls.delete(e.id);decor=decor.filter(d=>d.id!==e.id);toast('Проём открыт')}else{
+  if(items.some(it=>{const fp=hexFootprint(it);return fp.includes(key(e.q,e.r))&&fp.includes(key(nq,nr))})){
+    toast('Здесь стоит мебель на двух гексах — сначала переставь её');return;
+  }
+  walls.add(e.id);toast('Перегородка построена')
+ }save();updateEditor()}
+function wallDecorTap(e){if(!e)return;if(!(e.exterior||walls.has(e.id))){toast('Здесь нет стены — сначала построй её');return}const existing=decor.find(d=>d.id===e.id);selectedWall=e.id;
+ if(existing?.type===activeWallType){decor=decor.filter(d=>d.id!==e.id);toast('Декор снят')}else{
+  decor=decor.filter(d=>d.id!==e.id);decor.push({id:e.id,type:activeWallType});toast('Украшение на стене');
+ }
+ $('#wallItemStatus').textContent=existing?.type===activeWallType?'Декор снят':wallCatalog[activeWallType].name+' установлен';save();updateEditor()}
+function expandTap(hex){const k=key(...hex);if(cells.has(k)){toast('Эта ячейка уже твоя');return}if(!frontier(cells).has(k)){toast('Можно расширяться только от существующей границы');return}cells.add(k);save();updateEditor();toast('Площадь расширена! +1 гекс')}
+function pickAndAct(point,reason='tap'){const h=hit(...point);hover=h;if(mode==='furniture'){if(h.item){chooseItem(h.item.id)}else if(selected&&h.onFloor){relocate(selected,...h.hex)}}else if(mode==='walls'){wallTap(h.wall)}else if(mode==='decor'){wallDecorTap(h.wall)}else if(mode==='expand'){expandTap(h.hex)}requestDraw()}
+function renderPointerMove(p){if(mode==='furniture'||mode==='walls'||mode==='decor'||mode==='expand'){hover=hit(...p);requestDraw()}}
+// Mobile pointer interaction: edit moves furniture; orbit mode rotates camera; pinch always zooms.
+let touches=new Map(),p0=null,lastFrame=0;
+canvas.addEventListener('pointerdown',e=>{e.preventDefault();canvas.setPointerCapture?.(e.pointerId);const pt=screenPoint(e);touches.set(e.pointerId,{...{x:pt[0],y:pt[1]},ox:pt[0],oy:pt[1]});if(touches.size===1){p0={id:e.pointerId,start:pt,last:pt,moved:false,wasItem:mode==='furniture'?hit(...pt).item?.id:null};if(mode==='furniture'&&p0.wasItem){selected=p0.wasItem;updateEditor()}}});
+canvas.addEventListener('pointermove',e=>{if(!touches.has(e.pointerId))return;const pt=screenPoint(e),t=touches.get(e.pointerId);t.x=pt[0];t.y=pt[1];if(touches.size>=2){const p=[...touches.values()];const now=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y),prior=Math.hypot(p[0].ox-p[1].ox,p[0].oy-p[1].oy);if(prior>10)camera.zoom=clamp(camera.zoom*now/prior,.48,2.3);p.forEach(x=>{x.ox=x.x;x.oy=x.y});requestDraw();return}if(!p0)return;const dx=pt[0]-p0.last[0],dy=pt[1]-p0.last[1];if(Math.hypot(pt[0]-p0.start[0],pt[1]-p0.start[1])>7)p0.moved=true;if(mode==='camera'){camera.yaw+=dx/W*4.8;camera.elevation=clamp(camera.elevation+dy/H*2.0,.20,1.23);requestDraw()}else if(mode==='furniture'&&p0.wasItem&&p0.moved){const h=hit(...pt);hover=h;requestDraw()}else renderPointerMove(pt);p0.last=pt;t.ox=t.x;t.oy=t.y;});
+function endPointer(e){if(!touches.has(e.pointerId))return;const t=touches.get(e.pointerId);touches.delete(e.pointerId);if(touches.size||!p0)return;const end=[t.x,t.y];if(mode==='furniture'&&p0.wasItem&&p0.moved){const h=hit(...end);if(h.onFloor)relocate(p0.wasItem,...h.hex)}else if(!p0.moved)pickAndAct(end);p0=null;hover=null;requestDraw()}
+canvas.addEventListener('pointerup',endPointer);canvas.addEventListener('pointercancel',e=>{touches.delete(e.pointerId);p0=null;hover=null;requestDraw()});
+canvas.addEventListener('wheel',e=>{e.preventDefault();camera.zoom=clamp(camera.zoom*Math.exp(-e.deltaY*.0007),.48,2.3);requestDraw()},{passive:false});
+$$('[data-mode]').forEach(b=>b.addEventListener('click',()=>chooseMode(b.dataset.mode)));
+$('#rotateLeft').onclick=()=>rotateItem(-1);$('#rotateRight').onclick=()=>rotateItem(1);
+$('#deleteFurniture').onclick=()=>{items=items.filter(i=>i.id!==selected);selected=null;save();updateEditor()};
+$('#cloneFurniture').onclick=()=>{const it=items.find(i=>i.id===selected);if(it)addItem(it.type)};
+$('#wallsClear').onclick=()=>{walls.clear();decor=decor.filter(x=>boundary(cells).some(e=>e.id===x.id));save();updateEditor();toast('Все внутренние перегородки убраны')};
+$('#removeWallDecor').onclick=()=>{if(selectedWall){decor=decor.filter(d=>d.id!==selectedWall);save();updateEditor();toast('Декор снят')}else toast('Сначала выбери стену с декором')};
+$('#resetAll').onclick=()=>{if(!confirm('Удалить текущую планировку и начать заново?'))return;data=seed();cells=new Set(data.cells);walls=new Set(data.walls);decor=data.decor;items=data.items;next=data.next;selected=null;camera={yaw:.75,elevation:.72,zoom:1,panX:0,panZ:0};save();updateEditor()};
+$('#saveNow').onclick=()=>{save();toast('Планировка сохранена на этом устройстве')};
+$('#zoomIn').onclick=()=>{camera.zoom=clamp(camera.zoom*1.15,.48,2.3);requestDraw()};$('#zoomOut').onclick=()=>{camera.zoom=clamp(camera.zoom/1.15,.48,2.3);requestDraw()};
+const resetCam=()=>{camera={yaw:.75,elevation:.72,zoom:1,panX:0,panZ:0};requestDraw()};$('#cameraReset').onclick=resetCam;$('#resetCamera2').onclick=resetCam;
+$('#toggleGrid').onclick=()=>{showGrid=!showGrid;$('#toggleGrid').textContent='Сетка: '+(showGrid?'включена':'выключена');requestDraw()};
+$('#colors').innerHTML=palettes.map((c,i)=>`<button class="swatch" data-color="${i}" style="--c:${c}" aria-label="Цвет ${i+1}"></button>`).join('');$$('[data-color]').forEach(b=>b.onclick=()=>{const it=items.find(i=>i.id===selected);if(it){it.color=Number(b.dataset.color);save();updateEditor()}});
+$('#furnitureCatalog').innerHTML=Object.entries(catalog).map(([t,v])=>`<button class="item" data-add="${t}"><span class="pic">${v.icon}</span><span><b>${v.name}</b><small>${v.price}</small></span></button>`).join('');$$('[data-add]').forEach(b=>b.onclick=()=>addItem(b.dataset.add));
+$('#wallCatalog').innerHTML=Object.entries(wallCatalog).map(([t,v])=>`<button class="item" data-walltype="${t}"><span class="pic">${v.icon}</span><b>${v.name}</b></button>`).join('');$$('[data-walltype]').forEach(b=>b.onclick=()=>{activeWallType=b.dataset.walltype;$$('[data-walltype]').forEach(x=>x.classList.toggle('active',x===b));$('#wallItemStatus').textContent='Выбрано: '+wallCatalog[activeWallType].name+' · коснись стены';});
+new ResizeObserver(requestDraw).observe(stage);updateEditor();requestDraw();
+</script>
+</body>
+</html>
