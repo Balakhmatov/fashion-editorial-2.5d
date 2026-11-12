@@ -5,13 +5,13 @@
 :root{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#403942;background:#f8f3f1;-webkit-tap-highlight-color:transparent}
 *{box-sizing:border-box}body{margin:0}button,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.35;cursor:not-allowed}button:focus-visible,input:focus-visible{outline:3px solid #a772ae;outline-offset:3px}
 .app{max-width:1380px;margin:auto;padding:16px 17px 36px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.brand{display:flex;align-items:center;gap:11px}.logo{width:44px;height:44px;display:grid;place-items:center;border-radius:15px;background:#fce0e7;font-size:26px}.brand b{display:block;font-size:15px;letter-spacing:.12em;font-weight:900}.brand small{display:block;color:#ab909e;font-size:10px;letter-spacing:.12em;font-weight:800}.pill{padding:9px 12px;border-radius:999px;border:1px solid #ebdfdf;background:#fff9;color:#786873;font-size:11px;font-weight:800;white-space:nowrap}
-.layout{display:grid;grid-template-columns:minmax(0,1fr) 325px;gap:15px;align-items:start}.scene-shell{min-width:0}.viewport{height:min(77vh,705px);min-height:490px;position:relative;background:#f4e9e5;border-radius:25px;overflow:hidden;border:1px solid #e9dddf;touch-action:none;box-shadow:0 16px 44px #5e3b4e12}canvas{width:100%;height:100%;display:block;touch-action:none}.over{pointer-events:none;position:absolute;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-start;gap:7px}.tag{background:#fffcf7d9;border:1px solid #fff8;color:#655765;padding:9px 12px;font-size:11px;font-weight:850;border-radius:50px;backdrop-filter:blur(7px)}.tag.pink{color:#ab6b8c}.bottom{position:absolute;bottom:12px;left:12px;right:12px;display:flex;gap:10px;justify-content:space-between;align-items:end;pointer-events:none}.hint{background:#fffdf9d9;padding:9px 11px;max-width:68%;border-radius:12px;font-size:11px;line-height:1.4;color:#806f79;pointer-events:none}.zoom{display:flex;pointer-events:auto;gap:3px;background:#fffefaec;padding:4px;border-radius:14px;border:1px solid #fff}.zoom button{border:0;background:transparent;min-width:35px;height:36px;border-radius:10px;color:#7d6476;font-size:21px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 325px;gap:15px;align-items:start}.scene-shell{min-width:0}.viewport{height:min(77vh,705px);min-height:490px;position:relative;background:#f4e9e5;border-radius:25px;overflow:hidden;border:1px solid #e9dddf;touch-action:none;box-shadow:0 16px 44px #5e3b4e12}canvas{width:100%;height:100%;display:block;touch-action:none}.over{pointer-events:none;position:absolute;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-start;gap:7px}.tag{background:#fffcf7d9;border:1px solid #fff8;color:#655765;padding:9px 12px;font-size:11px;font-weight:850;border-radius:50px;backdrop-filter:blur(7px)}.tag.pink{color:#ab6b8c}.bottom{position:absolute;bottom:12px;left:12px;right:12px;display:flex;gap:10px;justify-content:space-between;align-items:end;pointer-events:none}.hint{background:#fffdf9d9;padding:9px 11px;max-width:68%;border-radius:12px;font-size:11px;line-height:1.4;color:#806f79;pointer-events:none}.wall-display{position:absolute;top:58px;left:14px;z-index:3;pointer-events:auto}.wall-display button{border:1px solid #e8d8dc;background:#fffaf6e6;color:#875a78;border-radius:11px;padding:8px 11px;font-size:11px;font-weight:850;box-shadow:0 2px 8px #714d6810}.zoom{display:flex;pointer-events:auto;gap:3px;background:#fffefaec;padding:4px;border-radius:14px;border:1px solid #fff}.zoom button{border:0;background:transparent;min-width:35px;height:36px;border-radius:10px;color:#7d6476;font-size:21px}
 .modes{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin-top:12px;background:white;border:1px solid #f1e6e7;border-radius:18px;padding:5px}.mode{min-width:0;display:flex;justify-content:center;align-items:center;gap:6px;padding:11px 3px;background:transparent;border:0;border-radius:13px;font-weight:800;font-size:12px;color:#9c8994}.mode.active{background:#f7e8ed;color:#6e4a68}.mode .ico{font-size:18px}.footnote{font-size:12px;color:#958793;line-height:1.5;margin:12px 3px}
 .panel{border-radius:24px;border:1px solid #eee3e5;background:#fff;padding:19px;box-shadow:0 14px 30px #6a4e4d0c}.eyebrow{font-weight:900;color:#b17b9d;letter-spacing:.12em;font-size:10px}h1{margin:7px 0 9px;font-size:27px;letter-spacing:-.05em;line-height:1.12}h1 em{font-style:normal;color:#ba82aa}.panel p{margin:0 0 14px;color:#877b83;font-size:13px;line-height:1.55}.divider{height:1px;background:#f1e7e8;margin:16px 0}.section-title{font-weight:900;letter-spacing:.08em;color:#927d8b;font-size:11px;text-transform:uppercase;margin-bottom:10px}.status{background:#fbf3f7;padding:11px 12px;color:#886078;line-height:1.45;font-size:12px;border-radius:12px}.row{display:flex;gap:7px;margin:9px 0}.btn{flex:1;min-width:0;min-height:42px;background:#fff8fb;border:1px solid #ebdfe8;color:#765467;font-size:12px;font-weight:800;border-radius:12px;padding:10px 9px}.btn.primary{background:#7b5271;border-color:#7b5271;color:white}.btn.negative{color:#b86370}.btn.active{border-color:#c391b1;background:#f4e4ee}.colours{display:flex;flex-wrap:wrap;gap:8px;margin:9px 0 15px}.swatch{width:31px;height:31px;border-radius:50%;border:3px solid white;box-shadow:0 0 0 1px #e5d5dc;background:var(--c)}.swatch.active{box-shadow:0 0 0 2px #b874a5}.items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.item{display:flex;gap:8px;align-items:center;padding:9px;text-align:left;border-radius:13px;background:#fffafb;border:1px solid #f0e5ea;min-width:0;min-height:54px;color:#594b56}.item .ico{font-size:23px}.item b{display:block;font-size:12px}.item small{display:block;color:#a0959d;font-size:10px}.hidden{display:none!important}.info{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{padding:9px 10px;border-radius:12px;border:1px solid #f2e8ed;background:#fffbfc}.stat b{display:block;font-size:18px;color:#6b4c64}.stat small{font-size:10px;color:#9e8a99}.desc{padding:11px 12px;font-size:12px;line-height:1.55;background:#faf3f6;border-radius:12px;color:#866e7b}.slider{width:100%;accent-color:#aa7f9e;cursor:pointer}.range-head{display:flex;justify-content:space-between;font-weight:800;color:#897184;font-size:12px;margin:11px 0 4px}.toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,25px);opacity:0;pointer-events:none;z-index:20;background:#4c3b4c;color:white;padding:11px 17px;border-radius:13px;text-align:center;font-size:13px;font-weight:800;box-shadow:0 16px 35px #0003;transition:.17s}.toast.show{opacity:1;transform:translate(-50%,0)}
 @media(max-width:880px){.app{padding:11px 10px 28px}.layout{grid-template-columns:1fr;gap:12px}.viewport{height:62svh;min-height:360px;border-radius:20px}.panel{border-radius:20px;padding:17px}.brand b{font-size:13px}.pill{font-size:10px}.modes .mode{font-size:11px;flex-direction:column;gap:2px;padding:8px 1px}.modes .ico{font-size:19px}.footnote{margin:8px 2px 14px}.hint{font-size:10px;max-width:63%}}
 </style></head><body>
-<div class="app"><header class="top"><div class="brand"><div class="logo">☁️</div><div><b>INFINITE HOUSE</b><small>CLOUD APARTMENT · ROOM BUILDER</small></div></div><span class="pill" id="saveFlag">● Локальная планировка</span></header>
-<div class="layout"><div class="scene-shell"><section id="stage" class="viewport"><canvas id="view" aria-label="Редактор квартиры с прямыми стенами и свободным поворотом мебели"></canvas><div class="over"><span class="tag pink">✦ МОЯ КВАРТИРА</span><span class="tag" id="coordsLabel">8 × 7 · 6 предметов</span></div><div class="bottom"><div class="hint" id="hint">Выбери и передвигай предмет. Поворот — от 0 до 359°.</div><div class="zoom"><button id="zoomOut" aria-label="Отдалить">−</button><button id="cameraReset" aria-label="Вернуть ракурс">⌖</button><button id="zoomIn" aria-label="Приблизить">+</button></div></div></section><nav class="modes"><button class="mode active" data-mode="furniture"><span class="ico">🛋️</span>Мебель</button><button class="mode" data-mode="walls"><span class="ico">🧱</span>Стены</button><button class="mode" data-mode="decor"><span class="ico">🖼️</span>На стену</button><button class="mode" data-mode="expand"><span class="ico">↗️</span>Площадь</button><button class="mode" data-mode="camera"><span class="ico">👀</span>Осмотр</button></nav><p class="footnote">Ровные стены и перегородки · квадратная сетка · поворот мебели на любой угол · проверка столкновений · расширение целой стороны.</p></div>
+<div class="app"><header class="top"><div class="brand"><div class="logo">☁️</div><div><b>INFINITE HOUSE</b><small>CLOUD APARTMENT · WALLS 3.0</small></div></div><span class="pill" id="saveFlag">● Локальная планировка</span></header>
+<div class="layout"><div class="scene-shell"><section id="stage" class="viewport"><canvas id="view" aria-label="Редактор квартиры с прямыми стенами и свободным поворотом мебели"></canvas><div class="over"><span class="tag pink">✦ МОЯ КВАРТИРА</span><span class="tag" id="coordsLabel">8 × 7 · 6 предметов</span></div><div class="wall-display"><button id="wallView" type="button">🏠 Стены: срез</button></div><div class="bottom"><div class="hint" id="hint">Выбери и передвигай предмет. Поворот — от 0 до 359°.</div><div class="zoom"><button id="zoomOut" aria-label="Отдалить">−</button><button id="cameraReset" aria-label="Вернуть ракурс">⌖</button><button id="zoomIn" aria-label="Приблизить">+</button></div></div></section><nav class="modes"><button class="mode active" data-mode="furniture"><span class="ico">🛋️</span>Мебель</button><button class="mode" data-mode="walls"><span class="ico">🧱</span>Стены</button><button class="mode" data-mode="decor"><span class="ico">🖼️</span>На стену</button><button class="mode" data-mode="expand"><span class="ico">↗️</span>Площадь</button><button class="mode" data-mode="camera"><span class="ico">👀</span>Осмотр</button></nav><p class="footnote">Цельные прямые стены без швов · режим среза как в Sims · свободный поворот мебели · расширение квартиры.</p></div>
 <aside class="panel"><div class="eyebrow">CLOUD PLUSH · BUILD MODE</div><h1>Строй как в Sims.<br><em>Украшай как хочешь.</em></h1><p>Свободная планировка без назначения комнат. Переставляй мебель, строй перегородки и расширяй квартиру.</p><div class="info"><div class="stat"><b id="statCells">56</b><small>Квадратных ячеек</small></div><div class="stat"><b id="statObjects">6</b><small>Предметов</small></div></div><div class="divider"></div>
 <section id="furnitureTools"><div class="section-title">Выбранная мебель</div><div class="status" id="selectionStatus">Коснись предмета или добавь новый из каталога.</div><div class="section-title" style="margin-top:14px">Цвет</div><div class="colours" id="colors"></div><div class="range-head"><span>Угол поворота</span><span id="angleLabel">0°</span></div><input id="angle" class="slider" type="range" min="0" max="359" step="1" value="0"><div class="row"><button id="rotateLeft" class="btn">↶ −15°</button><button id="rotateRight" class="btn">+15° ↷</button></div><div class="row"><button class="btn negative" id="deleteFurniture">Удалить</button><button class="btn" id="cloneFurniture">Копировать</button></div><div class="divider"></div><div class="section-title">Мебель Cloud</div><div class="items" id="furnitureCatalog"></div></section>
 <section id="wallsTools" class="hidden"><div class="section-title">Прямые стены / проёмы</div><div class="desc">Нажми на линию между квадратами, чтобы поставить стену. Нажми повторно — будет проход. Стены строго горизонтальные или вертикальные, как в строительном режиме The Sims.</div><div class="row"><button id="wallsClear" class="btn negative">Убрать перегородки</button></div><div class="status" id="wallStatus">Никаких типов комнат или запрета мебели.</div></section>
@@ -38,9 +38,9 @@ function seed(){const cells=[];for(let x=-4;x<=3;x++)for(let z=-3;z<=3;z++)cells
  for(const z of [-3,-2,-1,1,2,3])walls.push(wallKey(-1,z,0));
  for(const x of [-4,-2,-1])walls.push(wallKey(x,0,1));
  return {cells,walls,decor:[{id:wallKey(-2,-3,3),type:'window'},{id:wallKey(2,-3,3),type:'window'},{id:wallKey(-4,2,2),type:'picture'}],items:[{id:1,type:'sofa',x:-2.2,z:-.4,rot:0,color:0},{id:2,type:'chair',x:1.25,z:-.75,rot:25,color:2},{id:3,type:'bed',x:-2.1,z:-2.25,rot:0,color:0},{id:4,type:'table',x:1.4,z:1.5,rot:0,color:4},{id:5,type:'dresser',x:-2.0,z:2.1,rot:0,color:3},{id:6,type:'fridge',x:2.5,z:-2.25,rot:0,color:1}],next:7}}
-const STORAGE='infinite-house-cloud-sims-v1';let data;try{data=JSON.parse(localStorage.getItem(STORAGE))}catch(e){}if(!data||!Array.isArray(data.cells)||!Array.isArray(data.items))data=seed();
+const STORAGE='infinite-house-cloud-sims-v2';let data;try{data=JSON.parse(localStorage.getItem(STORAGE))}catch(e){}if(!data||!Array.isArray(data.cells)||!Array.isArray(data.items))data=seed();
 let cells=new Set(data.cells),walls=new Set(data.walls),decor=data.decor,items=data.items,next=data.next;
-let mode='furniture',selected=null,selectedWall=null,activeWallType='picture',hover=null,showGrid=true;
+let mode='furniture',selected=null,selectedWall=null,activeWallType='picture',hover=null,showGrid=true,wallView='cut';
 let camera={yaw:.7,elevation:.76,zoom:1,panX:0,panZ:0};let W=1000,H=700,scale=62;
 let shapes=[],furnitureRecords=[],wallRecords=[],raf=0,drag=null,saveTimer=null,toastTimer=null;
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),1900)}
@@ -111,41 +111,88 @@ function renderFurniture(it){const x=it.x,z=it.z,rot=it.rot*Math.PI/180,co=Math.
  furnitureRecords.push({it,x,z});
 }
 
-function renderWall(edge){
- const [a,b]=edgeVerts(edge.x,edge.z,edge.d),h=1.93;
- const mid=[(a[0]+b[0])/2,(a[1]+b[1])/2];
- const {eye}=cameraBasis(),[cx,cz]=center();
- // In cutaway mode, the walls closest to the camera are reduced to a neat baseboard.
- const forward=(mid[0]-cx)*eye[0]+(mid[1]-cz)*eye[2]>.3;
- const cut=edge.exterior&&forward;
- wallRecords.push({...edge,a,b,mid,visible:!cut});
- const dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz),nx=-dz/len,nz=dx/len,t=.053;
- const P=(x,y,z,o)=>[x+nx*o,y,z+nz*o];
- function face(y0,y1,offset,material,normal){
-  const v0=P(a[0],y0,a[1],offset),v1=P(b[0],y0,b[1],offset);
-  const v2=P(b[0],y1,b[1],offset),v3=P(a[0],y1,a[1],offset);
-  plane([v0,v1,v2,v3],material,normal);
+// Room geometry is still defined by individual grid edges for editing, but *rendered*
+// as merged architectural runs: one continuous, straight vertical surface per run.
+// No small separately shaded wall blocks and no seams at every grid square.
+function getWallRuns(){
+ const grouped=new Map();
+ for(const edge of getAllEdges()){
+  const [a,b]=edgeVerts(edge.x,edge.z,edge.d);
+  const alongX=Math.abs(a[0]-b[0])>Math.abs(a[1]-b[1]);
+  const fixed=alongX?a[1]:a[0], start=alongX?Math.min(a[0],b[0]):Math.min(a[1],b[1]);
+  const group=(alongX?'x':'z')+':'+fixed+':'+(edge.exterior?'ext':'int');
+  if(!grouped.has(group))grouped.set(group,[]);
+  grouped.get(group).push({start,end:start+1,edge,alongX,fixed});
  }
- const wallpaint=color(edge.exterior?'#f7ebe9':'#f3dce6');
+ const runs=[];
+ for(const segs of grouped.values()){
+  segs.sort((a,b)=>a.start-b.start);
+  let run=null;
+  for(const seg of segs){
+   if(!run || seg.start>run.end+.001){
+    run={start:seg.start,end:seg.end,alongX:seg.alongX,fixed:seg.fixed,exterior:seg.edge.exterior,segments:[seg.edge]};
+    runs.push(run);
+   }else{run.end=Math.max(run.end,seg.end);run.segments.push(seg.edge);}
+  }
+ }
+ return runs.map(run=>({...run,
+  a:run.alongX?[run.start,run.fixed]:[run.fixed,run.start],
+  b:run.alongX?[run.end,run.fixed]:[run.fixed,run.end]
+ }));
+}
+function wallIsCut(a,b,exterior){
+ if(wallView==='hidden')return true;
+ if(wallView==='full')return false;
+ const mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],[cx,cz]=center();
+ const eye=cameraBasis().eye;
+ // Exterior wall nearest the camera becomes a small cutaway plinth.
+ return exterior&&((mid[0]-cx)*eye[0]+(mid[1]-cz)*eye[2]>.30);
+}
+function renderWallRun(run){
+ const {a,b,exterior}=run,h=2.22;
+ const cut=wallIsCut(a,b,exterior),cutHeight=.12;
+ wallRecords.push({a,b,exterior,visible:!cut,height:h});
+ if(wallView==='hidden')return;
+ const dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz),nx=-dz/len,nz=dx/len,t=.065;
+ const eye=cameraBasis().eye,front=dot([nx,0,nz],eye)>0?1:-1;
+ const P=(x,y,z,offset)=>[x+nx*offset,y,z+nz*offset];
+ const panel=(y0,y1,offset,mat,n)=>shapes.push({v:[
+   P(a[0],y0,a[1],offset),P(b[0],y0,b[1],offset),
+   P(b[0],y1,b[1],offset),P(a[0],y1,a[1],offset)
+ ],mat,normal:n});
+ const n=[nx*front,0,nz*front];
  if(cut){
-   face(0,.16,-t,color('#efe2e5'),[-nx,0,-nz]);
-   face(0,.16,t,color('#efe2e5'),[nx,0,nz]);
-   return;
+  panel(0,cutHeight,front*t,color('#e3cfd3'),n);
+  // Neat cut top strip, not a full obstructing foreground wall.
+  shapes.push({v:[P(a[0],cutHeight,a[1],-t),P(b[0],cutHeight,b[1],-t),P(b[0],cutHeight,b[1],t),P(a[0],cutHeight,a[1],t)],mat:color('#fff9f5'),normal:[0,1,0]});
+  return;
  }
- // Flat, perfectly planar continuous walls with a narrow solid top edge. No rounded-box tessellation.
- const visibleSide=dot([nx,0,nz],eye)>0?1:-1;
- face(0,h,t*visibleSide,wallpaint,[nx*visibleSide,0,nz*visibleSide]);
- plane([P(a[0],h,a[1],-t),P(b[0],h,b[1],-t),P(b[0],h,b[1],t),P(a[0],h,a[1],t)],color('#fffaf4'),[0,1,0]);
- face(.08,.19,(t+.004)*visibleSide,color('#e6c7d1'),[nx*visibleSide,0,nz*visibleSide]);
- face(h-.085,h,(t+.004)*visibleSide,color('#fff6f3'),[nx*visibleSide,0,nz*visibleSide]);
+ // One uninterrupted main panel and thin cap. Stop banding/different lighting on adjacent tiles.
+ const main=color(exterior?'#f6eae7':'#f1dee7');
+ panel(0,h,t*front,main,n);
+ shapes.push({v:[P(a[0],h,a[1],-t),P(b[0],h,b[1],-t),P(b[0],h,b[1],t),P(a[0],h,a[1],t)],mat:color('#fff9f2'),normal:[0,1,0]});
+ panel(.04,.12,t*front+.004,color('#dbc1cd'),n);
+ // A single restrained upper cornice across the WHOLE run.
+ panel(h-.07,h,t*front+.004,color('#fff4ee'),n);
+}
+function renderWallDecoration(edge){
+ if(wallView==='hidden')return;
+ const [a,b]=edgeVerts(edge.x,edge.z,edge.d),cut=wallIsCut(a,b,edge.exterior);
+ if(cut)return;
  const deco=decor.find(o=>o.id===edge.id);if(!deco)return;
- const ux=dx/len,uz=dz/len,front=dot([nx,0,nz],eye)>0?1:-1;
- const point=(u,v,o=.08)=>[mid[0]+ux*u+nx*o*front,v,mid[1]+uz*u+nz*o*front];
- const flat=(u,v,w,hh,material,o=.081)=>plane([point(u-w/2,v-hh/2,o),point(u+w/2,v-hh/2,o),point(u+w/2,v+hh/2,o),point(u-w/2,v+hh/2,o)],material,[nx*front,0,nz*front]);
- if(deco.type==='window'){flat(0,1.17,.73,1.02,color('#fffaf3'));flat(0,1.17,.60,.88,color('#9dd8e3'),.085);flat(0,1.17,.055,.88,color('#fffdf8'),.090);flat(0,1.17,.60,.05,color('#fffdf8'),.090)}
- if(deco.type==='picture'){flat(0,1.15,.66,.77,color('#b688a7'));flat(0,1.15,.53,.64,color('#ffeff2'),.090);flat(0,1.17,.26,.31,color('#eda9c1'),.095)}
- if(deco.type==='shelf'){flat(0,1.0,.71,.10,color('#b98869'));flat(-.21,1.29,.12,.37,color('#a2beca'),.095);flat(.08,1.27,.15,.41,color('#e3bb81'),.095);flat(.28,1.27,.11,.34,color('#c9a9d2'),.095)}
- if(deco.type==='lamp'){flat(0,1.21,.21,.26,color('#c78f61'));flat(0,1.34,.41,.27,color('#ffe4a5'),.09)}
+ const mid=[(a[0]+b[0])/2,(a[1]+b[1])/2];
+ const dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz),ux=dx/len,uz=dz/len,nx=-uz,nz=ux,eye=cameraBasis().eye,front=dot([nx,0,nz],eye)>0?1:-1;
+ const point=(u,v,o=.084)=>[mid[0]+ux*u+nx*o*front,v,mid[1]+uz*u+nz*o*front];
+ const flat=(u,v,w,hh,material,o=.085)=>shapes.push({v:[point(u-w/2,v-hh/2,o),point(u+w/2,v-hh/2,o),point(u+w/2,v+hh/2,o),point(u-w/2,v+hh/2,o)],mat:material,normal:[nx*front,0,nz*front]});
+ if(deco.type==='window'){
+  flat(0,1.31,.76,1.12,color('#fffaf4'));
+  flat(0,1.31,.63,.98,color('#a9d8e6'),.089);
+  flat(0,1.31,.047,.98,color('#fffdf7'),.092);
+  flat(0,1.31,.63,.048,color('#fffdf7'),.092);
+ }
+ if(deco.type==='picture'){flat(0,1.30,.68,.78,color('#ba91ad'));flat(0,1.30,.55,.65,color('#ffeff3'),.09);flat(0,1.32,.28,.32,color('#e9a8c5'),.094)}
+ if(deco.type==='shelf'){flat(0,1.14,.73,.12,color('#b98969'));flat(-.20,1.42,.13,.40,color('#a2beca'),.09);flat(.08,1.41,.15,.43,color('#e3bb81'),.09);flat(.27,1.43,.12,.36,color('#c9a9d2'),.09)}
+ if(deco.type==='lamp'){flat(0,1.25,.21,.29,color('#c78f61'));flat(0,1.40,.40,.28,color('#ffe4a5'),.09)}
 }
 // Rotated furniture footprints are oriented rectangles, not blocked square cells.
 function corners(it,x=it.x,z=it.z,rot=it.rot){const c=catalog[it.type],a=rot*Math.PI/180,co=Math.cos(a),si=Math.sin(a),w=c.w/2,d=c.d/2;return [[-w,-d],[w,-d],[w,d],[-w,d]].map(([u,v])=>[x+u*co-v*si,z+u*si+v*co])}
@@ -175,13 +222,13 @@ function renderAll(){raf=0;const b=stage.getBoundingClientRect(),dpr=Math.min(wi
  if(mode==='expand'){const b=bounds();for(const k of outer){const [x,z]=parse(k);poly(tileVerts(x,z,-.07),'#cbe9da','#7bae93',1.5,.75)}}
  if(mode==='furniture'&&hover?.point&&selected!=null){const it=items.find(i=>i.id===selected);if(it){const [x,z]=hover.point,can=valid(it,x,z,it.rot),v=corners(it,x,z,it.rot).map(p=>[p[0],.035,p[1]]);poly(v,can?'#bde6ce':'#f7bdc8',can?'#52a677':'#c65a70',2,.61)}}
  for(const it of items){const p=corners(it),cen=[it.x,it.z],v=[];for(let n=0;n<20;n++){const a=n*Math.PI/10;v.push([cen[0]+Math.cos(a)*catalog[it.type].w*.42,-.01,cen[1]+Math.sin(a)*catalog[it.type].d*.42])}poly(v,'rgba(102,70,78,.12)')}
- shapes=[];furnitureRecords=[];wallRecords=[];for(const it of items)renderFurniture(it);for(const e of getAllEdges())renderWall(e);
+ shapes=[];furnitureRecords=[];wallRecords=[];for(const it of items)renderFurniture(it);for(const run of getWallRuns())renderWallRun(run);for(const edge of getAllEdges())renderWallDecoration(edge);
  const all=[];for(const p of primitives){const pp=p.v.map(projected);all.push({v:pp,depth:pp.reduce((s,v)=>s+v[2],0)/pp.length,fill:p.fill,stroke:p.stroke,line:p.line,alpha:p.alpha})}
  for(const m of shapes){const pp=m.v.map(projected);all.push({v:pp,depth:pp.reduce((s,v)=>s+v[2],0)/pp.length,fill:css(shade(m.mat,m.normal)),mesh:true,alpha:1})}
  all.sort((a,b)=>a.depth-b.depth);
  for(const p of all){ctx.globalAlpha=p.alpha;ctx.beginPath();ctx.moveTo(p.v[0][0],p.v[0][1]);for(let i=1;i<p.v.length;i++)ctx.lineTo(p.v[i][0],p.v[i][1]);ctx.closePath();ctx.fillStyle=p.fill;ctx.fill();ctx.strokeStyle=p.stroke||p.fill;ctx.lineWidth=p.mesh?.72:p.stroke?p.line:0;if(ctx.lineWidth)ctx.stroke()}
  ctx.globalAlpha=1;
- for(const w of wallRecords){if(!w.visible)continue;const a=projected([w.a[0],1.99,w.a[1]]),b=projected([w.b[0],1.99,w.b[1]]);ctx.strokeStyle=w.exterior?'#dcc4c7':'#bf9eae';ctx.lineWidth=2*dpr;ctx.lineCap='square';ctx.beginPath();ctx.moveTo(...a.slice(0,2));ctx.lineTo(...b.slice(0,2));ctx.stroke()}
+ for(const w of wallRecords){if(!w.visible)continue;const a=projected([w.a[0],w.height,w.a[1]]),b=projected([w.b[0],w.height,w.b[1]]);ctx.strokeStyle=w.exterior?'#dcc4c7':'#bf9eae';ctx.lineWidth=2*dpr;ctx.lineCap='square';ctx.beginPath();ctx.moveTo(...a.slice(0,2));ctx.lineTo(...b.slice(0,2));ctx.stroke()}
  if(selected!=null&&mode==='furniture'){const it=items.find(i=>i.id===selected);if(it){const p=corners(it).map(([x,z])=>projected([x,.026,z]));ctx.beginPath();p.forEach((a,i)=>i?ctx.lineTo(a[0],a[1]):ctx.moveTo(a[0],a[1]));ctx.closePath();ctx.fillStyle='#ecb1d729';ctx.fill();ctx.strokeStyle='#b96d9f';ctx.lineWidth=2.3*dpr;ctx.stroke();}}
  if((mode==='walls'||mode==='decor')&&hover?.wall){const [a,b]=edgeVerts(hover.wall.x,hover.wall.z,hover.wall.d),pa=projected([a[0],.025,a[1]]),pb=projected([b[0],.025,b[1]]);ctx.strokeStyle='#b46d96';ctx.lineWidth=5*dpr;ctx.beginPath();ctx.moveTo(pa[0],pa[1]);ctx.lineTo(pb[0],pb[1]);ctx.stroke();}
 }
@@ -228,7 +275,7 @@ $('#deleteFurniture').onclick=()=>{items=items.filter(i=>i.id!==selected);select
 $('#wallsClear').onclick=()=>{walls.clear();decor=decor.filter(x=>boundary().some(e=>e.id===x.id));save();updateEditor();toast('Перегородки убраны')};$('#removeWallDecor').onclick=()=>{if(selectedWall){decor=decor.filter(d=>d.id!==selectedWall);save();updateEditor();toast('Декор снят')}else toast('Сначала выбери стену')};
 $('#resetAll').onclick=()=>{if(!confirm('Сбросить всю планировку?'))return;data=seed();cells=new Set(data.cells);walls=new Set(data.walls);decor=data.decor;items=data.items;next=data.next;selected=null;camera={yaw:.7,elevation:.76,zoom:1,panX:0,panZ:0};save();updateEditor()};$('#saveNow').onclick=()=>{save();toast('Сохранено на этом устройстве')};
 $('#zoomIn').onclick=()=>{camera.zoom=clamp(camera.zoom*1.13,.45,2.7);requestDraw()};$('#zoomOut').onclick=()=>{camera.zoom=clamp(camera.zoom/1.13,.45,2.7);requestDraw()};const resetCam=()=>{camera={yaw:.7,elevation:.76,zoom:1,panX:0,panZ:0};requestDraw()};$('#cameraReset').onclick=resetCam;$('#resetCamera2').onclick=resetCam;
-$('#toggleGrid').onclick=()=>{showGrid=!showGrid;$('#toggleGrid').textContent='Сетка: '+(showGrid?'включена':'выключена');requestDraw()};
+$('#toggleGrid').onclick=()=>{showGrid=!showGrid;$('#toggleGrid').textContent='Сетка: '+(showGrid?'включена':'выключена');requestDraw()};$('#wallView').onclick=()=>{wallView=wallView==='cut'?'full':wallView==='full'?'hidden':'cut';$('#wallView').textContent='🏠 Стены: '+({cut:'срез',full:'полные',hidden:'скрыты'}[wallView]);requestDraw()};
 for(const dir of ['Left','Right','Back','Front'])$('#expand'+dir).onclick=()=>expand(dir.toLowerCase());
 $('#colors').innerHTML=palettes.map((c,i)=>`<button class="swatch" data-color="${i}" style="--c:${c}" aria-label="Цвет ${i+1}"></button>`).join('');$$('[data-color]').forEach(b=>b.onclick=()=>{const it=items.find(i=>i.id===selected);if(it){it.color=+b.dataset.color;save();updateEditor()}});
 $('#furnitureCatalog').innerHTML=Object.entries(catalog).map(([t,v])=>`<button class="item" data-add="${t}"><span class="ico">${v.icon}</span><span><b>${v.name}</b><small>${v.w.toFixed(1)} × ${v.d.toFixed(1)}</small></span></button>`).join('');$$('[data-add]').forEach(b=>b.onclick=()=>addItem(b.dataset.add));$('#wallCatalog').innerHTML=Object.entries(wallCatalog).map(([t,v])=>`<button class="item" data-walltype="${t}"><span class="ico">${v.icon}</span><b>${v.name}</b></button>`).join('');$$('[data-walltype]').forEach(b=>b.onclick=()=>{activeWallType=b.dataset.walltype;$$('[data-walltype]').forEach(x=>x.classList.toggle('active',x===b));$('#wallItemStatus').textContent='Выбрано: '+wallCatalog[activeWallType].name+'. Коснись стены.'});
