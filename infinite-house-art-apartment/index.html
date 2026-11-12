@@ -422,8 +422,8 @@ function update(){
    im.src='data:image/webp;base64,'+ART[o.type==='sofa'?sofaView(o).key:o.type];
    im.style.transform=o.type==='sofa'&&sofaView(o).flip?'scaleX(-1)':'none';
    name.textContent=ITEMS[o.type].name;
-   info.textContent=o.type==='sofa'?'Исходный рисованный диван · 8 направлений, шаг 45°':ITEMS[o.type].wall?'Закреплено на стене · перемещай вдоль стены':'Рисованный предмет';
-   turn.textContent=o.type==='sofa'?sofaView(o).heading+' · '+(dir8(o.rot)+1)+' / 8':ITEMS[o.type].wall?(wallSide(o)==='back'?'Задняя':'Левая'):'арт · 1';
+   info.textContent=o.type==='sofa'?sofaView(o).heading+' · поворот 45°':ITEMS[o.type].wall?'На стене · перетаскивай вдоль неё':'Перемещай по клеткам';
+   turn.textContent=o.type==='sofa'?(dir8(o.rot)+1)+' / 8':ITEMS[o.type].wall?(wallSide(o)==='back'?'Задняя':'Левая'):'—';
  }else{
    im.removeAttribute('src');im.style.transform='none';name.textContent='Выбери предмет';
    info.textContent='Нажми на мебель в квартире';turn.textContent='—';
