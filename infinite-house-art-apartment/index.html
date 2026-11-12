@@ -394,6 +394,14 @@ function box(o){
 }
 
 let hitBoxes=[];
+function drawSelectionFootprint(o){
+ const fp=ITEMS[o.type].foot||[1,1],hx=fp[0]/2,hz=fp[1]/2;
+ const outline=[
+  P(o.x-hx,o.z-hz),P(o.x+hx,o.z-hz),
+  P(o.x+hx,o.z+hz),P(o.x-hx,o.z+hz)
+ ];
+ polygon(outline,'rgba(255,214,108,.13)','#f0aa2e',2.2);
+}
 function drawGroundContact(o,b){
  if(ITEMS[o.type].layer==='floor')return;
  // A small contact shadow is physically attached to the projected floor
@@ -416,9 +424,9 @@ function drawObject(o){
  if(spec.wall){
    drawWallObject(o);
  }else{
+   if(active)drawSelectionFootprint(o);
    drawGroundContact(o,b);
    if(o.type==='lamp'&&deviceOn(o))lampGlow(b);
-   if(active)ellipse(b.foot[0],b.foot[1]+1,isFloor?90:Math.max(46,b.w*.45),isFloor?31:24,'rgba(255,209,68,.27)','#ffc743',2.6);
    if(im&&((im.complete&&im.naturalWidth)||(im.width&&im.height))){
      if(o.type==='sofa'&&sofaView(o).flip){
         ctx.save();ctx.translate(b.x+b.w,0);ctx.scale(-1,1);
@@ -452,7 +460,7 @@ function render(){
      const g=wallGeometry(s);
      polygon([g.q(-.05,-.06),g.q(1.05,-.06),g.q(1.05,1.06),g.q(-.05,1.06)],'rgba(0,0,0,0)','#f9c84e',3);
    }else{
-     const b=box(s);ctx.strokeRect(b.x-3,b.y-3,b.w+6,b.h+6);
+     // Floor-item selection is rendered in drawObject beneath the sprite.
    }
    ctx.setLineDash([]);
  }
