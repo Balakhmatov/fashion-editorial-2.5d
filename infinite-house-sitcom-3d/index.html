@@ -25,22 +25,22 @@ main{max-width:1000px;margin:auto;padding:22px 16px 40px}
 </head>
 <body>
 <main>
- <div class="topline"><small class="kicker">INFINITE HOUSE · DRAWN 3D / TEST 02</small><h1>Мультяшный диван · 6 поворотов</h1><p class="sub">Один рисованный интерьер, одна модель. Стабильная камера, одно освещение, шесть фиксированных положений — как в строительной игре.</p></div>
+ <div class="topline"><small class="kicker">INFINITE HOUSE · FLAT CARTOON / TEST 03</small><h1>Мультяшный диван · 6 поворотов</h1><p class="sub">Один рисованный интерьер, одна модель. Камера неподвижна, свет не рассчитывается: у дивана заранее заданные рисованные оттенки, которые не меняются при повороте. Шесть положений по кнопкам.</p></div>
  <section class="room" id="room"><canvas id="scene" aria-label="Мультяшная 3D-комната: диван поворачивается кнопками на 60 градусов"></canvas>
-  <div class="watermark"><i class="dot"></i> CLOUD PLUSH · TOON</div><div class="roomLabel" id="angleBadge">01 / 06</div>
+  <div class="watermark"><i class="dot"></i> CLOUD PLUSH · FLAT TOON</div><div class="roomLabel" id="angleBadge">01 / 06</div>
   <div class="hint">Поворачивай только кнопками ↓</div><div id="status"></div>
  </section>
  <div class="controls"><button type="button" class="turn" id="rotatePrev" aria-label="Повернуть влево на 60 градусов"><span>↶</span> Влево</button>
  <div class="orientation" aria-live="polite"><b id="turnLabel">Положение 1 / 6</b><small id="turnAngle">0°</small><div class="dots" id="dots"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div></div>
  <button type="button" class="turn next" id="rotateNext" aria-label="Повернуть вправо на 60 градусов"><span>↷</span> Вправо</button></div>
- <p class="note">Предмет — настоящая трёхмерная геометрия. Свет и камера не меняются, реалистичных бликов нет. Поворот возможен только с шагом 60°, без свободного вращения и без PNG.</p>
+ <p class="note">Настоящая трёхмерная форма, но цвета и тени нарисованы заранее. Динамического освещения и бликов нет. Картины плоские, как на нарисованной стене. Только шесть положений по кнопкам.</p>
 </main>
 <script>
 'use strict';
 const canvas=document.getElementById('scene');
 const gl=canvas.getContext('webgl2',{antialias:true,alpha:true,premultipliedAlpha:false});
 const body=document.getElementById('room');
-let state={spin:0,mode:0,color:0,index:0};
+let state={spin:0,color:0,index:0};
 const TURN=Math.PI/3;
 const swatches=['#f2dfca'];
 const P=(h)=>{h=h.replace('#','');return [0,2,4].map(i=>parseInt(h.slice(i,i+2),16)/255)};
@@ -55,6 +55,21 @@ function quad(a,b,c,d,n,col,ink=0){triangle(a,b,c,n,n,n,col,ink);triangle(a,c,d,
 function faceRect(x,y,z,w,h,axis,col,ink=0){
  if(axis==='z')quad([x-w/2,y-h/2,z],[x+w/2,y-h/2,z],[x+w/2,y+h/2,z],[x-w/2,y+h/2,z],[0,0,1],col,ink);
  else quad([x,y-h/2,z-w/2],[x,y-h/2,z+w/2],[x,y+h/2,z+w/2],[x,y+h/2,z-w/2],[1,0,0],col,ink);
+}
+// Flat painted discs: physically zero thickness, drawn on a wall as a graphic.
+function paintCircleZ(x,y,z,rx,ry,color,segments=24){
+ const center=[x,y,z],n=[0,0,1];
+ for(let i=0;i<segments;i++){
+  const a=i/segments*Math.PI*2,b=(i+1)/segments*Math.PI*2;
+  triangle(center,[x+Math.cos(a)*rx,y+Math.sin(a)*ry,z],[x+Math.cos(b)*rx,y+Math.sin(b)*ry,z],n,n,n,color,0);
+ }
+}
+function paintCircleX(x,y,z,ry,rz,color,segments=24){
+ const center=[x,y,z],n=[1,0,0];
+ for(let i=0;i<segments;i++){
+  const a=i/segments*Math.PI*2,b=(i+1)/segments*Math.PI*2;
+  triangle(center,[x,y+Math.cos(a)*ry,z+Math.sin(a)*rz],[x,y+Math.cos(b)*ry,z+Math.sin(b)*rz],n,n,n,color,0);
+ }
 }
 function box(x,y,z,w,h,d,col,ink=0){let hx=w/2,hy=h/2,hz=d/2;for(const a of [-1,1]){
  quad([x-hx,y-hy,z+a*hz],[x+hx,y-hy,z+a*hz],[x+hx,y+hy,z+a*hz],[x-hx,y+hy,z+a*hz],[0,0,a],col,ink);
@@ -104,12 +119,27 @@ function makeRoom(){using=roomVerts;roomVerts.length=0;
  roundedBox(.52,1.72,-2.68,.28,1.50,.19,.09,'#bba0cc',0);
  roundedBox(2.56,1.72,-2.68,.29,1.50,.19,.09,'#bba0cc',0);
  box(1.54,2.48,-2.66,2.25,.07,.07,'#6d4f5e');
- // wall framed artwork, positioned left of window
- box(-1.15,1.82,-2.89,.82,.95,.09,'#6c4b4e');box(-1.15,1.82,-2.826,.70,.82,.09,'#fff0c8');
- flower(-1.15,1.84,-2.72,.20,'#ffba75','#e4a24f');
- // left wall decorative trim and mini painting
- box(-3.50,1.63,-.48,.09,.85,1.13,'#654e52');box(-3.44,1.63,-.48,.09,.72,.97,'#a0c3c5');
- box(-3.38,1.57,-.48,.08,.28,.44,'#f0cf82');
+ // Wall art is a PAINTED, zero-thickness plane on the wall. No extruded frames.
+ // Back wall front face is z=-2.98; all graphic layers differ by only 0.004 units.
+ faceRect(-1.15,1.83,-2.963,.94,1.06,'z','#755359');
+ faceRect(-1.15,1.83,-2.958,.87,.99,'z','#fff1ce');
+ faceRect(-1.15,1.83,-2.953,.75,.86,'z','#ffe5aa');
+ // Stylized flower, drawn entirely in the picture plane.
+ faceRect(-1.15,1.65,-2.941,.038,.27,'z','#648967');
+ for(let i=0;i<6;i++){
+  let a=i*Math.PI/3;
+  paintCircleZ(-1.15+Math.cos(a)*.135,1.94+Math.sin(a)*.135,-2.934,.115,.112,'#fff6df');
+ }
+ paintCircleZ(-1.15,1.94,-2.930,.083,.083,'#eab15b');
+ paintCircleZ(-1.15,1.94,-2.928,.038,.038,'#f7d589');
+ // Side-wall picture is also only painted layers, not a box sticking out.
+ // Inner face of left wall is x=-3.56.
+ faceRect(-3.535,1.63,-.48,1.13,.85,'x','#725459');
+ faceRect(-3.530,1.63,-.48,1.05,.77,'x','#fff1d0');
+ faceRect(-3.525,1.63,-.48,.96,.69,'x','#a6d4dc');
+ // little stylized landscape (sun + green hills), still entirely flat
+ paintCircleX(-3.519,1.73,-.47,.14,.14,'#f7ce75');
+ faceRect(-3.513,1.42,-.48,.92,.21,'x','#77a88c');
  // lavender rug, simple soft blob geometry, under the rotating sofa
  ellipse(0,.10,.50,2.62,.065,1.62,'#9e82b2',0,10,48);
  ellipse(0,.15,.50,2.38,.045,1.39,'#cbb3dd',0,10,48);
@@ -150,18 +180,22 @@ makeRoom();makeSofa();
 const VS=`#version 300 es
 precision highp float;in vec3 aPos,aNormal,aColor;in float aInk;
 uniform vec3 uRight,uUp,uEye,uCenter;uniform float uScale,uAspect,uRotation;
-out vec3 vNormal,vColor;out float vInk;
+out vec3 vViewNormal,vLocalNormal,vColor;out float vInk;
 void main(){float c=cos(uRotation),s=sin(uRotation);vec3 pos=vec3(aPos.x*c-aPos.z*s,aPos.y,aPos.x*s+aPos.z*c);vec3 no=vec3(aNormal.x*c-aNormal.z*s,aNormal.y,aNormal.x*s+aNormal.z*c);vec3 rel=pos-uCenter;
- gl_Position=vec4(dot(rel,uRight)/(uScale*uAspect),dot(rel,uUp)/uScale,dot(rel,-uEye)/18.,1.0);vNormal=no;vColor=aColor;vInk=aInk;}`;
+ gl_Position=vec4(dot(rel,uRight)/(uScale*uAspect),dot(rel,uUp)/uScale,dot(rel,-uEye)/18.,1.0);
+ vViewNormal=no;vLocalNormal=aNormal;vColor=aColor;vInk=aInk;}`;
 const FS=`#version 300 es
-precision highp float;in vec3 vNormal,vColor;in float vInk;uniform int uMode;uniform vec3 uEye;out vec4 color;
-void main(){vec3 n=normalize(vNormal);float l=max(dot(n,normalize(vec3(-.43,.91,1.12))),0.);
- float shade=l>.64?1.04:l>.23?.91:.82;
+precision highp float;in vec3 vViewNormal,vLocalNormal,vColor;in float vInk;uniform vec3 uEye;out vec4 color;
+void main(){
+ // Graphic ink-and-paint palette, not lighting: no light direction, material
+ // reflection, world-space shading or light updates on object rotation.
+ vec3 n=normalize(vLocalNormal);
+ float shade=n.y>.55?1.018:(n.z>.12?.985:.948);
  vec3 col=clamp(vColor*shade,0.,1.);
- float edge=1.0-smoothstep(.10,.30,abs(dot(n,normalize(uEye))));
- float ink=edge*.92*vInk;
- col=mix(col,vec3(.28,.20,.25),ink);
- color=vec4(pow(col,vec3(.96)),1.);}`;
+ // Only a dark silhouette outline moves with the rotated object's contour.
+ float edge=1.0-smoothstep(.035,.19,abs(dot(normalize(vViewNormal),normalize(uEye))));
+ col=mix(col,vec3(.29,.21,.26),edge*.83*vInk);
+ color=vec4(col,1.);}`;
 let program=null,roomBuffer=null,sofaBuffer=null,roomCount=roomVerts.length/10,sofaCount=sofaVerts.length/10,softCtx=null;
 function compile(src,type){const sh=gl.createShader(type);gl.shaderSource(sh,src);gl.compileShader(sh);if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(sh));return sh}
 if(gl){try{
@@ -175,7 +209,7 @@ function resize(){const r=canvas.getBoundingClientRect(),dpr=Math.min(window.dev
 function bindBuffer(b,rotation){gl.useProgram(program);const cam=makeCamera(),aspect=canvas.width/canvas.height;
  gl.uniform3fv(gl.getUniformLocation(program,'uRight'),cam.right);gl.uniform3fv(gl.getUniformLocation(program,'uUp'),cam.up);gl.uniform3fv(gl.getUniformLocation(program,'uEye'),cam.e);
  gl.uniform3fv(gl.getUniformLocation(program,'uCenter'),cam.center);gl.uniform1f(gl.getUniformLocation(program,'uScale'),cam.scale);gl.uniform1f(gl.getUniformLocation(program,'uAspect'),aspect);
- gl.uniform1f(gl.getUniformLocation(program,'uRotation'),rotation);gl.uniform1i(gl.getUniformLocation(program,'uMode'),state.mode);
+ gl.uniform1f(gl.getUniformLocation(program,'uRotation'),rotation);
  gl.bindBuffer(gl.ARRAY_BUFFER,b);const stride=40;for(const [name,n,offset] of [['aPos',3,0],['aNormal',3,12],['aColor',3,24],['aInk',1,36]]){let a=gl.getAttribLocation(program,name);gl.enableVertexAttribArray(a);gl.vertexAttribPointer(a,n,gl.FLOAT,false,stride,offset)}
 }
 function renderSoftware(){
@@ -185,7 +219,7 @@ function renderSoftware(){
  const [w,h]=resize();const cam=makeCamera(),aspect=w/h;
  const image=ctx.createImageData(w,h),pix=image.data,zbuf=new Float32Array(w*h);
  zbuf.fill(-1e12);
- const light=norm([-.43,.91,1.12]),eye=cam.e;
+ const eye=cam.e;
  function raster(vertices,rotation){
   const co=Math.cos(rotation),si=Math.sin(rotation),N=vertices.length;
   for(let i=0;i<N;i+=30){
@@ -197,7 +231,7 @@ function renderSoftware(){
     let sx=w*.5+(rx*cam.right[0]+ry*cam.right[1]+rz*cam.right[2])/(cam.scale*aspect)*w*.5;
     let sy=h*.5-(rx*cam.up[0]+ry*cam.up[1]+rz*cam.up[2])/cam.scale*h*.5;
     const depth=rx*eye[0]+ry*eye[1]+rz*eye[2];
-    p.push([sx,sy,depth]);n.push([vertices[k+3]*co-vertices[k+5]*si,vertices[k+4],vertices[k+3]*si+vertices[k+5]*co]);
+    p.push([sx,sy,depth]);n.push([vertices[k+3],vertices[k+4],vertices[k+5]]);
     colors.push([vertices[k+6],vertices[k+7],vertices[k+8],vertices[k+9]]);
    }
    const x0=p[0][0],y0=p[0][1],x1=p[1][0],y1=p[1][1],x2=p[2][0],y2=p[2][1];
@@ -219,15 +253,15 @@ function renderSoftware(){
      let ny=n[0][1]*W0+n[1][1]*W1+n[2][1]*W2;
      let nz=n[0][2]*W0+n[1][2]*W1+n[2][2]*W2;
      const invLen=1/(Math.hypot(nx,ny,nz)||1);nx*=invLen;ny*=invLen;nz*=invLen;
-     let li=Math.max(0,nx*light[0]+ny*light[1]+nz*light[2]);
-     let shade=state.mode===0?(li>.65?1.04:li>.28?.92:.82):(.63+.45*li);
-     let edge=1-smooth(0.10,0.30,Math.abs(nx*eye[0]+ny*eye[1]+nz*eye[2]));
-     let ink=state.mode===0?edge*.9:edge*.32;
-     ink*=colors[0][3]*W0+colors[1][3]*W1+colors[2][3]*W2;
+     // Same two predesigned tones regardless of furniture rotation.
+     const shade=ny>.55?1.018:(nz>.12?.985:.948);
+     const worldX=nx*co-nz*si,worldZ=nx*si+nz*co;
+     let edge=1-smooth(0.035,0.19,Math.abs(worldX*eye[0]+ny*eye[1]+worldZ*eye[2]));
+     let ink=edge*.83*(colors[0][3]*W0+colors[1][3]*W1+colors[2][3]*W2);
      const off=idx*4;
      for(let ch=0;ch<3;ch++){
       const base=(colors[0][ch]*W0+colors[1][ch]*W1+colors[2][ch]*W2)*shade;
-      pix[off+ch]=Math.round(Math.min(1,base*(1-ink)+[.28,.20,.25][ch]*ink)*255);
+      pix[off+ch]=Math.round(Math.min(1,base*(1-ink)+[.29,.21,.26][ch]*ink)*255);
      }
      pix[off+3]=255;
     }
