@@ -467,7 +467,7 @@ function updateAssetStatus(){
  if(!label)return;
  label.textContent=ROTATABLE.filter(t=>atlasFor({type:t})).length+' из 9 наборов · по 8 ракурсов';
 }
-const atlasFor=o=>sheets[o.type]&&sheets[o.type].complete&&sheets[o.type].naturalWidth>0?sheets[o.type]:null;
+function atlasFor(o){return sheets[o.type]&&sheets[o.type].complete&&sheets[o.type].naturalWidth>0?sheets[o.type]:null}
 const atlasCell=o=>{
  const sheet=atlasFor(o);
  return sheet?{sheet,w:sheet.naturalWidth/4,h:sheet.naturalHeight/2,col:dir8(o.rot)%4,row:Math.floor(dir8(o.rot)/4)}:null;
