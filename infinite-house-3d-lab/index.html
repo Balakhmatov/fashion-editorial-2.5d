@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#30283b">
+<title>Infinite House • 3D Lab</title>
+<style>
+:root{color-scheme:light;font-family:Inter,ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;background:#30283b;color:#352d3b}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;overscroll-behavior:none}button,input{font:inherit}button{cursor:pointer}
+.shell{max-width:1250px;margin:auto;padding:18px 18px 42px}
+.head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:13px;color:white}
+.brand{display:flex;align-items:center;gap:12px}.logo{display:grid;place-items:center;width:46px;height:46px;border-radius:16px;background:#f3cc96;font-size:27px;box-shadow:0 5px 0 #211b2c}
+.brand h1{font-size:20px;margin:0;font-weight:900;letter-spacing:-.035em}.brand p{font-size:11px;letter-spacing:.13em;font-weight:850;color:#ffce83;margin:2px 0 0}
+.pill{border-radius:30px;background:#584763;border:1px solid #75637e;padding:10px 13px;color:#f9e7ec;font-size:12px;font-weight:750}
+.scene{position:relative;overflow:hidden;height:min(71vh,720px);min-height:390px;border:5px solid #1e1a2b;border-radius:26px;background:radial-gradient(ellipse at 35% 18%,#fffbeb,#e6e8dd 48%,#cbd9d0 95%);box-shadow:0 13px 0 #201928,0 22px 48px #21162955}
+#three{width:100%;height:100%;display:block;touch-action:none}
+.scene-top{position:absolute;top:18px;left:18px;z-index:2;pointer-events:none}
+.scene-top strong{display:block;font-size:15px;color:#533d4a;line-height:1.1}.scene-top span{display:block;color:#846d72;font-size:11px;margin-top:5px;font-weight:700}
+.scene-info{position:absolute;top:16px;right:16px;z-index:2;border-radius:16px;background:#fffdf3df;color:#635267;padding:10px 13px;font-size:12px;font-weight:850;box-shadow:0 4px 0 #ad9aa655}
+.stage-bottom{position:absolute;bottom:14px;left:14px;right:14px;display:flex;justify-content:center;pointer-events:none}
+.stage-bottom span{padding:9px 17px;background:#382b46cf;color:white;border-radius:28px;font-size:12px;font-weight:760;backdrop-filter:blur(12px)}
+.panel{display:grid;grid-template-columns:minmax(245px,1.2fr) minmax(265px,1fr);gap:15px;margin-top:24px}
+.card{border:3px solid #dac7b6;border-radius:23px;background:#fff8ea;padding:19px 20px;box-shadow:0 6px 0 #241c2c3b}
+.kicker{font-size:11px;color:#a78685;font-weight:850;letter-spacing:.12em;text-transform:uppercase}
+.card h2{font-size:21px;margin:6px 0 3px;letter-spacing:-.045em;line-height:1.15}.sub{color:#8f7d82;font-size:12px;line-height:1.5;margin:5px 0 15px}
+.items{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.item{border:2px solid #e1d4c5;background:#fffefa;border-radius:14px;padding:11px 2px 10px;font-size:12px;font-weight:800;color:#6b5665;transition:transform .12s}
+.item.on{background:#fff0c8;border-color:#e6ad38;box-shadow:0 3px 0 #d39d3d}
+.item:active,.key:active{transform:translateY(2px)}.emoji{font-size:27px;display:block;margin-bottom:4px}
+.turn{display:flex;align-items:center;gap:10px;margin:12px 0 7px}
+.key{background:#fffefa;border:2px solid #e2d4c6;min-width:52px;height:48px;border-radius:13px;color:#53425b;font-weight:900;font-size:22px;box-shadow:0 3px 0 #d6c9bc}
+.center{flex:1;text-align:center;font-size:12px;font-weight:800;color:#776674}
+#angle{width:100%;accent-color:#e6a64e;cursor:pointer}
+.tiny{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#977f82;font-size:11px;font-weight:750}
+.tiny strong{color:#674a65;font-size:12px}
+.actions{display:flex;gap:9px;margin-top:15px}
+.actions button{flex:1;border:2px solid #e2d3c4;border-radius:12px;padding:10px 5px;font-size:12px;font-weight:820;color:#5c4d5e;background:#fffdfa}
+.actions button.active{background:#fbd881;border-color:#d5a44b}
+.note{margin-top:16px;color:#eadce5;font-size:12px;line-height:1.55;max-width:1050px}
+#loading{position:absolute;inset:0;display:grid;place-items:center;color:#6d536b;font-weight:800;font-size:16px;z-index:4;background:#f2eadedb}
+@media(max-width:700px){.shell{padding:12px 12px 27px}.head{gap:7px}.brand h1{font-size:17px}.pill{font-size:10px;padding:8px}.logo{width:38px;height:38px;font-size:22px}.scene{height:52vh;min-height:355px;border-radius:20px;border-width:3px}.scene-top{top:10px;left:10px}.scene-top strong{font-size:12px}.scene-info{font-size:10px;top:10px;right:10px;padding:8px 10px}.panel{grid-template-columns:1fr;margin-top:14px;gap:10px}.card{padding:16px}.items{grid-template-columns:repeat(4,1fr)}.item{font-size:11px}.emoji{font-size:22px}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
+</head>
+<body>
+<div class="shell">
+<header class="head"><div class="brand"><div class="logo">🏠</div><div><h1>Infinite House</h1><p>3D LAB · ИГРОВОЙ СТИЛЬ</p></div></div><div class="pill">Одна модель · любые углы</div></header>
+<section class="scene" id="stage">
+ <canvas id="three"></canvas>
+ <div class="scene-top"><strong>Настоящее 3D</strong><span>Изометрическая камера · мягкие тени</span></div>
+ <div class="scene-info" id="metrics">6 предметов · 3D</div>
+ <div class="stage-bottom"><span>Нажми на мебель или перетащи её по полу</span></div>
+ <div id="loading">Создаём 3D-комнату…</div>
+</section>
+<div class="panel">
+ <section class="card">
+  <div class="kicker">Набор мебели</div><h2>Что поставить в комнату?</h2>
+  <p class="sub">Это объёмные модели, а не картинки с заранее нарисованными ракурсами.</p>
+  <div class="items" id="itembar">
+   <button class="item on" data-type="sofa"><span class="emoji">🛋️</span>Диван</button>
+   <button class="item" data-type="chair"><span class="emoji">🪑</span>Кресло</button>
+   <button class="item" data-type="bed"><span class="emoji">🛏️</span>Кровать</button>
+   <button class="item" data-type="table"><span class="emoji">🪵</span>Стол</button>
+   <button class="item" data-type="lamp"><span class="emoji">💡</span>Торшер</button>
+   <button class="item" data-type="rug"><span class="emoji">🟣</span>Ковёр</button>
+   <button class="item" data-type="wardrobe"><span class="emoji">🚪</span>Шкаф</button>
+  </div>
+ </section>
+ <section class="card">
+  <div class="kicker">Вращение без спрайтов</div><h2 id="chosen">Диван «Уют»</h2>
+  <p class="sub" id="detail">Реальные размеры на полу: 3 × 2 клетки.</p>
+  <div class="turn"><button class="key" id="left" aria-label="Повернуть влево">↶</button><div class="center" id="angleLabel">0°</div><button class="key" id="right" aria-label="Повернуть вправо">↷</button></div>
+  <input id="angle" type="range" min="0" max="360" value="0" step="15" aria-label="Свободный поворот предмета">
+  <div class="tiny"><span>Любой угол, без смены картинки</span><strong id="occupied">6 клеток</strong></div>
+  <div class="actions"><button id="camera">↻ Камера</button><button id="grid" class="active">▦ Сетка</button><button id="light">💡 Свет</button></div>
+ </section>
+</div>
+<p class="note">Экспериментальная версия. Мебель построена из настоящей 3D-геометрии с округлёнными краями. Для финального качества её можно заменить моделями GLB, экспортированными из Blender, без переделки редактора.</p>
+</div>
+<script type="module">
+import * as THREE from 'three';
+import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+const stage=document.getElementById('stage');
+const canvas=document.getElementById('three');
+const scene=new THREE.Scene();
+scene.background=null;
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.4;
+const camera=new THREE.OrthographicCamera(-8,8,8,-8,.1,120);
+let cameraIndex=0;
+function updateCamera(){
+ const sx=[13,-13,-13,13][cameraIndex],sz=[15,15,-15,-15][cameraIndex];
+ camera.position.set(sx,15,sz);camera.lookAt(0,.45,0);camera.updateProjectionMatrix();
+}
+updateCamera();
+function size(){
+ const w=stage.clientWidth,h=stage.clientHeight;
+ renderer.setSize(w,h,false);
+ const aspect=w/h,view=window.innerWidth<720?10.6:11.8;
+ camera.left=-view*aspect/2;camera.right=view*aspect/2;
+ camera.top=view/2;camera.bottom=-view/2;camera.updateProjectionMatrix();
+}
+new ResizeObserver(size).observe(stage);
+size();
+const hemi=new THREE.HemisphereLight(0xfff0d8,0x9b8698,2.2);scene.add(hemi);
+const key=new THREE.DirectionalLight(0xfff0d8,3.3);
+key.position.set(-4,12,8);key.castShadow=true;
+key.shadow.mapSize.set(2048,2048);
+Object.assign(key.shadow.camera,{left:-12,right:12,top:12,bottom:-12,near:1,far:32});
+key.shadow.bias=-.0002;key.shadow.normalBias=.025;key.shadow.radius=4;
+scene.add(key,key.target);
+const fill=new THREE.DirectionalLight(0xb1d9ff,1.0);fill.position.set(7,6,-5);scene.add(fill);
+const mats={
+ red:new THREE.MeshStandardMaterial({color:0xc95a42,roughness:.83}),
+ redHi:new THREE.MeshStandardMaterial({color:0xe47c5e,roughness:.88}),
+ redDark:new THREE.MeshStandardMaterial({color:0x98422f,roughness:.88}),
+ seam:new THREE.MeshStandardMaterial({color:0x713d38,roughness:.9}),
+ wood:new THREE.MeshStandardMaterial({color:0xc78a48,roughness:.57}),
+ woodHi:new THREE.MeshStandardMaterial({color:0xf2b86e,roughness:.56}),
+ woodDark:new THREE.MeshStandardMaterial({color:0x78472f,roughness:.64}),
+ green:new THREE.MeshStandardMaterial({color:0x8ab74a,roughness:.88}),
+ greenHi:new THREE.MeshStandardMaterial({color:0xa6d365,roughness:.87}),
+ greenDark:new THREE.MeshStandardMaterial({color:0x527b34,roughness:.85}),
+ cream:new THREE.MeshStandardMaterial({color:0xffe8a1,roughness:.86}),
+ lilac:new THREE.MeshStandardMaterial({color:0x9671b8,roughness:.89}),
+ white:new THREE.MeshStandardMaterial({color:0xfff7e7,roughness:.9}),
+ metal:new THREE.MeshStandardMaterial({color:0x8c6853,roughness:.4,metalness:.35}),
+ pink:new THREE.MeshStandardMaterial({color:0xeea1a2,roughness:.9}),
+ carpet:new THREE.MeshStandardMaterial({color:0x8e65bc,roughness:1}),
+ rugEdge:new THREE.MeshStandardMaterial({color:0x634489,roughness:1})
+};
+function mesh(geo,mat,parent,x=0,y=0,z=0){
+ const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;
+}
+function round(parent,w,h,d,r,mat,x,y,z){
+ return mesh(new RoundedBoxGeometry(w,h,d,4,Math.min(r,w*.45,h*.45,d*.45)),mat,parent,x,y,z);
+}
+function cylinder(parent,rt,rb,height,mat,x,y,z,n=24){
+ return mesh(new THREE.CylinderGeometry(rt,rb,height,n),mat,parent,x,y,z);
+}
+function sphere(parent,r,mat,x,y,z){
+ return mesh(new THREE.SphereGeometry(r,16,10),mat,parent,x,y,z);
+}
+function legs(g,points,y=.18,h=.26,mat=mats.woodDark,rad=.085){
+ for(const [x,z] of points)cylinder(g,rad*.85,rad,h,mat,x,y,z,12);
+}
+function sofaModel(){
+ const g=new THREE.Group();
+ legs(g,[[-1.18,-.62],[1.18,-.62],[-1.18,.62],[1.18,.62]],.18,.27);
+ round(g,2.75,.47,1.55,.20,mats.redDark,0,.51,0);
+ round(g,2.74,.92,.30,.15,mats.red,-.00,1.04,-.72);
+ for(const x of [-.88,0,.88]){
+  round(g,.83,.62,.30,.16,mats.redHi,x,1.15,-.58);
+  round(g,.83,.26,1.02,.16,mats.redHi,x,.81,.27);
+  sphere(g,.038,mats.seam,x,1.22,-.39);
+ }
+ for(const x of [-1.27,1.27])round(g,.32,.72,1.37,.17,mats.red,x,.90,.04);
+ const pillow=round(g,.44,.46,.17,.09,mats.cream,-.80,1.09,.18);
+ pillow.rotation.z=-.12;pillow.rotation.x=-.26;
+ sphere(g,.075,mats.pink,-.80,1.19,.32);
+ for(let i=0;i<5;i++)sphere(g,.035,mats.woodDark,-.80+Math.cos(i*Math.PI*2/5)*.10,1.19+Math.sin(i*Math.PI*2/5)*.10,.335);
+ round(g,.33,.18,.62,.08,mats.green,1.29,1.10,.29).rotation.z=-.12;
+ return g;
+}
+function chairModel(){
+ const g=new THREE.Group();
+ legs(g,[[-.66,-.62],[.66,-.62],[-.66,.62],[.66,.62]],.17,.25,mats.woodDark);
+ round(g,1.68,.43,1.43,.18,mats.greenDark,0,.50,0);
+ round(g,1.58,.89,.32,.16,mats.green,-.02,1.05,-.57);
+ round(g,1.32,.68,.26,.17,mats.greenHi,0,1.10,-.48);
+ round(g,1.24,.30,1.0,.15,mats.greenHi,0,.79,.26);
+ for(const x of [-.74,.74])round(g,.28,.67,1.35,.14,mats.green,x,.87,.09);
+ sphere(g,.035,mats.greenDark,-.20,1.18,-.30);
+ sphere(g,.035,mats.greenDark,.20,1.18,-.30);
+ return g;
+}
+function bedModel(){
+ const g=new THREE.Group();
+ legs(g,[[-1.25,-.71],[1.25,-.71],[-1.25,.71],[1.25,.71]],.17,.25,mats.woodDark);
+ round(g,2.89,.25,1.85,.09,mats.woodDark,0,.35,0);
+ round(g,2.68,.30,1.65,.11,mats.white,0,.55,0);
+ round(g,2.72,1.12,.17,.13,mats.woodHi,0,.88,-.89);
+ round(g,2.72,.50,.13,.08,mats.wood,0,.34,.91);
+ round(g,2.55,.15,1.1,.09,mats.lilac,0,.78,.25);
+ for(const x of [-.59,.59])round(g,1.02,.12,.47,.09,mats.white,x,.79,-.53);
+ return g;
+}
+function tableModel(){
+ const g=new THREE.Group();
+ for(const x of [-.74,.74])for(const z of [-.34,.34])round(g,.13,.53,.13,.035,mats.woodDark,x,.27,z);
+ round(g,1.85,.16,.98,.10,mats.woodHi,0,.59,0);
+ round(g,1.62,.038,.77,.028,mats.wood,0,.67,0);
+ return g;
+}
+function wardrobeModel(){
+ const g=new THREE.Group();
+ legs(g,[[-.74,-.35],[.74,-.35],[-.74,.35],[.74,.35]],.12,.17);
+ round(g,1.89,2.08,.93,.11,mats.woodDark,0,1.18,0);
+ round(g,1.72,1.91,.10,.05,mats.woodHi,0,1.19,.51);
+ round(g,.78,1.79,.06,.035,mats.wood,-.42,1.17,.58);
+ round(g,.78,1.79,.06,.035,mats.wood,.42,1.17,.58);
+ sphere(g,.055,mats.metal,-.14,1.22,.64);
+ sphere(g,.055,mats.metal,.14,1.22,.64);
+ return g;
+}
+function rugModel(){
+ const g=new THREE.Group();
+ function ellipse(radX,radZ,y,mat){
+  const ring=mesh(new THREE.CircleGeometry(1,64),mat,g,0,y,0);ring.rotation.x=-Math.PI/2;ring.scale.set(radX,radZ,1);ring.castShadow=false;
+ }
+ ellipse(1.87,1.34,.036,mats.rugEdge);
+ ellipse(1.67,1.14,.044,mats.carpet);
+ ellipse(1.26,.77,.05,mats.pink);
+ ellipse(1.04,.58,.057,mats.lilac);
+ return g;
+}
+function lampModel(){
+ const g=new THREE.Group();
+ cylinder(g,.26,.31,.13,mats.woodDark,0,.07,0,28);
+ cylinder(g,.035,.044,1.85,mats.metal,0,1.02,0,16);
+ const shade=mesh(new THREE.CylinderGeometry(.33,.57,.73,32),mats.cream,g,0,2.15,0);
+ shade.castShadow=true;
+ cylinder(g,.30,.30,.035,mats.woodHi,0,2.53,0,32);
+ const light=new THREE.PointLight(0xffc768,2.6,4.7,2);
+ light.position.set(0,1.85,0);g.add(light);g.userData.lamp=light;
+ return g;
+}
+const models={
+ sofa:{label:'Диван «Уют»',foot:[3,2],build:sofaModel,pos:[-2.5,.0]},
+ chair:{label:'Кресло',foot:[2,2],build:chairModel,pos:[2,0]},
+ bed:{label:'Кровать',foot:[3,2],build:bedModel,pos:[2.5,-3]},
+ table:{label:'Столик',foot:[2,1],build:tableModel,pos:[-.5,2.5]},
+ lamp:{label:'Торшер',foot:[1,1],build:lampModel,pos:[4.5,2.5]},
+ rug:{label:'Ковёр',foot:[4,3],build:rugModel,pos:[-.5,1.5]},
+ wardrobe:{label:'Шкаф',foot:[2,1],build:wardrobeModel,pos:[-3.5,-3.5]}
+};
+const world=new THREE.Group();scene.add(world);
+const floorBase=mesh(new THREE.BoxGeometry(12.15,.26,10.15),new THREE.MeshStandardMaterial({color:0x8c6d71,roughness:1}),world,0,-.18,0);
+floorBase.castShadow=false;
+const tiles=new THREE.Group();world.add(tiles);
+const tileMats=[0xf8dfc3,0xf4dec4,0xf2d0ae,0xe9c8ae].map(c=>new THREE.MeshStandardMaterial({color:c,roughness:1}));
+for(let x=-6;x<6;x++)for(let z=-5;z<5;z++){
+ const tile=mesh(new THREE.BoxGeometry(.985,.035,.985),tileMats[((x+6)+(z+5)*7)%4],tiles,x+.5,-.022,z+.5);
+ tile.castShadow=false;
+}
+const wallMaterial=new THREE.MeshStandardMaterial({color:0xffdfd8,roughness:1});
+const wallMaterial2=new THREE.MeshStandardMaterial({color:0xffe9b5,roughness:1});
+round(world,12.06,2.15,.16,.04,wallMaterial,0,1.03,-5.09).castShadow=false;
+round(world,.16,2.15,10.06,.04,wallMaterial2,-6.09,1.03,0).castShadow=false;
+round(world,12.16,.16,.2,.03,mats.woodHi,0,2.18,-5.1).castShadow=false;
+round(world,.20,.16,10.16,.03,mats.woodHi,-6.09,2.18,0).castShadow=false;
+// A minimal window makes the room read as a cozy interior, not a CAD viewport.
+round(world,1.9,1.25,.07,.04,mats.wood,-.7,1.33,-4.96).castShadow=false;
+round(world,1.68,1.03,.03,.02,new THREE.MeshStandardMaterial({color:0xa8dbea,roughness:.2,metalness:.05}),-.7,1.33,-4.91).castShadow=false;
+round(world,.09,1.05,.09,.02,mats.white,-.7,1.33,-4.84).castShadow=false;
+round(world,1.76,.08,.08,.02,mats.white,-.7,1.32,-4.84).castShadow=false;
+const objects=[];
+function snap(v,span){return Math.round(v-span/2)+span/2}
+function footprintOf(entry){
+ const r=Math.round(entry.root.rotation.y/(Math.PI/2));
+ const turn=((r%4)+4)%4;
+ return turn%2?[entry.def.foot[1],entry.def.foot[0]]:entry.def.foot;
+}
+function applySnap(entry,x,z){
+ const [w,d]=footprintOf(entry);
+ entry.root.position.set(THREE.MathUtils.clamp(snap(x,w),-6+w/2,6-w/2),0,
+  THREE.MathUtils.clamp(snap(z,d),-5+d/2,5-d/2));
+}
+function addObject(type){
+ const def=models[type],root=def.build();
+ root.userData.type=type;world.add(root);
+ const entry={type,def,root,angle:0};
+ objects.push(entry);applySnap(entry,def.pos[0],def.pos[1]);
+ root.traverse(obj=>{if(obj.isMesh)obj.userData.entry=entry});
+ return entry;
+}
+for(const type of ['rug','sofa','chair','bed','table','lamp','wardrobe'])addObject(type);
+const highlight=new THREE.Group();world.add(highlight);
+const hlMat=new THREE.MeshBasicMaterial({color:0xf8b54f,transparent:true,opacity:.34,depthWrite:false});
+const tileHl=new THREE.PlaneGeometry(.97,.97);
+let selected=objects.find(o=>o.type==='sofa');
+let gridOn=true,lightOn=true,dragging=false,down=null;
+const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
+const hitPlane=new THREE.Plane(new THREE.Vector3(0,1,0),0),intersection=new THREE.Vector3();
+function occupiedCells(entry){
+ const [w,d]=footprintOf(entry),cx=entry.root.position.x,cz=entry.root.position.z;
+ const result=[];
+ const startX=Math.round(cx-w/2),startZ=Math.round(cz-d/2);
+ for(let x=0;x<w;x++)for(let z=0;z<d;z++)result.push({x:startX+x,z:startZ+z});
+ return result;
+}
+function refreshHighlight(){
+ while(highlight.children.length){const child=highlight.children[0];highlight.remove(child)}
+ if(!selected)return;
+ for(const cell of occupiedCells(selected)){
+  const t=new THREE.Mesh(tileHl,hlMat);
+  t.rotation.x=-Math.PI/2;t.position.set(cell.x+.5,.048,cell.z+.5);
+  highlight.add(t);
+ }
+}
+function choose(entry){
+ selected=entry;
+ document.querySelectorAll('[data-type]').forEach(el=>el.classList.toggle('on',el.dataset.type===entry.type));
+ document.getElementById('chosen').textContent=entry.def.label;
+ updateInfo();refreshHighlight();
+}
+function updateInfo(){
+ if(!selected)return;
+ const [w,d]=footprintOf(selected);
+ document.getElementById('angleLabel').textContent=Math.round(selected.angle)%360+'°';
+ document.getElementById('angle').value=Math.round(selected.angle)%360;
+ document.getElementById('detail').textContent='Основание модели: '+w+' × '+d+' клетки. Геометрия настоящая.';
+ document.getElementById('occupied').textContent=(w*d)+' клеток';
+}
+function rotateTo(angle){
+ if(!selected)return;
+ selected.angle=((angle%360)+360)%360;
+ selected.root.rotation.y=THREE.MathUtils.degToRad(selected.angle);
+ applySnap(selected,selected.root.position.x,selected.root.position.z);
+ updateInfo();refreshHighlight();
+}
+document.getElementById('left').onclick=()=>rotateTo(selected.angle-90);
+document.getElementById('right').onclick=()=>rotateTo(selected.angle+90);
+document.getElementById('angle').oninput=e=>rotateTo(+e.target.value);
+document.getElementById('camera').onclick=()=>{cameraIndex=(cameraIndex+1)%4;updateCamera()};
+document.getElementById('grid').onclick=e=>{gridOn=!gridOn;tiles.visible=gridOn;e.currentTarget.classList.toggle('active',gridOn)};
+document.getElementById('light').onclick=e=>{
+ lightOn=!lightOn;
+ for(const entry of objects)if(entry.type==='lamp')entry.root.userData.lamp.intensity=lightOn?2.6:0;
+ e.currentTarget.classList.toggle('active',lightOn);
+};
+document.querySelectorAll('[data-type]').forEach(btn=>btn.onclick=()=>{
+ const entry=objects.find(o=>o.type===btn.dataset.type);if(entry)choose(entry);
+});
+function normalized(event){
+ const r=canvas.getBoundingClientRect();
+ pointer.set((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1);
+ raycaster.setFromCamera(pointer,camera);
+}
+function hitGround(event){normalized(event);return raycaster.ray.intersectPlane(hitPlane,intersection)}
+canvas.addEventListener('pointerdown',event=>{
+ down={x:event.clientX,y:event.clientY};
+ normalized(event);
+ const meshes=objects.flatMap(entry=>{const list=[];entry.root.traverse(o=>{if(o.isMesh)list.push(o)});return list});
+ const first=raycaster.intersectObjects(meshes,false)[0];
+ if(first?.object?.userData?.entry){
+  choose(first.object.userData.entry);dragging=true;canvas.setPointerCapture(event.pointerId);
+ }
+});
+canvas.addEventListener('pointermove',event=>{
+ if(!dragging||!down)return;
+ if(Math.hypot(event.clientX-down.x,event.clientY-down.y)<6)return;
+ if(hitGround(event)){applySnap(selected,intersection.x,intersection.z);refreshHighlight()}
+});
+function finish(){dragging=false;down=null}
+canvas.addEventListener('pointerup',finish);
+canvas.addEventListener('pointercancel',finish);
+canvas.addEventListener('wheel',event=>{
+ event.preventDefault();
+ const zoom=event.deltaY>0?.92:1.08;
+ camera.zoom=THREE.MathUtils.clamp(camera.zoom*zoom,.72,1.65);
+ camera.updateProjectionMatrix();
+},{passive:false});
+choose(selected);
+document.getElementById('loading').remove();
+function loop(){
+ requestAnimationFrame(loop);
+ renderer.render(scene,camera);
+}
+loop();
+window.__ih3d={objects,selected:()=>selected,occupiedCells,rotateTo,THREE};
+</script>
+</body>
+</html>
