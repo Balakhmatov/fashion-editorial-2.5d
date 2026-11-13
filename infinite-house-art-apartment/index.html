@@ -96,7 +96,7 @@ button:disabled{opacity:.33;cursor:default}
   <div class="stage" id="stage">
    <canvas id="canvas" width="1460" height="920" aria-label="Изометрическая квартира"></canvas>
    <div class="stage-bar">
-    <span class="stage-tag">🏡 <span id="roomSize">15 × 13 клеток</span></span>
+    <span class="stage-tag">🏡 <span id="roomSize">30 × 26 клеток</span></span>
     <div class="stage-tools">
      <button id="toggleGrid" class="stage-tool active" title="Показать или скрыть сетку" aria-label="Сетка">▦</button>
      <button id="toggleWalls" class="stage-tool active" title="Показать или скрыть стены" aria-label="Стены">▥</button>
@@ -141,17 +141,15 @@ const ART={"dresser":"UklGRngzAABXRUJQVlA4WAoAAAAQAAAAvQAA2QAAQUxQSA8NAAAN8Hbbtv
 const ITEMS={sofa:{name:'Диван «Уют»',w:218,h:158,foot:[3,2],wall:false,dx:-4,dy:2,wallInset:0.18},chair:{name:'Кресло',w:112,h:111,foot:[2,1],dx:-1,dy:1,wallInset:0.08},table:{name:'Столик',w:118,h:88,foot:[2,1],dx:0,dy:1,wallInset:0.06},rug:{name:'Ковёр',w:206,h:88,foot:[3,2],layer:'floor',dx:0,dy:0,wallInset:0},painting:{name:'Картина',w:83,h:110,foot:[1,1],wall:true},window:{name:'Окно',w:99,h:134,foot:[1,1],wall:true},door:{name:'Дверь',w:74,h:133,foot:[1,1],wall:true},bed:{name:'Кровать',w:150,h:142,foot:[2,2],dx:-1,dy:1,wallInset:0.1},wardrobe:{name:'Шкаф',w:108,h:162,foot:[2,1],dx:-2,dy:2,wallInset:0.12},dresser:{name:'Тумба',w:108,h:119,foot:[2,1],dx:-2,dy:2,wallInset:0.1},lamp:{name:'Торшер',w:62,h:151,foot:[1,1],dx:0,dy:0,wallInset:0},bookshelf:{name:'Стеллаж',w:104,h:160,foot:[2,1],dx:-2,dy:2,wallInset:0.12},tv:{name:'Телевизор',w:136,h:86,foot:[2,1],wall:true}};
 const c=document.getElementById('canvas'),ctx=c.getContext('2d'),imgs={};for(const [key,base] of Object.entries(ART)){const im=new Image();im.src='data:image/webp;base64,'+base;imgs[key]=im;im.onload=()=>render();}
 // Area 195 cells (15 x 13), previously 63 (9 x 7).
-const TX=88,TY=44,OX=700,OY=190,XN=15,ZN=13;
+const TX=88,TY=44,OX=700,OY=190,XN=30,ZN=26;
 const P=(x,z)=>[OX+(x-z)*TX/2,OY+(x+z)*TY/2];
 const INV=(x,y)=>{const dx=(x-OX)/TX,dy=(y-OY)/TY;return [dy+dx,dy-dx]};
 const snapAxis=(value,span,total)=>{const half=span/2;return Math.max(half,Math.min(total-half,Math.round(value-half)+half))};
 // Wall offset is quantized to full grid cells: no fractional drifting.
-// A footprint is a rotated world-space polygon, never a static 3x2 overlay.
-// In this prototype sofa sprites are the only upright objects with 8 views.
-// Other illustrated furniture has one fixed camera angle; its rot remains 0.
+// All floor objects share the same eight-direction footprint geometry.
 function footprintPolygon(o,x=o.x,z=o.z){
  const [w,h]=ITEMS[o.type].foot||[1,1];
- const t=o.type==='sofa'?dir8(o.rot||0)*Math.PI/4:0;
+ const t=dir8(o.rot||0)*Math.PI/4;
  const cs=Math.cos(t),sn=Math.sin(t);
  return [[-w/2,-h/2],[w/2,-h/2],[w/2,h/2],[-w/2,h/2]]
   .map(([dx,dz])=>[x+dx*cs-dz*sn,z+dx*sn+dz*cs]);
@@ -214,9 +212,11 @@ function line(a,b,color='#72565a',width=2){ctx.beginPath();ctx.moveTo(...a);ctx.
 function ellipse(x,y,rx,ry,fill,stroke='',sw=2){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=sw;ctx.stroke()}}
 function tile(x,z){
  const a=P(x,z),b=P(x+1,z),d=P(x,z+1),e=P(x+1,z+1);
- const fill=x>=9?((x+z)%2?'#d0b8df':'#d9c3e6'):z<4?((x+z)%2?'#fff0cd':'#c4dce7'):((x+z)%2?'#eeb77c':'#f2c38f');
+ const zone=x<9&&z<13?'living':z<13&&x<19?'kitchen':z<13?'hall':x<19?'bedroom':'studio';
+ const colors={living:['#eeb77c','#f2c38f'],kitchen:['#fff0cd','#c4dce7'],hall:['#eccfbd','#f5dcca'],bedroom:['#d0b8df','#d9c3e6'],studio:['#d0dfbd','#e2edcd']};
+ const fill=colors[zone][(x+z)%2];
  polygon([a,b,e,d],fill,showGrid?'#bc8c76':null,showGrid?1.4:0);
- if(x<9&&z>=4){const u=P(x+.08,z+.16),v=P(x+.92,z+.16);line(u,v,'#d99a69',1.1)}
+ if(x<9&&z>=4&&z<13){const u=P(x+.08,z+.16),v=P(x+.92,z+.16);line(u,v,'#d99a69',1.1)}
 }
 function drawFloor(){const shadow=[P(-.15,-.1),P(XN+.24,-.1),P(XN+.24,ZN+.28),P(-.15,ZN+.28)].map(v=>[v[0]+2,v[1]+26]);polygon(shadow,'#62434e','#573544',5);for(let x=0;x<XN;x++)for(let z=0;z<ZN;z++)tile(x,z);polygon([P(0,0),P(XN,0),P(XN,ZN),P(0,ZN)],'rgba(0,0,0,0)','#69494c',5)}
 function wall(a,b,h,paint,cap='#ffe4cf'){const topA=[a[0],a[1]-h],topB=[b[0],b[1]-h];polygon([topA,topB,b,a],paint,'#68444e',3.4);polygon([[topA[0]-2,topA[1]-7],[topB[0]+1,topB[1]-7],topB,topA],cap,'#68444e',3);line([a[0],a[1]-3],[b[0],b[1]-3],'#8a5a63',2)}
@@ -320,7 +320,15 @@ const PARTITIONS=[
  {axis:'z',at:4,from:0,to:3.5,color:'#ffd7b7'},
  {axis:'z',at:4,from:5.5,to:9,color:'#ffd7b7'},
  {axis:'x',at:9,from:0,to:4.2,color:'#f8c5c9'},
- {axis:'x',at:9,from:6.2,to:ZN,color:'#f8c5c9'}
+ {axis:'x',at:9,from:6.2,to:13,color:'#f8c5c9'},
+ {axis:'z',at:13,from:0,to:11.5,color:'#ffe0bf'},
+ {axis:'z',at:13,from:14,to:19,color:'#ffe0bf'},
+ {axis:'z',at:13,from:21,to:30,color:'#ffe0bf'},
+ {axis:'x',at:19,from:0,to:9.5,color:'#f8c5c9'},
+ {axis:'x',at:19,from:12,to:19.5,color:'#f8c5c9'},
+ {axis:'x',at:19,from:21.5,to:26,color:'#f8c5c9'},
+ {axis:'z',at:21,from:2,to:12.5,color:'#f8d9bb'},
+ {axis:'z',at:21,from:15,to:19,color:'#f8d9bb'}
 ];
 // Walls share one height but remain hidden together by the existing toggle.
 function drawBackWalls(){
@@ -602,8 +610,10 @@ function drawObject(o){
 function drawInfo(){
  ctx.font='800 15px Inter,Arial';ctx.fillStyle='#684554';ctx.textAlign='center';
  ctx.fillText('ГОСТИНАЯ',P(4.4,11.5)[0],P(4.4,11.5)[1]+46);
- ctx.fillText('КУХНЯ',P(4.5,2)[0],P(4.5,2)[1]+34);
- ctx.fillText('СПАЛЬНЯ',P(12,10.8)[0],P(12,10.8)[1]+36);
+ ctx.fillText('КУХНЯ',P(13,5.5)[0],P(13,5.5)[1]+34);
+ ctx.fillText('ХОЛЛ',P(24,6.5)[0],P(24,6.5)[1]+36);
+ ctx.fillText('СПАЛЬНЯ',P(13,18)[0],P(13,18)[1]+36);
+ ctx.fillText('СТУДИЯ',P(24,20)[0],P(24,20)[1]+36);
 }
 
 function render(){
@@ -677,11 +687,8 @@ function hasConflict(o,x,z){
   sofa:.18,wardrobe:.18,bookshelf:.18,dresser:.14,bed:.14,
   chair:.10,table:.08
  }[o.type]??.10;
- const dividers=[
-  {axis:'z',at:4,lo:0,hi:3.5},{axis:'z',at:4,lo:5.5,hi:9},
-  {axis:'x',at:9,lo:0,hi:4.2},{axis:'x',at:9,lo:6.2,hi:ZN}
- ];
- for(const w of dividers){
+ for(const segment of PARTITIONS){
+  const w={axis:segment.axis,at:segment.at,lo:segment.from,hi:segment.to};
   if(w.axis==='z'&&zmin-clearance<w.at&&zmax+clearance>w.at&&xmin-clearance<w.hi&&xmax+clearance>w.lo)return true;
   if(w.axis==='x'&&xmin-clearance<w.at&&xmax+clearance>w.at&&zmin-clearance<w.hi&&zmax+clearance>w.lo)return true;
  }
