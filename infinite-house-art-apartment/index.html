@@ -552,14 +552,18 @@ function drawIsoArt(o,im,b){
 }
 let hitBoxes=[];
 function drawSelectionFootprint(o){
- // Highlight the actual occupied grid cells, not a fixed rectangle.
- const tiles=occupiedCells(o);
+ const tiles=occupiedCells(o),invalid=hasConflict(o,o.x,o.z);
+ // Occupied and collided tiles are the exact same set. Invalid rotations
+ // remain inspectable, highlighted in red until the item is moved.
+ const fill=invalid?'rgba(248,106,107,.27)':'rgba(255,208,83,.26)';
+ const stroke=invalid?'#e75e65':'#f0aa2e';
  for(const cell of tiles){
   polygon([P(cell.x,cell.z),P(cell.x+1,cell.z),P(cell.x+1,cell.z+1),P(cell.x,cell.z+1)],
-   'rgba(255,208,83,.26)','#f0aa2e',1.1);
+   fill,stroke,1.1);
  }
  const contour=footprintPolygon(o).map(([x,z])=>P(x,z));
- polygon(contour,'rgba(255,215,107,.06)','#ffb22d',2.6);
+ polygon(contour,invalid?'rgba(255,103,103,.08)':'rgba(255,215,107,.06)',
+   invalid?'#e75e65':'#ffb22d',2.6);
 }
 function drawGroundContact(o,b){
  if(ITEMS[o.type].layer==='floor')return;
@@ -791,7 +795,7 @@ function update(){
    im.src=artPreview(o);
    im.style.transform=o.type==='sofa'&&sofaView(o).flip?'scaleX(-1)':'none';
    name.textContent=ITEMS[o.type].name;
-   info.textContent=o.type==='sofa'?sofaView(o).heading+' · '+occupiedCells(o).length+' клеток':(o.type==='lamp'||o.type==='tv')?(deviceOn(o)?'Включён · нажми, чтобы выключить':'Выключен · нажми, чтобы включить'):ITEMS[o.type].wall?'На стене · перетаскивай вдоль неё':'Перемещай по клеткам';
+   info.textContent=o.type==='sofa'?sofaView(o).heading+' · '+occupiedCells(o).length+' клеток'+(hasConflict(o,o.x,o.z)?' · ⚠ пересечение':''):(o.type==='lamp'||o.type==='tv')?(deviceOn(o)?'Включён · нажми, чтобы выключить':'Выключен · нажми, чтобы включить'):ITEMS[o.type].wall?'На стене · перетаскивай вдоль неё':'Перемещай по клеткам';
    turn.textContent=o.type==='sofa'?(dir8(o.rot)+1)+' / 8':ITEMS[o.type].wall?(wallSide(o)==='back'?'Задняя':'Левая'):'—';
  }else{
    im.removeAttribute('src');im.style.transform='none';name.textContent='Выбери предмет';
@@ -864,7 +868,16 @@ c.addEventListener('pointermove',e=>{
   return;
  }
  const [nx,nz]=snapPos(o.type,rawX,rawZ,o.rot);
- if(!hasConflict(o,nx,nz)){o.x=nx;o.z=nz;render();}
+ if(!hasConflict(o,nx,nz)){
+  if(o.type==='sofa'){
+   if(!Number.isFinite(o.rotationOriginX))o.rotationOriginX=o.x;
+   if(!Number.isFinite(o.rotationOriginZ))o.rotationOriginZ=o.z;
+   const [oldX,oldZ]=snapPos(o.type,o.rotationOriginX,o.rotationOriginZ,o.rot);
+   o.rotationOriginX+=nx-oldX;
+   o.rotationOriginZ+=nz-oldZ;
+  }
+  o.x=nx;o.z=nz;render();
+ }
 });
 function toggleDevice(o){
  if(!o||(o.type!=='lamp'&&o.type!=='tv'))return false;
@@ -895,7 +908,17 @@ document.getElementById('objectToggle').onclick=()=>{
  const o=objects.find(x=>x.id===selected);
  if(toggleDevice(o))update();
 };
-document.getElementById('turnL').onclick=()=>{const o=objects.find(x=>x.id===selected);if(!o||o.type!=='sofa')return;o.rot=dir8(o.rot-1);save();update()};document.getElementById('turnR').onclick=()=>{const o=objects.find(x=>x.id===selected);if(!o||o.type!=='sofa')return;o.rot=dir8(o.rot+1);save();update()};
+function rotateSofa(o,step){
+ if(!o||o.type!=='sofa')return;
+ // Stable world-space rotation origin: no gradual drift after eight clicks.
+ if(!Number.isFinite(o.rotationOriginX))o.rotationOriginX=o.x;
+ if(!Number.isFinite(o.rotationOriginZ))o.rotationOriginZ=o.z;
+ o.rot=dir8(o.rot+step);
+ [o.x,o.z]=snapPos(o.type,o.rotationOriginX,o.rotationOriginZ,o.rot);
+ save();update();
+}
+document.getElementById('turnL').onclick=()=>rotateSofa(objects.find(x=>x.id===selected),-1);
+document.getElementById('turnR').onclick=()=>rotateSofa(objects.find(x=>x.id===selected),1);
 
 document.getElementById('clone').onclick=()=>{
  const o=objects.find(x=>x.id===selected);if(!o)return;
