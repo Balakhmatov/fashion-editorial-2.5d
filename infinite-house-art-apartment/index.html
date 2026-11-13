@@ -101,7 +101,7 @@ button:disabled{opacity:.33;cursor:default}
      <button id="toggleGrid" class="stage-tool active" title="Показать или скрыть сетку" aria-label="Сетка">▦</button>
      <button id="toggleWalls" class="stage-tool active" title="Показать или скрыть стены" aria-label="Стены">▥</button>
      <button id="zoomOut" class="stage-tool" title="Отдалить" aria-label="Отдалить">−</button>
-     <span id="zoomText" class="zoom-text">100%</span>
+     <span id="zoomText" class="zoom-text">115%</span>
      <button id="zoomIn" class="stage-tool" title="Приблизить" aria-label="Приблизить">+</button>
      <button id="zoomReset" class="stage-tool" title="Сбросить масштаб" aria-label="Сбросить масштаб">⌖</button>
     </div>
@@ -307,7 +307,9 @@ function sceneBackground(){
  ellipse(1130,108,82,19,'#f8faf1');ellipse(1090,95,38,25,'#f8faf1');
 }
 let showGrid=true,showWalls=true,MODE='move';let selected=1,drag=null,lastPt=null;
-const camera={x:0,y:0,zoom:1};
+// Open 15% closer, keeping the centre of the scene stationary.
+const DEFAULT_ZOOM=1.15;
+const camera={x:(1-DEFAULT_ZOOM)*c.width/2,y:(1-DEFAULT_ZOOM)*c.height/2,zoom:DEFAULT_ZOOM};
 const pointers=new Map();let pinch=null;
 const clampZoom=z=>Math.max(.6,Math.min(2.8,z));
 function syncZoom(){document.getElementById('zoomText').textContent=Math.round(camera.zoom*100)+'%'}
@@ -437,69 +439,48 @@ function box(o){
 // The two source edge slopes are per-asset *measurements/approximations*, not
 // identical warp values. Convert the edges to the floor axes (+/-TY/TX).
 // Objects without reliable straight reference edges keep their neutral artwork.
-const ISO_EDGE_SLOPES={
- sofa:{0:{minus:-.450,plus:.358,scaleX:.94}},
- chair:{minus:-.55,plus:.35},
- table:{minus:-.47,plus:.50},
- bed:{minus:-.52,plus:.37},
- dresser:{minus:-.31,plus:.58},
- wardrobe:{minus:-.32,plus:.55},
- bookshelf:{minus:-.35,plus:.55}
-};
+// All floor furniture uses one drawing pipeline, but only specifically
+// calibrated assets get an affine transform. Unverified views stay unwarped.
 const ISO_IDENTITY=Object.freeze({scaleX:1,shearY:0,scaleY:1});
-function isoProfile(o,im,b){
- const def=ISO_EDGE_SLOPES[o.type];
- const edges=o.type==='sofa'?def&&def[dir8(o.rot)]:def;
- if(!edges)return ISO_IDENTITY;
- // The source edges need adjusting for the image's display scaling first.
- const naturalW=im?.naturalWidth||b.w,naturalH=im?.naturalHeight||b.h;
- const displayAspect=(b.h/naturalH)/(b.w/naturalW);
- const minus=edges.minus*displayAspect,plus=edges.plus*displayAspect;
- const target=TY/TX,scaleX=edges.scaleX||1;
- const scaleY=2*target*scaleX/(plus-minus);
- const shearY=-target*scaleX-scaleY*minus;
- if(!Number.isFinite(scaleY)||scaleY<.7||scaleY>1.4||Math.abs(shearY)>.28)
-  return ISO_IDENTITY;
- return {scaleX,shearY,scaleY};
+const ITEM_PROFILES=Object.freeze({
+ chair:{scaleX:1,shearY:.06,scaleY:1.10},
+ table:ISO_IDENTITY, // Original table already follows the tile axes adequately.
+ bed:{scaleX:1,shearY:.05,scaleY:1.08},
+ dresser:{scaleX:1,shearY:-.06,scaleY:1.08},
+ wardrobe:{scaleX:1,shearY:-.05,scaleY:1.08},
+ bookshelf:{scaleX:1,shearY:-.04,scaleY:1.06},
+ lamp:ISO_IDENTITY,
+ rug:ISO_IDENTITY
+});
+// The sofa combines six original paintings with two mirrored views, so
+// these explicit 8 directions must not inherit any generic furniture warp.
+const SOFA_PROFILES=Object.freeze({
+ 0:{scaleX:.94,shearY:.052,scaleY:1.16},   // south-west, calibrated screenshot
+ 1:ISO_IDENTITY,                            // west
+ 2:ISO_IDENTITY,                            // north-west
+ 3:ISO_IDENTITY,                            // north
+ 4:{scaleX:.96,shearY:-.030,scaleY:1.10},   // north-east, modest correction
+ 5:ISO_IDENTITY,                            // east
+ 6:ISO_IDENTITY,                            // south-east
+ 7:ISO_IDENTITY                             // south
+});
+function profileForObject(o){
+ if(o.type==='sofa')return SOFA_PROFILES[dir8(o.rot)]||ISO_IDENTITY;
+ return ITEM_PROFILES[o.type]||ISO_IDENTITY;
 }
 function isoPoint(x,y,foot,pr){
  return [foot[0]+pr.scaleX*(x-foot[0]),foot[1]+pr.shearY*(x-foot[0])+pr.scaleY*(y-foot[1])];
 }
 function projectedItemBounds(o,b,im){
- const pr=isoProfile(o,im,b);
+ const pr=profileForObject(o);
  const points=[[b.x,b.y],[b.x+b.w,b.y],[b.x+b.w,b.y+b.h],[b.x,b.y+b.h]];
- // The repaired near-side sofa foot extends beyond the original WebP canvas.
- if(o.type==='sofa'&&dir8(o.rot)===0){
-  points.push([b.x+b.w*270/412,b.y+b.h*332/315],
-              [b.x+b.w*298/412,b.y+b.h*332/315]);
- }
  const transformed=points.map(([x,y])=>isoPoint(x,y,b.foot,pr));
  const xs=transformed.map(p=>p[0]),ys=transformed.map(p=>p[1]);
  const minX=Math.min(...xs),minY=Math.min(...ys);
  return {x:minX,y:minY,w:Math.max(...xs)-minX,h:Math.max(...ys)-minY,foot:b.foot};
 }
-function repairNearSofaLeg(b){
- // Vector completion of the missing/cropped closest leg on original sofa_1.
- // Coordinates refer to its native 412x315 painting; retained in the same
- // isometric transform as the parent asset.
- ctx.save();
- ctx.translate(b.x-b.foot[0],b.y-b.foot[1]);
- ctx.scale(b.w/412,b.h/315);
- ctx.beginPath();
- ctx.moveTo(271,300);ctx.lineTo(292,304);ctx.lineTo(292,322);
- ctx.lineTo(282,332);ctx.lineTo(271,323);ctx.closePath();
- ctx.fillStyle='#65382e';ctx.fill();
- ctx.lineWidth=3;ctx.strokeStyle='#44272b';ctx.stroke();
- ctx.beginPath();ctx.moveTo(273,308);ctx.lineTo(282,314);
- ctx.lineTo(282,329);ctx.lineTo(273,323);ctx.closePath();
- ctx.fillStyle='#894738';ctx.fill();
- ctx.beginPath();ctx.moveTo(283,315);ctx.lineTo(289,310);
- ctx.lineTo(289,321);ctx.lineTo(283,326);ctx.closePath();
- ctx.fillStyle='#4c2b29';ctx.fill();
- ctx.restore();
-}
 function drawIsoArt(o,im,b){
- const pr=isoProfile(o,im,b),[px,py]=b.foot;
+ const pr=profileForObject(o),[px,py]=b.foot;
  ctx.save();ctx.translate(px,py);
  ctx.transform(pr.scaleX,pr.shearY,0,pr.scaleY,0,0);
  if(o.type==='sofa'&&sofaView(o).flip){
@@ -509,7 +490,6 @@ function drawIsoArt(o,im,b){
  }else{
   ctx.drawImage(im,b.x-px,b.y-py,b.w,b.h);
  }
- if(o.type==='sofa'&&dir8(o.rot)===0)repairNearSofaLeg(b);
  ctx.restore();
 }
 let hitBoxes=[];
@@ -881,7 +861,9 @@ document.getElementById('toggleWalls').onclick=()=>{
 document.getElementById('zoomIn').onclick=()=>zoomAt(1.2);
 document.getElementById('zoomOut').onclick=()=>zoomAt(1/1.2);
 document.getElementById('zoomReset').onclick=()=>{
- camera.x=0;camera.y=0;camera.zoom=1;syncZoom();render();
+ camera.x=(1-DEFAULT_ZOOM)*c.width/2;
+ camera.y=(1-DEFAULT_ZOOM)*c.height/2;
+ camera.zoom=DEFAULT_ZOOM;syncZoom();render();
 };
 
 const catalog=document.getElementById('catalog');
@@ -899,5 +881,5 @@ for(const [type,s] of Object.entries(ITEMS)){
  catalog.appendChild(el);
 }
 
-update();
+syncZoom();update();
 </script></body></html>
