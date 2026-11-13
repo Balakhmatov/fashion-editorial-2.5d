@@ -104,6 +104,7 @@ button:disabled{opacity:.33;cursor:default}
      <span id="zoomText" class="zoom-text">115%</span>
      <button id="zoomIn" class="stage-tool" title="Приблизить" aria-label="Приблизить">+</button>
      <button id="zoomReset" class="stage-tool" title="Сбросить масштаб" aria-label="Сбросить масштаб">⌖</button>
+     <button id="fitRoom" class="stage-tool" title="Вся квартира" aria-label="Показать всю квартиру">⛶</button>
     </div>
    </div>
    <span class="mode" id="mode">Редактор квартиры</span>
@@ -130,7 +131,7 @@ button:disabled{opacity:.33;cursor:default}
   <section class="panel">
    <div class="panel-heading"><h3>🛋️ Мебель и декор</h3><small>Нажми, чтобы добавить</small></div>
    <div class="catalog" id="catalog"></div>
-   <p class="hint">Перетаскивай мебель по клеткам. Нажми на торшер или телевизор, чтобы включить свет или экран. Пустое место — движение комнаты.</p>
+   <p class="hint">Поворачивай выбранную мебель ↶ ↷. Двигай комнату за свободный пол; ⛶ покажет всю квартиру. Нажми на торшер или телевизор для включения.</p>
   </section>
  </aside>
 </div>
@@ -377,11 +378,22 @@ let showGrid=true,showWalls=true,MODE='move';let selected=1,drag=null,lastPt=nul
 const DEFAULT_ZOOM=1.15;
 const camera={x:(1-DEFAULT_ZOOM)*c.width/2,y:(1-DEFAULT_ZOOM)*c.height/2,zoom:DEFAULT_ZOOM};
 const pointers=new Map();let pinch=null;
-const clampZoom=z=>Math.max(.6,Math.min(2.8,z));
+const clampZoom=z=>Math.max(.28,Math.min(3.0,z));
 function syncZoom(){document.getElementById('zoomText').textContent=Math.round(camera.zoom*100)+'%'}
 function zoomAt(ratio,x=c.width/2,y=c.height/2){
  const next=clampZoom(camera.zoom*ratio),k=next/camera.zoom;
  camera.x=x-(x-camera.x)*k;camera.y=y-(y-camera.y)*k;camera.zoom=next;
+ syncZoom();render();
+}
+function fitApartment(){
+ const corners=[P(0,0),P(XN,0),P(XN,ZN),P(0,ZN)];
+ const xs=corners.map(p=>p[0]),ys=corners.map(p=>p[1]);
+ const left=Math.min(...xs),right=Math.max(...xs);
+ const top=Math.min(...ys)-FULL_WALL_H-20,bottom=Math.max(...ys)+35;
+ const zoom=clampZoom(Math.min((c.width-100)/(right-left),(c.height-90)/(bottom-top)));
+ camera.zoom=zoom;
+ camera.x=c.width/2-zoom*(left+right)/2;
+ camera.y=c.height/2-zoom*(top+bottom)/2;
  syncZoom();render();
 }
 const initial=[
@@ -988,6 +1000,7 @@ document.getElementById('zoomReset').onclick=()=>{
  camera.y=(1-DEFAULT_ZOOM)*c.height/2;
  camera.zoom=DEFAULT_ZOOM;syncZoom();render();
 };
+document.getElementById('fitRoom').onclick=fitApartment;
 
 const catalog=document.getElementById('catalog');
 for(const [type,s] of Object.entries(ITEMS)){
