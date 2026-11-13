@@ -429,6 +429,27 @@ function box(o){
  return {x:foot[0]-w*ax+(spec.dx||0),y:foot[1]-h*ay+(spec.dy||0),w,h,foot};
 }
 
+// Calibrated against the original SW sofa: its front floor-facing edge
+// had slope ~0.358 and the adjacent side ~-0.45, while the floor's axes are
+// +0.5/-0.5. An image-space affine projection corrects BOTH edge families;
+// rotating the complete sprite cannot do that. World-space foot and cells
+// remain unchanged. Other views are intentionally untouched until calibrated.
+const SOFA_SW_ISO={scaleX:.94,shearY:.052,scaleY:1.16};
+function correctedSofaView(o){return o.type==='sofa'&&dir8(o.rot)===0;}
+function sofaImageBounds(o,b){
+ if(!correctedSofaView(o))return b;
+ const {scaleX,shearY,scaleY}=SOFA_SW_ISO;
+ const [px,py]=b.foot;
+ const corners=[
+  [b.x,b.y],[b.x+b.w,b.y],[b.x+b.w,b.y+b.h],[b.x,b.y+b.h]
+ ].map(([x,y])=>[
+  px+scaleX*(x-px),
+  py+shearY*(x-px)+scaleY*(y-py)
+ ]);
+ const xs=corners.map(v=>v[0]),ys=corners.map(v=>v[1]);
+ const x=Math.min(...xs),y=Math.min(...ys);
+ return {x,y,w:Math.max(...xs)-x,h:Math.max(...ys)-y,foot:b.foot};
+}
 let hitBoxes=[];
 function drawSelectionFootprint(o){
  const fp=ITEMS[o.type].foot||[1,1],hx=fp[0]/2,hz=fp[1]/2;
@@ -465,14 +486,22 @@ function drawObject(o){
    if(o.type==='lamp'&&deviceOn(o))lampGlow(b);
    if(im&&((im.complete&&im.naturalWidth)||(im.width&&im.height))){
      ctx.save();
-     ctx.translate(b.x+b.w/2,b.y+b.h/2);
-     if(o.type==='sofa'&&sofaView(o).flip)ctx.scale(-1,1);
-     ctx.drawImage(im,-b.w/2,-b.h/2,b.w,b.h);
+     if(correctedSofaView(o)){
+      // Affine correction about the fixed floor point; no artificial rotation.
+      const {scaleX,shearY,scaleY}=SOFA_SW_ISO;
+      ctx.translate(b.foot[0],b.foot[1]);
+      ctx.transform(scaleX,shearY,0,scaleY,0,0);
+      ctx.drawImage(im,b.x-b.foot[0],b.y-b.foot[1],b.w,b.h);
+     }else{
+      ctx.translate(b.x+b.w/2,b.y+b.h/2);
+      if(o.type==='sofa'&&sofaView(o).flip)ctx.scale(-1,1);
+      ctx.drawImage(im,-b.w/2,-b.h/2,b.w,b.h);
+     }
      ctx.restore();
      if(o.type==='lamp'&&deviceOn(o))lampShadeLight(b);
    }else polygon([[b.x,b.y+b.h],[b.x+b.w,b.y+b.h],[b.x+b.w,b.y]],'#dba37e','#583c51',3);
  }
- hitBoxes.push({...b,o});
+ hitBoxes.push({...sofaImageBounds(o,b),o});
 }
 
 function drawInfo(){
