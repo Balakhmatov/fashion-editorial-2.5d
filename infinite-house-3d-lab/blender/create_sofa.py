@@ -22,10 +22,12 @@ scene.render.resolution_y = 1152
 scene.render.resolution_percentage = 100
 scene.render.image_settings.file_format = "PNG"
 scene.render.film_transparent = True
-try:
-    scene.render.engine = "BLENDER_EEVEE_NEXT"
-except TypeError:
-    scene.render.engine = "BLENDER_EEVEE"
+for engine in ("BLENDER_EEVEE_NEXT", "BLENDER_EEVEE", "CYCLES"):
+    try:
+        scene.render.engine = engine
+        break
+    except (TypeError, ValueError):
+        continue
 
 def material(name, rgba, roughness=.82, metallic=0.0):
     mat = bpy.data.materials.new(name)
@@ -156,3 +158,7 @@ scene.world.color = (.78,.80,.84)
 scene.render.filepath = str(HERE / "sofa_preview.png")
 bpy.ops.render.render(write_still=True)
 print("Preview exported:", scene.render.filepath)
+# Source stays editable. A separate GLB remains the runtime game asset.
+source_path = HERE / "sofa_source.blend"
+bpy.ops.wm.save_as_mainfile(filepath=str(source_path))
+print("Editable Blender source:", source_path)
