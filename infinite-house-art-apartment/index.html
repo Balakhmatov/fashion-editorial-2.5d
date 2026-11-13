@@ -429,8 +429,36 @@ const SOFA_VIEWS=[
  {key:'sofa_0',flip:false,heading:'Юг',angle:180}
 ];
 const dir8=n=>((Math.trunc(Number(n)||0)%8)+8)%8;
+const ROTATABLE=['sofa','chair','table','rug','bed','wardrobe','dresser','bookshelf','lamp'];
+const COMPASS=['Юго-запад','Запад','Северо-запад','Север','Северо-восток','Восток','Юго-восток','Юг'];
 const sofaView=o=>SOFA_VIEWS[dir8(o.rot)];
 const sprite=o=>imgs[o.type==='sofa'?sofaView(o).key:o.type];
+// Each atlas is a 4x2 transparent sheet, clockwise SW/W/NW/N/NE/E/SE/S.
+const sheets={};
+for(const type of ROTATABLE){
+ const atlas=new Image();
+ atlas.onload=()=>update();
+ atlas.onerror=()=>{sheets[type]=null};
+ sheets[type]=atlas;
+ atlas.src='assets/rotations/'+type+'.webp?v=3';
+}
+const atlasFor=o=>sheets[o.type]&&sheets[o.type].complete&&sheets[o.type].naturalWidth>0?sheets[o.type]:null;
+const atlasCell=o=>{
+ const sheet=atlasFor(o);
+ return sheet?{sheet,w:sheet.naturalWidth/4,h:sheet.naturalHeight/2,col:dir8(o.rot)%4,row:Math.floor(dir8(o.rot)/4)}:null;
+};
+const PREVIEWS={};
+function currentPreview(o){
+ const cell=atlasCell(o);
+ if(!cell)return artPreview(o);
+ const key=o.type+'_'+dir8(o.rot);
+ if(PREVIEWS[key])return PREVIEWS[key];
+ const cv=document.createElement('canvas');cv.width=160;cv.height=160;
+ const cc=cv.getContext('2d');
+ if(!cc||!cv.toDataURL)return artPreview(o);
+ cc.drawImage(cell.sheet,cell.col*cell.w,cell.row*cell.h,cell.w,cell.h,0,0,160,160);
+ return PREVIEWS[key]=cv.toDataURL('image/png');
+}
 // Preserve saved room objects and migrate old sofa headings only once.
 try{
  const key='ih_art_apartment_v1',hasSaved=!!localStorage.getItem(key);
@@ -489,8 +517,8 @@ function box(o){
  };
  const [ax,ay]=anchors[o.type]||[.5,.96];
  let w=spec.w,h=spec.h;
- if(o.type==='sofa'){
-  // Existing sofa drawing size: 0.49 source pixels per scene pixel.
+ if(atlasFor(o)){w=spec.w;h=spec.h;
+ }else if(o.type==='sofa'){
   const scale=.49;w=(im?.naturalWidth||spec.w*2)*scale;
   h=(im?.naturalHeight||spec.h*2)*scale;
  }else if((spec.layer!=='floor'||o.type==='rug')&&o.type!=='lamp'&&im?.naturalWidth&&im?.naturalHeight){
@@ -539,7 +567,7 @@ function isoPoint(x,y,foot,pr){
  return [foot[0]+pr.scaleX*(x-foot[0]),foot[1]+pr.shearY*(x-foot[0])+pr.scaleY*(y-foot[1])];
 }
 function projectedItemBounds(o,b,im){
- const pr=profileForObject(o);
+ const pr=atlasFor(o)?ISO_IDENTITY:profileForObject(o);
  const points=[[b.x,b.y],[b.x+b.w,b.y],[b.x+b.w,b.y+b.h],[b.x,b.y+b.h]];
  const transformed=points.map(([x,y])=>isoPoint(x,y,b.foot,pr));
  const xs=transformed.map(p=>p[0]),ys=transformed.map(p=>p[1]);
@@ -547,6 +575,8 @@ function projectedItemBounds(o,b,im){
  return {x:minX,y:minY,w:Math.max(...xs)-minX,h:Math.max(...ys)-minY,foot:b.foot};
 }
 function drawIsoArt(o,im,b){
+ const cell=atlasCell(o);
+ if(cell){ctx.drawImage(cell.sheet,cell.col*cell.w,cell.row*cell.h,cell.w,cell.h,b.x,b.y,b.w,b.h);return;}
  const pr=profileForObject(o),[px,py]=b.foot;
  ctx.save();ctx.translate(px,py);
  ctx.transform(pr.scaleX,pr.shearY,0,pr.scaleY,0,0);
@@ -703,7 +733,7 @@ function hasConflict(o,x,z){
  return false;
 }
 
-function nextPos(type){
+function nextPos(type,rot=0){
  if(ITEMS[type].wall){
   for(const side of ['back','left']){
    const limit=side==='back'?XN:ZN;
@@ -714,10 +744,11 @@ function nextPos(type){
   }
   return null;
  }
- const fp=ITEMS[type].foot||[1,1],inset=ITEMS[type].wallInset||0;
- for(let z=fp[1]/2+Math.ceil(inset);z<=ZN-fp[1]/2;z++){
-  for(let x=fp[0]/2+Math.ceil(inset);x<=XN-fp[0]/2;x++){
-   if(!hasConflict({id:-1,type},x,z))return [x,z];
+ const ext=footprintExtents(type,rot),inset=ITEMS[type].wallInset||0;
+ const w=Math.ceil(ext.x-1e-8),h=Math.ceil(ext.z-1e-8);
+ for(let z=h/2+Math.ceil(inset);z<=ZN-h/2;z++){
+  for(let x=w/2+Math.ceil(inset);x<=XN-w/2;x++){
+   if(!hasConflict({id:-1,type,rot},x,z))return [x,z];
   }
  }
  return null;
@@ -800,11 +831,11 @@ function update(){
  const o=objects.find(x=>x.id===selected),im=document.getElementById('selectedImg'),name=document.getElementById('selectedName'),
  info=document.getElementById('selectedInfo'),turn=document.getElementById('rotateText');
  if(o){
-   im.src=artPreview(o);
-   im.style.transform=o.type==='sofa'&&sofaView(o).flip?'scaleX(-1)':'none';
+   im.src=currentPreview(o);
+   im.style.transform=!atlasFor(o)&&o.type==='sofa'&&sofaView(o).flip?'scaleX(-1)':'none';
    name.textContent=ITEMS[o.type].name;
-   info.textContent=o.type==='sofa'?sofaView(o).heading+' · '+occupiedCells(o).length+' клеток'+(hasConflict(o,o.x,o.z)?' · ⚠ пересечение':''):(o.type==='lamp'||o.type==='tv')?(deviceOn(o)?'Включён · нажми, чтобы выключить':'Выключен · нажми, чтобы включить'):ITEMS[o.type].wall?'На стене · перетаскивай вдоль неё':'Перемещай по клеткам';
-   turn.textContent=o.type==='sofa'?(dir8(o.rot)+1)+' / 8':ITEMS[o.type].wall?(wallSide(o)==='back'?'Задняя':'Левая'):'—';
+   info.textContent=ROTATABLE.includes(o.type)?COMPASS[dir8(o.rot)]+' · '+occupiedCells(o).length+' клеток'+(hasConflict(o,o.x,o.z)?' · ⚠ пересечение':''):(o.type==='tv')?(deviceOn(o)?'Включён · нажми, чтобы выключить':'Выключен · нажми, чтобы включить'):ITEMS[o.type].wall?'На стене · перетаскивай вдоль неё':'Перемещай по клеткам';
+   turn.textContent=ROTATABLE.includes(o.type)?(dir8(o.rot)+1)+' / 8':ITEMS[o.type].wall?(wallSide(o)==='back'?'Задняя':'Левая'):'—';
  }else{
    im.removeAttribute('src');im.style.transform='none';name.textContent='Выбери предмет';
    info.textContent='Нажми на мебель в квартире';turn.textContent='—';
@@ -816,7 +847,7 @@ function update(){
   toggle.textContent=(o.type==='lamp'?'💡 ':'📺 ')+(deviceOn(o)?'Выключить':'Включить');
   toggle.title=(deviceOn(o)?'Выключить ':'Включить ')+ITEMS[o.type].name.toLowerCase();
  }
- const disable=!o||o.type!=='sofa';
+ const disable=!o||!ROTATABLE.includes(o.type);
  document.getElementById('turnL').disabled=disable;
  document.getElementById('turnR').disabled=disable;
  document.getElementById('clone').disabled=!o;
@@ -877,7 +908,7 @@ c.addEventListener('pointermove',e=>{
  }
  const [nx,nz]=snapPos(o.type,rawX,rawZ,o.rot);
  if(!hasConflict(o,nx,nz)){
-  if(o.type==='sofa'){
+  if(ROTATABLE.includes(o.type)){
    if(!Number.isFinite(o.rotationOriginX))o.rotationOriginX=o.x;
    if(!Number.isFinite(o.rotationOriginZ))o.rotationOriginZ=o.z;
    const [oldX,oldZ]=snapPos(o.type,o.rotationOriginX,o.rotationOriginZ,o.rot);
@@ -916,8 +947,8 @@ document.getElementById('objectToggle').onclick=()=>{
  const o=objects.find(x=>x.id===selected);
  if(toggleDevice(o))update();
 };
-function rotateSofa(o,step){
- if(!o||o.type!=='sofa')return;
+function rotateItem(o,step){
+ if(!o||!ROTATABLE.includes(o.type))return;
  // Stable world-space rotation origin: no gradual drift after eight clicks.
  if(!Number.isFinite(o.rotationOriginX))o.rotationOriginX=o.x;
  if(!Number.isFinite(o.rotationOriginZ))o.rotationOriginZ=o.z;
@@ -925,14 +956,15 @@ function rotateSofa(o,step){
  [o.x,o.z]=snapPos(o.type,o.rotationOriginX,o.rotationOriginZ,o.rot);
  save();update();
 }
-document.getElementById('turnL').onclick=()=>rotateSofa(objects.find(x=>x.id===selected),-1);
-document.getElementById('turnR').onclick=()=>rotateSofa(objects.find(x=>x.id===selected),1);
+document.getElementById('turnL').onclick=()=>rotateItem(objects.find(x=>x.id===selected),-1);
+document.getElementById('turnR').onclick=()=>rotateItem(objects.find(x=>x.id===selected),1);
 
 document.getElementById('clone').onclick=()=>{
  const o=objects.find(x=>x.id===selected);if(!o)return;
- const np=nextPos(o.type);
+ const np=nextPos(o.type,o.rot||0);
  if(!np){flash('Нет свободного места');return;}
  const neo={...o,id:Math.max(0,...objects.map(x=>x.id))+1,x:np[0],z:np[1]};
+ delete neo.rotationOriginX;delete neo.rotationOriginZ;
  if(ITEMS[o.type].wall)neo.wallSide=np[2];
  if(hasConflict(neo,neo.x,neo.z)){flash('Нет свободного места');return;}
  objects.push(neo);selected=neo.id;save();update();
