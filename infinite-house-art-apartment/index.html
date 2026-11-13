@@ -39,6 +39,8 @@ button:disabled{opacity:.33;cursor:default}
 .action{border:2px solid #ab9aad;background:#fff;border-radius:11px;height:42px;min-width:0;color:#59445d;font-size:22px;font-weight:850;box-shadow:0 3px 0 #36264018}
 .action:active:not(:disabled){transform:translateY(2px)}
 .action.red{color:#c24453}
+.import-asset{width:100%;margin-top:11px;border:1.5px solid #cdb5a6;border-radius:11px;background:#fff1db;color:#644653;padding:11px 10px;font-size:12px;font-weight:850}
+.import-asset:active{transform:translateY(1px)}
 .object-toggle{width:100%;display:flex;gap:8px;justify-content:center;align-items:center;border:1.5px solid #e2cbab;border-radius:11px;background:#fff0d6;color:#62445a;font-size:12px;font-weight:850;margin-top:11px;padding:10px 13px;min-height:41px}
 .object-toggle:hover{background:#ffe6be}
 .object-toggle[hidden]{display:none}
@@ -132,6 +134,9 @@ button:disabled{opacity:.33;cursor:default}
    <div class="panel-heading"><h3>🛋️ Мебель и декор</h3><small>Нажми, чтобы добавить</small></div>
    <div class="catalog" id="catalog"></div>
    <p class="hint">Поворачивай выбранную мебель ↶ ↷. Двигай комнату за свободный пол; ⛶ покажет всю квартиру. Нажми на торшер или телевизор для включения.</p>
+   <button id="importSpriteZip" class="import-asset" type="button">📦 Загрузить новые 8 ракурсов (ZIP)</button>
+   <input id="spriteZipFile" type="file" accept=".zip,application/zip" hidden>
+   <p class="hint" id="spriteStatus">Подключение спрайтов…</p>
   </section>
  </aside>
 </div>
@@ -447,12 +452,20 @@ const sofaView=o=>SOFA_VIEWS[dir8(o.rot)];
 const sprite=o=>imgs[o.type==='sofa'?sofaView(o).key:o.type];
 // Each atlas is a 4x2 transparent sheet, clockwise SW/W/NW/N/NE/E/SE/S.
 const sheets={};
+const ASSET_STORAGE='ih_art_apartment_rotations_v1';
+let localAtlases={};
+try{localAtlases=JSON.parse(localStorage.getItem(ASSET_STORAGE)||'{}')}catch{}
 for(const type of ROTATABLE){
  const atlas=new Image();
- atlas.onload=()=>update();
- atlas.onerror=()=>{sheets[type]=null};
+ atlas.onload=()=>{update();updateAssetStatus()};
+ atlas.onerror=()=>{sheets[type]=null;updateAssetStatus()};
  sheets[type]=atlas;
- atlas.src='assets/rotations/'+type+'.webp?v=3';
+ atlas.src=localAtlases[type]||'assets/rotations/'+type+'.webp?v=3';
+}
+function updateAssetStatus(){
+ const label=document.getElementById('spriteStatus');
+ if(!label)return;
+ label.textContent=ROTATABLE.filter(t=>atlasFor({type:t})).length+' из 9 наборов · по 8 ракурсов';
 }
 const atlasFor=o=>sheets[o.type]&&sheets[o.type].complete&&sheets[o.type].naturalWidth>0?sheets[o.type]:null;
 const atlasCell=o=>{
@@ -985,6 +998,52 @@ document.getElementById('remove').onclick=()=>{
  objects=objects.filter(x=>x.id!==selected);selected=null;save();update();
 };
 
+// Offline ZIP_STORED import: no third-party services and no server upload.
+function unpackStoredZip(buffer){
+ const bytes=new Uint8Array(buffer),view=new DataView(buffer);
+ const decoder=new TextDecoder(),found=new Map();
+ let at=0;
+ while(at+30<=bytes.length&&view.getUint32(at,true)===0x04034b50){
+  const flags=view.getUint16(at+6,true),method=view.getUint16(at+8,true);
+  const size=view.getUint32(at+18,true),nlen=view.getUint16(at+26,true);
+  const extra=view.getUint16(at+28,true),begin=at+30;
+  const name=decoder.decode(bytes.slice(begin,begin+nlen));
+  const dataAt=begin+nlen+extra;
+  if(flags&8||method!==0||dataAt+size>bytes.length)
+    throw new Error('Нужен ZIP без сжатия (STORE)');
+  const base=name.split('/').pop(),type=base.endsWith('.webp')?base.slice(0,-5):'';
+  if(ROTATABLE.includes(type))found.set(type,bytes.slice(dataAt,dataAt+size));
+  at=dataAt+size;
+ }
+ return found;
+}
+const imageAsUrl=bytes=>new Promise((resolve,reject)=>{
+ const reader=new FileReader();
+ reader.onload=()=>resolve(reader.result);
+ reader.onerror=()=>reject(reader.error);
+ reader.readAsDataURL(new Blob([bytes],{type:'image/webp'}));
+});
+document.getElementById('importSpriteZip').onclick=()=>document.getElementById('spriteZipFile').click();
+document.getElementById('spriteZipFile').onchange=async e=>{
+ const file=e.target.files?.[0];if(!file)return;
+ try{
+  const entries=unpackStoredZip(await file.arrayBuffer());
+  if(ROTATABLE.some(type=>!entries.has(type)))throw new Error('В архиве должно быть 9 WebP');
+  const next={};
+  for(const type of ROTATABLE)next[type]=await imageAsUrl(entries.get(type));
+  localStorage.setItem(ASSET_STORAGE,JSON.stringify(next));
+  localAtlases=next;
+  for(const k of Object.keys(PREVIEWS))delete PREVIEWS[k];
+  for(const type of ROTATABLE){
+   const im=new Image();
+   im.onload=()=>{update();updateAssetStatus()};
+   im.onerror=()=>flash('Ошибка изображения '+type);
+   sheets[type]=im;im.src=next[type];
+  }
+  flash('✓ Все 72 ракурса загружены');
+ }catch(error){flash('Ошибка ZIP: '+error.message)}
+ e.target.value='';
+};
 function flash(text){document.getElementById('mode').textContent=text;setTimeout(()=>document.getElementById('mode').textContent='Редактор квартиры',1600)}
 document.getElementById('save').onclick=()=>{save();flash('✓ Сохранено на устройстве')};
 document.getElementById('toggleGrid').onclick=()=>{
