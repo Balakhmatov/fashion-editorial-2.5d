@@ -146,11 +146,69 @@ const P=(x,z)=>[OX+(x-z)*TX/2,OY+(x+z)*TY/2];
 const INV=(x,y)=>{const dx=(x-OX)/TX,dy=(y-OY)/TY;return [dy+dx,dy-dx]};
 const snapAxis=(value,span,total)=>{const half=span/2;return Math.max(half,Math.min(total-half,Math.round(value-half)+half))};
 // Wall offset is quantized to full grid cells: no fractional drifting.
-const snapPos=(type,x,z)=>{
- const spec=ITEMS[type],fp=spec.foot||[1,1],inset=spec.wallInset||0;
- const ax=snapAxis(x,fp[0],XN),az=snapAxis(z,fp[1],ZN);
- return [Math.max(ax,fp[0]/2+Math.ceil(inset)),Math.max(az,fp[1]/2+Math.ceil(inset))];
+// A footprint is a rotated world-space polygon, never a static 3x2 overlay.
+// In this prototype sofa sprites are the only upright objects with 8 views.
+// Other illustrated furniture has one fixed camera angle; its rot remains 0.
+function footprintPolygon(o,x=o.x,z=o.z){
+ const [w,h]=ITEMS[o.type].foot||[1,1];
+ const t=o.type==='sofa'?dir8(o.rot||0)*Math.PI/4:0;
+ const cs=Math.cos(t),sn=Math.sin(t);
+ return [[-w/2,-h/2],[w/2,-h/2],[w/2,h/2],[-w/2,h/2]]
+  .map(([dx,dz])=>[x+dx*cs-dz*sn,z+dx*sn+dz*cs]);
+}
+function footprintExtents(type,rot=0){
+ const p=footprintPolygon({type,rot},0,0);
+ const xs=p.map(v=>v[0]),zs=p.map(v=>v[1]);
+ return {x:Math.max(...xs)-Math.min(...xs),z:Math.max(...zs)-Math.min(...zs)};
+}
+const snapPos=(type,x,z,rot=0)=>{
+ const spec=ITEMS[type],fp=footprintExtents(type,rot),inset=spec.wallInset||0;
+ // Quarter-turns swap footprint dimensions and snap offsets; diagonals
+ // need a larger bounding region while preserving a stable grid lattice.
+ const wx=Math.ceil(fp.x-1e-8),wz=Math.ceil(fp.z-1e-8);
+ const ax=snapAxis(x,wx,XN),az=snapAxis(z,wz,ZN);
+ return [Math.max(ax,wx/2+Math.ceil(inset)),Math.max(az,wz/2+Math.ceil(inset))];
 };
+// Sutherland-Hodgman clipping: exact occupied tiles for any 45° rotation.
+function clipFootprint(poly,x,z){
+ let p=poly;
+ for(const [axis,limit,positive] of [[0,x,true],[0,x+1,false],[1,z,true],[1,z+1,false]]){
+  if(!p.length)break;
+  const next=[];
+  for(let i=0;i<p.length;i++){
+   const a=p[i],b=p[(i+1)%p.length];
+   const av=positive?a[axis]>=limit-1e-9:a[axis]<=limit+1e-9;
+   const bv=positive?b[axis]>=limit-1e-9:b[axis]<=limit+1e-9;
+   if(av!==bv){
+    const t=(limit-a[axis])/(b[axis]-a[axis]);
+    next.push([a[0]+t*(b[0]-a[0]),a[1]+t*(b[1]-a[1])]);
+   }
+   if(bv)next.push(b);
+  }
+  p=next;
+ }
+ return p;
+}
+function polygonArea(poly){
+ if(poly.length<3)return 0;
+ let sum=0;
+ for(let i=0;i<poly.length;i++){
+  const a=poly[i],b=poly[(i+1)%poly.length];sum+=a[0]*b[1]-b[0]*a[1];
+ }
+ return Math.abs(sum)/2;
+}
+function occupiedCells(o,x=o.x,z=o.z){
+ const poly=footprintPolygon(o,x,z);
+ const xs=poly.map(v=>v[0]),zs=poly.map(v=>v[1]),result=[];
+ for(let i=Math.max(0,Math.floor(Math.min(...xs)));i<Math.min(XN,Math.ceil(Math.max(...xs)));i++){
+  for(let j=Math.max(0,Math.floor(Math.min(...zs)));j<Math.min(ZN,Math.ceil(Math.max(...zs)));j++){
+   const clipped=clipFootprint(poly,i,j);
+   if(polygonArea(clipped)>.025)result.push({x:i,z:j});
+  }
+ }
+ return result;
+}
+
 function polygon(pts,fill,stroke='#62464c',width=2.8){ctx.beginPath();ctx.moveTo(...pts[0]);for(let i=1;i<pts.length;i++)ctx.lineTo(...pts[i]);ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.lineWidth=width;ctx.strokeStyle=stroke;ctx.lineJoin='round';ctx.stroke()}}
 function line(a,b,color='#72565a',width=2){ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.lineWidth=width;ctx.strokeStyle=color;ctx.stroke()}
 function ellipse(x,y,rx,ry,fill,stroke='',sw=2){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=sw;ctx.stroke()}}
@@ -494,12 +552,14 @@ function drawIsoArt(o,im,b){
 }
 let hitBoxes=[];
 function drawSelectionFootprint(o){
- const fp=ITEMS[o.type].foot||[1,1],hx=fp[0]/2,hz=fp[1]/2;
- const outline=[
-  P(o.x-hx,o.z-hz),P(o.x+hx,o.z-hz),
-  P(o.x+hx,o.z+hz),P(o.x-hx,o.z+hz)
- ];
- polygon(outline,'rgba(255,214,108,.13)','#f0aa2e',2.2);
+ // Highlight the actual occupied grid cells, not a fixed rectangle.
+ const tiles=occupiedCells(o);
+ for(const cell of tiles){
+  polygon([P(cell.x,cell.z),P(cell.x+1,cell.z),P(cell.x+1,cell.z+1),P(cell.x,cell.z+1)],
+   'rgba(255,208,83,.26)','#f0aa2e',1.1);
+ }
+ const contour=footprintPolygon(o).map(([x,z])=>P(x,z));
+ polygon(contour,'rgba(255,215,107,.06)','#ffb22d',2.6);
 }
 function drawGroundContact(o,b){
  if(ITEMS[o.type].layer==='floor')return;
@@ -604,29 +664,29 @@ function hasConflict(o,x,z){
    return objects.some(v=>v.id!==o.id&&ITEMS[v.type].wall&&wallSide(v)===side&&
      Math.abs((side==='back'?v.x:v.z)-coord)<(s.length+WALL_ASSETS[v.type].length)/2+.12);
  }
- const fp=spec.foot||[1,1],inset=spec.wallInset||0;
- if(x-fp[0]/2<inset-.001||z-fp[1]/2<inset-.001||
-    x+fp[0]/2>XN||z+fp[1]/2>ZN)return true;
- // Keep furniture from straddling the internal room dividers or hiding
- // their edges. Higher backrests need slightly more visual clearance.
+ const outline=footprintPolygon(o,x,z),inset=spec.wallInset||0;
+ const xx=outline.map(p=>p[0]),zz=outline.map(p=>p[1]);
+ const xmin=Math.min(...xx),xmax=Math.max(...xx),zmin=Math.min(...zz),zmax=Math.max(...zz);
+ if(xmin<inset-.001||zmin<inset-.001||xmax>XN+.001||zmax>ZN+.001)return true;
  const clearance={
-  sofa:.62,wardrobe:.18,bookshelf:.18,dresser:.14,bed:.14,
+  sofa:.18,wardrobe:.18,bookshelf:.18,dresser:.14,bed:.14,
   chair:.10,table:.08
- }[o.type]??.12;
- const xmin=x-fp[0]/2-clearance,xmax=x+fp[0]/2+clearance;
- const zmin=z-fp[1]/2-clearance,zmax=z+fp[1]/2+clearance;
+ }[o.type]??.10;
  const dividers=[
   {axis:'z',at:4,lo:0,hi:3.5},{axis:'z',at:4,lo:5.5,hi:9},
   {axis:'x',at:9,lo:0,hi:4.2},{axis:'x',at:9,lo:6.2,hi:ZN}
  ];
  for(const w of dividers){
-  if(w.axis==='z'&&zmin<w.at&&zmax>w.at&&xmin<w.hi&&xmax>w.lo)return true;
-  if(w.axis==='x'&&xmin<w.at&&xmax>w.at&&zmin<w.hi&&zmax>w.lo)return true;
+  if(w.axis==='z'&&zmin-clearance<w.at&&zmax+clearance>w.at&&xmin-clearance<w.hi&&xmax+clearance>w.lo)return true;
+  if(w.axis==='x'&&xmin-clearance<w.at&&xmax+clearance>w.at&&zmin-clearance<w.hi&&zmax+clearance>w.lo)return true;
  }
+ // A cell visible in the selection is the same cell used by collision checks.
+ // Rugs intentionally sit beneath furniture and do not block placement.
+ if(spec.layer==='floor')return false;
+ const cells=occupiedCells(o,x,z),taken=new Set(cells.map(c=>c.x+','+c.z));
  for(const v of objects){
-  if(v.id===o.id||ITEMS[v.type].wall||ITEMS[v.type].layer==='floor'||spec.layer==='floor')continue;
-  const other=ITEMS[v.type].foot||[1,1];
-  if(Math.abs(v.x-x)<(fp[0]+other[0])/2-.04&&Math.abs(v.z-z)<(fp[1]+other[1])/2-.04)return true;
+  if(v.id===o.id||ITEMS[v.type].wall||ITEMS[v.type].layer==='floor')continue;
+  if(occupiedCells(v).some(c=>taken.has(c.x+','+c.z)))return true;
  }
  return false;
 }
@@ -731,7 +791,7 @@ function update(){
    im.src=artPreview(o);
    im.style.transform=o.type==='sofa'&&sofaView(o).flip?'scaleX(-1)':'none';
    name.textContent=ITEMS[o.type].name;
-   info.textContent=o.type==='sofa'?sofaView(o).heading+' · поворот 45°':(o.type==='lamp'||o.type==='tv')?(deviceOn(o)?'Включён · нажми, чтобы выключить':'Выключен · нажми, чтобы включить'):ITEMS[o.type].wall?'На стене · перетаскивай вдоль неё':'Перемещай по клеткам';
+   info.textContent=o.type==='sofa'?sofaView(o).heading+' · '+occupiedCells(o).length+' клеток':(o.type==='lamp'||o.type==='tv')?(deviceOn(o)?'Включён · нажми, чтобы выключить':'Выключен · нажми, чтобы включить'):ITEMS[o.type].wall?'На стене · перетаскивай вдоль неё':'Перемещай по клеткам';
    turn.textContent=o.type==='sofa'?(dir8(o.rot)+1)+' / 8':ITEMS[o.type].wall?(wallSide(o)==='back'?'Задняя':'Левая'):'—';
  }else{
    im.removeAttribute('src');im.style.transform='none';name.textContent='Выбери предмет';
@@ -803,7 +863,7 @@ c.addEventListener('pointermove',e=>{
   if(!hasConflict(candidate,nx,nz)){o.x=nx;o.z=nz;o.wallSide=side;render();}
   return;
  }
- const [nx,nz]=snapPos(o.type,rawX,rawZ);
+ const [nx,nz]=snapPos(o.type,rawX,rawZ,o.rot);
  if(!hasConflict(o,nx,nz)){o.x=nx;o.z=nz;render();}
 });
 function toggleDevice(o){
