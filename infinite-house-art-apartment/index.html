@@ -123,7 +123,7 @@ button:disabled{opacity:.33;cursor:default}
    </div>
    <div class="actions">
     <button class="action" id="turnL" title="Повернуть влево" aria-label="Повернуть влево">↶</button>
-    <span class="rotValue" id="rotateText">1 / 8</span>
+    <span class="rotValue" id="rotateText">1 / 4</span>
     <button class="action" id="turnR" title="Повернуть вправо" aria-label="Повернуть вправо">↷</button>
     <button class="action" id="clone" title="Дублировать" aria-label="Дублировать">⊕</button>
     <button class="action red" id="remove" title="Удалить" aria-label="Удалить">⊗</button>
@@ -134,9 +134,7 @@ button:disabled{opacity:.33;cursor:default}
    <div class="panel-heading"><h3>🛋️ Мебель и декор</h3><small>Нажми, чтобы добавить</small></div>
    <div class="catalog" id="catalog"></div>
    <p class="hint">Поворачивай выбранную мебель ↶ ↷. Двигай комнату за свободный пол; ⛶ покажет всю квартиру. Нажми на торшер или телевизор для включения.</p>
-   <button id="importSpriteZip" class="import-asset" type="button">📦 Загрузить новые 8 ракурсов (ZIP)</button>
-   <input id="spriteZipFile" type="file" accept=".zip,application/zip" hidden>
-   <p class="hint" id="spriteStatus">Подключение спрайтов…</p>
+   <p class="hint">4 изометрических направления · поворот 90°</p>
   </section>
  </aside>
 </div>
@@ -154,29 +152,19 @@ const snapAxis=(value,span,total)=>{const half=span/2;return Math.max(half,Math.
 // Wall offset is quantized to full grid cells: no fractional drifting.
 // Physical floor occupancy is authored independently from rendered pixels.
 // Eight angles select exact masks; no polygon clipping or phantom corner tiles.
+// Four right-angle orientations. Only floor footprint (not picture pixels)
+// determines highlighted cells and collision occupancy.
 const FOOTPRINT_RULES={
- sofa:{base:[3,2],diagonal:['.XX.','XXX.','.XXX','.XX.']},
- chair:{base:[2,2],diagonal:['XX','XX']},
- table:{base:[2,1],diagonal:['.X.','XXX','.X.']},
- rug:{base:[4,3],diagonal:['.XX.','XXXX','XXXX','XXXX','.XX.']},
- bed:{base:[3,2],diagonal:['.XX.','XXX.','.XXX','.XX.']},
- wardrobe:{base:[2,1],diagonal:['.X.','XXX','.X.']},
- dresser:{base:[2,1],diagonal:['.X.','XXX','.X.']},
- bookshelf:{base:[2,1],diagonal:['.X.','XXX','.X.']},
- lamp:{base:[1,1],diagonal:['X']}
+ sofa:[3,2],chair:[2,2],table:[2,1],rug:[4,3],bed:[3,2],
+ wardrobe:[2,1],dresser:[2,1],bookshelf:[2,1],lamp:[1,1]
 };
 function rotationMask(type,rot=0){
- const rule=FOOTPRINT_RULES[type]||{base:ITEMS[type]?.foot||[1,1],diagonal:['X']};
- const dir=dir8(rot);
- let w,h,cells=[];
- if(dir%2===0){
-  [w,h]=rule.base;
-  for(let z=0;z<h;z++)for(let x=0;x<w;x++)cells.push([x,z]);
-  for(let k=0;k<dir/2;k++){cells=cells.map(([x,z])=>[h-1-z,x]);[w,h]=[h,w]}
- }else{
-  h=rule.diagonal.length;w=rule.diagonal[0].length;
-  rule.diagonal.forEach((row,z)=>{for(let x=0;x<row.length;x++)if(row[x]==='X')cells.push([x,z])});
-  for(let k=0;k<(dir-1)/2;k++){cells=cells.map(([x,z])=>[h-1-z,x]);[w,h]=[h,w]}
+ const dims=FOOTPRINT_RULES[type]||ITEMS[type]?.foot||[1,1];
+ let [w,h]=dims,cells=[];
+ for(let z=0;z<h;z++)for(let x=0;x<w;x++)cells.push([x,z]);
+ for(let k=0;k<dir4(rot);k++){
+  cells=cells.map(([x,z])=>[h-1-z,x]);
+  [w,h]=[h,w];
  }
  return {w,h,cells};
 }
@@ -424,45 +412,35 @@ const SOFA_VIEWS=[
  {key:'sofa_5',flip:false,heading:'Юго-восток',angle:135},
  {key:'sofa_0',flip:false,heading:'Юг',angle:180}
 ];
-const dir8=n=>((Math.trunc(Number(n)||0)%8)+8)%8;
+const dir8=n=>((Math.trunc(Number(n)||0)%8)+8)%8; // historical 8-view saved room migration
+const dir4=n=>((Math.trunc(Number(n)||0)%4)+4)%4;
+const viewIndex=o=>dir4(o.rot||0)*2; // frames 0,2,4,6 of the 4x2 atlases
+
 const ROTATABLE=['sofa','chair','table','rug','bed','wardrobe','dresser','bookshelf','lamp'];
-const COMPASS=['Юго-запад','Запад','Северо-запад','Север','Северо-восток','Восток','Юго-восток','Юг'];
-const sofaView=o=>SOFA_VIEWS[dir8(o.rot)];
+const COMPASS=['Юго-запад','Северо-запад','Северо-восток','Юго-восток'];
+const sofaView=o=>SOFA_VIEWS[viewIndex(o)];
 const sprite=o=>imgs[o.type==='sofa'?sofaView(o).key:o.type];
 // Each atlas is a 4x2 transparent sheet, clockwise SW/W/NW/N/NE/E/SE/S.
+// Only the four diagonal isometric views are used: atlas frames 0, 2, 4, 6.
 const sheets={};
-const ASSET_STORAGE='ih_art_apartment_rotations_v1';
-let localAtlases={};
-try{localAtlases=JSON.parse(localStorage.getItem(ASSET_STORAGE)||'{}')}catch{}
 for(const type of ROTATABLE){
  const atlas=new Image();
- let triedLocal=false;
- atlas.onload=()=>{update();updateAssetStatus()};
- atlas.onerror=()=>{
-  if(!triedLocal&&localAtlases[type]){
-   triedLocal=true;atlas.src=localAtlases[type];return;
-  }
-  sheets[type]=null;updateAssetStatus();
- };
+ atlas.onload=()=>{if(typeof update==='function')update()};
+ atlas.onerror=()=>{sheets[type]=null};
  sheets[type]=atlas;
- // Published repository assets take precedence over stale local imports.
- atlas.src='assets/rotations/'+type+'.webp?v=4';
-}
-function updateAssetStatus(){
- const label=document.getElementById('spriteStatus');
- if(!label)return;
- label.textContent=ROTATABLE.filter(t=>atlasFor({type:t})).length+' из 9 наборов · по 8 ракурсов';
+ atlas.src='assets/rotations/'+type+'.webp?v=5';
 }
 function atlasFor(o){return sheets[o.type]&&sheets[o.type].complete&&sheets[o.type].naturalWidth>0?sheets[o.type]:null}
 const atlasCell=o=>{
- const sheet=atlasFor(o);
- return sheet?{sheet,w:sheet.naturalWidth/4,h:sheet.naturalHeight/2,col:dir8(o.rot)%4,row:Math.floor(dir8(o.rot)/4)}:null;
+ const sheet=atlasFor(o),index=viewIndex(o);
+ return sheet?{sheet,w:sheet.naturalWidth/4,h:sheet.naturalHeight/2,
+   col:index%4,row:Math.floor(index/4)}:null;
 };
 const PREVIEWS={};
 function currentPreview(o){
  const cell=atlasCell(o);
  if(!cell)return artPreview(o);
- const key=o.type+'_'+dir8(o.rot);
+ const key=o.type+'_'+dir4(o.rot);
  if(PREVIEWS[key])return PREVIEWS[key];
  const cv=document.createElement('canvas');cv.width=160;cv.height=160;
  const cc=cv.getContext('2d');
@@ -510,11 +488,11 @@ try{
   localStorage.setItem('ih_art_apartment_tv_intro_v1','1');
  }
 }catch{}
-// Uniform sprite scaling: all 8 frames are 120x120 source pixels.
+// Uniform sprite scaling: source atlas frames are 120x120, 4 used per item.
 // Draw them on a SQUARE canvas; transparent padding is part of the atlas.
 // Separate authored render size from the footprint measured in floor tiles.
 const ATLAS_FRAME_SIZE={
- sofa:204,chair:132,table:150,rug:260,bed:179,
+ sofa:204,chair:166,table:150,rug:260,bed:179,
  dresser:148,wardrobe:166,bookshelf:174,lamp:169
 };
 function box(o){
@@ -580,7 +558,7 @@ const SOFA_PROFILES=Object.freeze({
  7:ISO_IDENTITY                             // south
 });
 function profileForObject(o){
- if(o.type==='sofa')return SOFA_PROFILES[dir8(o.rot)]||ISO_IDENTITY;
+ if(o.type==='sofa')return SOFA_PROFILES[viewIndex(o)]||ISO_IDENTITY;
  return ITEM_PROFILES[o.type]||ISO_IDENTITY;
 }
 function isoPoint(x,y,foot,pr){
@@ -852,6 +830,42 @@ function migrateMicroAlignment(){
 }
 migrateMicroAlignment();
 
+// Back up existing eight-view rooms and convert every floor item just once.
+// Old stored 0..7 views map to nearest of 0/2/4/6 source atlas frames.
+function migrateFourDirections(){
+ const flag='ih_four_directions_v1',key='ih_art_apartment_v1';
+ try{
+  if(localStorage.getItem(flag))return;
+  const prior=localStorage.getItem(key);
+  if(prior)localStorage.setItem(flag+'_backup',prior);
+  const floor=objects.filter(o=>ROTATABLE.includes(o.type));
+  objects=objects.filter(o=>!ROTATABLE.includes(o.type));
+  for(const o of floor){
+   o.rot=dir4(Math.round(dir8(o.rot||0)/2));
+   delete o.rotationOriginX;delete o.rotationOriginZ;
+   const [x,z]=snapPos(o.type,o.x,o.z,o.rot);
+   let target=!hasConflict(o,x,z)?[x,z]:null;
+   if(!target){
+    const {w,h}=rotationMask(o.type,o.rot),inset=ITEMS[o.type].wallInset||0;
+    let best=Infinity;
+    for(let zz=h/2+Math.ceil(inset);zz<=ZN-h/2;zz++){
+     for(let xx=w/2+Math.ceil(inset);xx<=XN-w/2;xx++){
+      if(hasConflict(o,xx,zz))continue;
+      const dist=(xx-x)**2+(zz-z)**2;
+      if(dist<best){best=dist;target=[xx,zz]}
+     }
+    }
+   }
+   if(target)[o.x,o.z]=target;
+   objects.push(o);
+  }
+  objects.sort((a,b)=>a.id-b.id);
+  if(prior)localStorage.setItem(key,JSON.stringify(objects));
+  localStorage.setItem(flag,'1');
+ }catch{/* Keep room usable if storage is unavailable */}
+}
+migrateFourDirections();
+
 function update(){
  const o=objects.find(x=>x.id===selected),im=document.getElementById('selectedImg'),name=document.getElementById('selectedName'),
  info=document.getElementById('selectedInfo'),turn=document.getElementById('rotateText');
@@ -859,8 +873,8 @@ function update(){
    im.src=currentPreview(o);
    im.style.transform=!atlasFor(o)&&o.type==='sofa'&&sofaView(o).flip?'scaleX(-1)':'none';
    name.textContent=ITEMS[o.type].name;
-   info.textContent=ROTATABLE.includes(o.type)?COMPASS[dir8(o.rot)]+' · '+occupiedCells(o).length+' клеток'+(hasConflict(o,o.x,o.z)?' · ⚠ пересечение':''):(o.type==='tv')?(deviceOn(o)?'Включён · нажми, чтобы выключить':'Выключен · нажми, чтобы включить'):ITEMS[o.type].wall?'На стене · перетаскивай вдоль неё':'Перемещай по клеткам';
-   turn.textContent=ROTATABLE.includes(o.type)?(dir8(o.rot)+1)+' / 8':ITEMS[o.type].wall?(wallSide(o)==='back'?'Задняя':'Левая'):'—';
+   info.textContent=ROTATABLE.includes(o.type)?COMPASS[dir4(o.rot)]+' · '+occupiedCells(o).length+' клеток'+(hasConflict(o,o.x,o.z)?' · ⚠ пересечение':''):(o.type==='tv')?(deviceOn(o)?'Включён · нажми, чтобы выключить':'Выключен · нажми, чтобы включить'):ITEMS[o.type].wall?'На стене · перетаскивай вдоль неё':'Перемещай по клеткам';
+   turn.textContent=ROTATABLE.includes(o.type)?(dir4(o.rot)+1)+' / 4':ITEMS[o.type].wall?(wallSide(o)==='back'?'Задняя':'Левая'):'—';
  }else{
    im.removeAttribute('src');im.style.transform='none';name.textContent='Выбери предмет';
    info.textContent='Нажми на мебель в квартире';turn.textContent='—';
@@ -974,10 +988,10 @@ document.getElementById('objectToggle').onclick=()=>{
 };
 function rotateItem(o,step){
  if(!o||!ROTATABLE.includes(o.type))return;
- // Stable world-space rotation origin: no gradual drift after eight clicks.
+ // Stable world-space rotation origin: no drift after four clicks.
  if(!Number.isFinite(o.rotationOriginX))o.rotationOriginX=o.x;
  if(!Number.isFinite(o.rotationOriginZ))o.rotationOriginZ=o.z;
- o.rot=dir8(o.rot+step);
+ o.rot=dir4(o.rot+step);
  [o.x,o.z]=snapPos(o.type,o.rotationOriginX,o.rotationOriginZ,o.rot);
  save();update();
 }
@@ -998,52 +1012,6 @@ document.getElementById('remove').onclick=()=>{
  objects=objects.filter(x=>x.id!==selected);selected=null;save();update();
 };
 
-// Offline ZIP_STORED import: no third-party services and no server upload.
-function unpackStoredZip(buffer){
- const bytes=new Uint8Array(buffer),view=new DataView(buffer);
- const decoder=new TextDecoder(),found=new Map();
- let at=0;
- while(at+30<=bytes.length&&view.getUint32(at,true)===0x04034b50){
-  const flags=view.getUint16(at+6,true),method=view.getUint16(at+8,true);
-  const size=view.getUint32(at+18,true),nlen=view.getUint16(at+26,true);
-  const extra=view.getUint16(at+28,true),begin=at+30;
-  const name=decoder.decode(bytes.slice(begin,begin+nlen));
-  const dataAt=begin+nlen+extra;
-  if(flags&8||method!==0||dataAt+size>bytes.length)
-    throw new Error('Нужен ZIP без сжатия (STORE)');
-  const base=name.split('/').pop(),type=base.endsWith('.webp')?base.slice(0,-5):'';
-  if(ROTATABLE.includes(type))found.set(type,bytes.slice(dataAt,dataAt+size));
-  at=dataAt+size;
- }
- return found;
-}
-const imageAsUrl=bytes=>new Promise((resolve,reject)=>{
- const reader=new FileReader();
- reader.onload=()=>resolve(reader.result);
- reader.onerror=()=>reject(reader.error);
- reader.readAsDataURL(new Blob([bytes],{type:'image/webp'}));
-});
-document.getElementById('importSpriteZip').onclick=()=>document.getElementById('spriteZipFile').click();
-document.getElementById('spriteZipFile').onchange=async e=>{
- const file=e.target.files?.[0];if(!file)return;
- try{
-  const entries=unpackStoredZip(await file.arrayBuffer());
-  if(ROTATABLE.some(type=>!entries.has(type)))throw new Error('В архиве должно быть 9 WebP');
-  const next={};
-  for(const type of ROTATABLE)next[type]=await imageAsUrl(entries.get(type));
-  localStorage.setItem(ASSET_STORAGE,JSON.stringify(next));
-  localAtlases=next;
-  for(const k of Object.keys(PREVIEWS))delete PREVIEWS[k];
-  for(const type of ROTATABLE){
-   const im=new Image();
-   im.onload=()=>{update();updateAssetStatus()};
-   im.onerror=()=>flash('Ошибка изображения '+type);
-   sheets[type]=im;im.src=next[type];
-  }
-  flash('✓ Все 72 ракурса загружены');
- }catch(error){flash('Ошибка ZIP: '+error.message)}
- e.target.value='';
-};
 function flash(text){document.getElementById('mode').textContent=text;setTimeout(()=>document.getElementById('mode').textContent='Редактор квартиры',1600)}
 document.getElementById('save').onclick=()=>{save();flash('✓ Сохранено на устройстве')};
 document.getElementById('toggleGrid').onclick=()=>{
