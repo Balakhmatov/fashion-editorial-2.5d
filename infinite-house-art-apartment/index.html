@@ -771,12 +771,16 @@ function nextPos(type,rot=0){
  }
  const ext=footprintExtents(type,rot),inset=ITEMS[type].wallInset||0;
  const w=Math.ceil(ext.x-1e-8),h=Math.ceil(ext.z-1e-8);
+ const centre=INV((c.width/2-camera.x)/camera.zoom,(c.height/2-camera.y)/camera.zoom);
+ let best=null,distance=Infinity;
  for(let z=h/2+Math.ceil(inset);z<=ZN-h/2;z++){
   for(let x=w/2+Math.ceil(inset);x<=XN-w/2;x++){
-   if(!hasConflict({id:-1,type,rot},x,z))return [x,z];
+   const score=(x-centre[0])**2+(z-centre[1])**2;
+   if(score>=distance||hasConflict({id:-1,type,rot},x,z))continue;
+   best=[x,z];distance=score;
   }
  }
- return null;
+ return best;
 }
 
 // Move only positions that no longer fit enlarged item footprints.
