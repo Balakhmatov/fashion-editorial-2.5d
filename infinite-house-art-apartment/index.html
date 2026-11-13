@@ -436,10 +436,17 @@ let localAtlases={};
 try{localAtlases=JSON.parse(localStorage.getItem(ASSET_STORAGE)||'{}')}catch{}
 for(const type of ROTATABLE){
  const atlas=new Image();
+ let triedLocal=false;
  atlas.onload=()=>{update();updateAssetStatus()};
- atlas.onerror=()=>{sheets[type]=null;updateAssetStatus()};
+ atlas.onerror=()=>{
+  if(!triedLocal&&localAtlases[type]){
+   triedLocal=true;atlas.src=localAtlases[type];return;
+  }
+  sheets[type]=null;updateAssetStatus();
+ };
  sheets[type]=atlas;
- atlas.src=localAtlases[type]||'assets/rotations/'+type+'.webp?v=3';
+ // Published repository assets take precedence over stale local imports.
+ atlas.src='assets/rotations/'+type+'.webp?v=4';
 }
 function updateAssetStatus(){
  const label=document.getElementById('spriteStatus');
@@ -507,7 +514,7 @@ try{
 // Draw them on a SQUARE canvas; transparent padding is part of the atlas.
 // Separate authored render size from the footprint measured in floor tiles.
 const ATLAS_FRAME_SIZE={
- sofa:204,chair:132,table:150,rug:190,bed:179,
+ sofa:204,chair:132,table:150,rug:260,bed:179,
  dresser:148,wardrobe:166,bookshelf:174,lamp:169
 };
 function box(o){
@@ -726,11 +733,16 @@ function hasConflict(o,x,z){
  }
  // Interior partitions have real occupied segments, not whole infinite lines.
  for(const wall of PARTITIONS){
-  for(const tile of cells){
-   if(wall.axis==='z'&&tile.z<wall.at&&tile.z+1>wall.at-0.001
-     &&tile.x<wall.to&&tile.x+1>wall.from)return true;
-   if(wall.axis==='x'&&tile.x<wall.at&&tile.x+1>wall.at-0.001
-     &&tile.z<wall.to&&tile.z+1>wall.from)return true;
+  // A wall blocks only when footprint cells cross to BOTH sides.
+  // Simply standing next to it (ending at the wall line) is legal.
+  if(wall.axis==='z'){
+   const touching=new Set(cells.filter(t=>t.z===wall.at-1
+     &&t.x<wall.to&&t.x+1>wall.from).map(t=>t.x));
+   if(cells.some(t=>t.z===wall.at&&touching.has(t.x)))return true;
+  }else{
+   const touching=new Set(cells.filter(t=>t.x===wall.at-1
+     &&t.z<wall.to&&t.z+1>wall.from).map(t=>t.z));
+   if(cells.some(t=>t.x===wall.at&&touching.has(t.z)))return true;
   }
  }
  if(spec.layer==='floor')return false;
