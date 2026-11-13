@@ -422,33 +422,95 @@ function box(o){
  const [ax,ay]=anchors[o.type]||[.5,.96];
  let w=spec.w,h=spec.h;
  if(o.type==='sofa'){
-  // Keep the original painted sofa's proportions for all eight directions.
+  // Existing sofa drawing size: 0.49 source pixels per scene pixel.
   const scale=.49;w=(im?.naturalWidth||spec.w*2)*scale;
   h=(im?.naturalHeight||spec.h*2)*scale;
+ }else if(spec.layer!=='floor'&&o.type!=='lamp'&&im?.naturalWidth&&im?.naturalHeight){
+  // Wardrobes and shelves were vertically stretched by up to ~10%.
+  // A common native-aspect convention removes that hidden deformation.
+  h=w*im.naturalHeight/im.naturalWidth;
  }
  return {x:foot[0]-w*ax+(spec.dx||0),y:foot[1]-h*ay+(spec.dy||0),w,h,foot};
 }
 
-// Calibrated against the original SW sofa: its front floor-facing edge
-// had slope ~0.358 and the adjacent side ~-0.45, while the floor's axes are
-// +0.5/-0.5. An image-space affine projection corrects BOTH edge families;
-// rotating the complete sprite cannot do that. World-space foot and cells
-// remain unchanged. Other views are intentionally untouched until calibrated.
-const SOFA_SW_ISO={scaleX:.94,shearY:.052,scaleY:1.16};
-function correctedSofaView(o){return o.type==='sofa'&&dir8(o.rot)===0;}
-function sofaImageBounds(o,b){
- if(!correctedSofaView(o))return b;
- const {scaleX,shearY,scaleY}=SOFA_SW_ISO;
- const [px,py]=b.foot;
- const corners=[
-  [b.x,b.y],[b.x+b.w,b.y],[b.x+b.w,b.y+b.h],[b.x,b.y+b.h]
- ].map(([x,y])=>[
-  px+scaleX*(x-px),
-  py+shearY*(x-px)+scaleY*(y-py)
- ]);
- const xs=corners.map(v=>v[0]),ys=corners.map(v=>v[1]);
- const x=Math.min(...xs),y=Math.min(...ys);
- return {x,y,w:Math.max(...xs)-x,h:Math.max(...ys)-y,foot:b.foot};
+// Every illustrated floor object goes through the same native-aspect ISO pipeline.
+// The two source edge slopes are per-asset *measurements/approximations*, not
+// identical warp values. Convert the edges to the floor axes (+/-TY/TX).
+// Objects without reliable straight reference edges keep their neutral artwork.
+const ISO_EDGE_SLOPES={
+ sofa:{0:{minus:-.450,plus:.358,scaleX:.94}},
+ chair:{minus:-.55,plus:.35},
+ table:{minus:-.47,plus:.50},
+ bed:{minus:-.52,plus:.37},
+ dresser:{minus:-.31,plus:.58},
+ wardrobe:{minus:-.32,plus:.55},
+ bookshelf:{minus:-.35,plus:.55}
+};
+const ISO_IDENTITY=Object.freeze({scaleX:1,shearY:0,scaleY:1});
+function isoProfile(o,im,b){
+ const def=ISO_EDGE_SLOPES[o.type];
+ const edges=o.type==='sofa'?def&&def[dir8(o.rot)]:def;
+ if(!edges)return ISO_IDENTITY;
+ // The source edges need adjusting for the image's display scaling first.
+ const naturalW=im?.naturalWidth||b.w,naturalH=im?.naturalHeight||b.h;
+ const displayAspect=(b.h/naturalH)/(b.w/naturalW);
+ const minus=edges.minus*displayAspect,plus=edges.plus*displayAspect;
+ const target=TY/TX,scaleX=edges.scaleX||1;
+ const scaleY=2*target*scaleX/(plus-minus);
+ const shearY=-target*scaleX-scaleY*minus;
+ if(!Number.isFinite(scaleY)||scaleY<.7||scaleY>1.4||Math.abs(shearY)>.28)
+  return ISO_IDENTITY;
+ return {scaleX,shearY,scaleY};
+}
+function isoPoint(x,y,foot,pr){
+ return [foot[0]+pr.scaleX*(x-foot[0]),foot[1]+pr.shearY*(x-foot[0])+pr.scaleY*(y-foot[1])];
+}
+function projectedItemBounds(o,b,im){
+ const pr=isoProfile(o,im,b);
+ const points=[[b.x,b.y],[b.x+b.w,b.y],[b.x+b.w,b.y+b.h],[b.x,b.y+b.h]];
+ // The repaired near-side sofa foot extends beyond the original WebP canvas.
+ if(o.type==='sofa'&&dir8(o.rot)===0){
+  points.push([b.x+b.w*270/412,b.y+b.h*332/315],
+              [b.x+b.w*298/412,b.y+b.h*332/315]);
+ }
+ const transformed=points.map(([x,y])=>isoPoint(x,y,b.foot,pr));
+ const xs=transformed.map(p=>p[0]),ys=transformed.map(p=>p[1]);
+ const minX=Math.min(...xs),minY=Math.min(...ys);
+ return {x:minX,y:minY,w:Math.max(...xs)-minX,h:Math.max(...ys)-minY,foot:b.foot};
+}
+function repairNearSofaLeg(b){
+ // Vector completion of the missing/cropped closest leg on original sofa_1.
+ // Coordinates refer to its native 412x315 painting; retained in the same
+ // isometric transform as the parent asset.
+ ctx.save();
+ ctx.translate(b.x-b.foot[0],b.y-b.foot[1]);
+ ctx.scale(b.w/412,b.h/315);
+ ctx.beginPath();
+ ctx.moveTo(271,300);ctx.lineTo(292,304);ctx.lineTo(292,322);
+ ctx.lineTo(282,332);ctx.lineTo(271,323);ctx.closePath();
+ ctx.fillStyle='#65382e';ctx.fill();
+ ctx.lineWidth=3;ctx.strokeStyle='#44272b';ctx.stroke();
+ ctx.beginPath();ctx.moveTo(273,308);ctx.lineTo(282,314);
+ ctx.lineTo(282,329);ctx.lineTo(273,323);ctx.closePath();
+ ctx.fillStyle='#894738';ctx.fill();
+ ctx.beginPath();ctx.moveTo(283,315);ctx.lineTo(289,310);
+ ctx.lineTo(289,321);ctx.lineTo(283,326);ctx.closePath();
+ ctx.fillStyle='#4c2b29';ctx.fill();
+ ctx.restore();
+}
+function drawIsoArt(o,im,b){
+ const pr=isoProfile(o,im,b),[px,py]=b.foot;
+ ctx.save();ctx.translate(px,py);
+ ctx.transform(pr.scaleX,pr.shearY,0,pr.scaleY,0,0);
+ if(o.type==='sofa'&&sofaView(o).flip){
+  const cx=b.x+b.w/2-px,cy=b.y+b.h/2-py;
+  ctx.translate(cx,cy);ctx.scale(-1,1);
+  ctx.drawImage(im,-b.w/2,-b.h/2,b.w,b.h);
+ }else{
+  ctx.drawImage(im,b.x-px,b.y-py,b.w,b.h);
+ }
+ if(o.type==='sofa'&&dir8(o.rot)===0)repairNearSofaLeg(b);
+ ctx.restore();
 }
 let hitBoxes=[];
 function drawSelectionFootprint(o){
@@ -485,23 +547,11 @@ function drawObject(o){
    drawGroundContact(o,b);
    if(o.type==='lamp'&&deviceOn(o))lampGlow(b);
    if(im&&((im.complete&&im.naturalWidth)||(im.width&&im.height))){
-     ctx.save();
-     if(correctedSofaView(o)){
-      // Affine correction about the fixed floor point; no artificial rotation.
-      const {scaleX,shearY,scaleY}=SOFA_SW_ISO;
-      ctx.translate(b.foot[0],b.foot[1]);
-      ctx.transform(scaleX,shearY,0,scaleY,0,0);
-      ctx.drawImage(im,b.x-b.foot[0],b.y-b.foot[1],b.w,b.h);
-     }else{
-      ctx.translate(b.x+b.w/2,b.y+b.h/2);
-      if(o.type==='sofa'&&sofaView(o).flip)ctx.scale(-1,1);
-      ctx.drawImage(im,-b.w/2,-b.h/2,b.w,b.h);
-     }
-     ctx.restore();
+     drawIsoArt(o,im,b);
      if(o.type==='lamp'&&deviceOn(o))lampShadeLight(b);
    }else polygon([[b.x,b.y+b.h],[b.x+b.w,b.y+b.h],[b.x+b.w,b.y]],'#dba37e','#583c51',3);
  }
- hitBoxes.push({...sofaImageBounds(o,b),o});
+ hitBoxes.push({...projectedItemBounds(o,b,im),o});
 }
 
 function drawInfo(){
