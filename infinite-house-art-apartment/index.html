@@ -485,9 +485,10 @@ function box(o){
   // Existing sofa drawing size: 0.49 source pixels per scene pixel.
   const scale=.49;w=(im?.naturalWidth||spec.w*2)*scale;
   h=(im?.naturalHeight||spec.h*2)*scale;
- }else if(spec.layer!=='floor'&&o.type!=='lamp'&&im?.naturalWidth&&im?.naturalHeight){
-  // Wardrobes and shelves were vertically stretched by up to ~10%.
-  // A common native-aspect convention removes that hidden deformation.
+ }else if((spec.layer!=='floor'||o.type==='rug')&&o.type!=='lamp'&&im?.naturalWidth&&im?.naturalHeight){
+  // Respect the original illustrated proportions for furniture AND the rug.
+  // Previously rug.webp (218x142) was squeezed into 206x88, changing
+  // the apparent floor angle and flattening its elliptical design.
   h=w*im.naturalHeight/im.naturalWidth;
  }
  return {x:foot[0]-w*ax+(spec.dx||0),y:foot[1]-h*ay+(spec.dy||0),w,h,foot};
